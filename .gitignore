@@ -1,0 +1,13 @@
+# Next.js app ignore
+rabtube/node_modules/
+rabtube/.next/
+rabtube/.env*.local
+rabtube/.vercel/
+
+# Scratch & comparisons
+diff_output.txt
+scratch/
+compare.py
+compare_diff.py
+*.mp4
+*.jpg

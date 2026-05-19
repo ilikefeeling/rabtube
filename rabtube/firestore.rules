@@ -1,0 +1,55 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users: 본인만 읽기/수정, 관리자만 전체 접근
+    match /users/{userId} {
+      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && (request.auth.uid == userId || isAdmin());
+    }
+
+    // Cases: 승인된 회원만 읽기, 본인 케이스만 쓰기
+    match /cases/{caseId} {
+      allow read: if request.auth != null && isApproved();
+      allow create: if request.auth != null && isApproved() && request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null && (
+        resource.data.userId == request.auth.uid ||
+        // likes, views 필드는 인증된 회원이면 업데이트 가능
+        (isApproved() && onlyUpdating(['likes', 'views']))
+      );
+      allow delete: if request.auth != null && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // ── RAB 잔액 ──────────────────────────────────
+    match /rab_balances/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // ── RAB 트랜잭션 ──────────────────────────────
+    match /rab_transactions/{txId} {
+      allow read: if request.auth != null
+        && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null
+        && request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null
+        && resource.data.userId == request.auth.uid
+        && onlyUpdating(['status']);
+      allow delete: if false;
+    }
+
+    function isAdmin() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isApproved() {
+      let status = get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status;
+      return status == 'approved' || status == 'APPROVED';
+    }
+
+    function onlyUpdating(fields) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(fields);
+    }
+  }
+}

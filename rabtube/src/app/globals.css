@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Noto Sans KR', 'Segoe UI', 'DM Sans', sans-serif;
+  --font-serif: 'DM Serif Display', serif;
+}
+
+body { 
+  font-family: var(--font-sans); 
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-teal-600 hover:bg-teal-700 text-white font-medium
+           px-4 py-2 rounded-lg text-sm transition-colors
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply border border-slate-200 hover:bg-slate-50 text-slate-600
+           font-medium px-4 py-2 rounded-lg text-sm transition-colors;
+  }
+  .input-field {
+    @apply w-full border border-slate-200 rounded-lg px-3 py-2 text-sm
+           focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500
+           bg-white placeholder:text-slate-400;
+  }
+  .select-field {
+    @apply w-full border border-slate-200 rounded-lg px-3 py-2 text-sm
+           focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500
+           bg-white appearance-none;
+  }
+  .card {
+    @apply bg-white rounded-xl border border-slate-100 overflow-hidden;
+  }
+}
