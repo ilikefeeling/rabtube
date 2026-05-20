@@ -56,18 +56,18 @@ export default function LicenseGate() {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8 relative overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-5 sm:p-8 relative overflow-hidden">
 
         {/* ── ASSOCIATE: 면허증 업로드 ── */}
         {(status === 'ASSOCIATE' || status === 'REJECTED' && showReupload) && (
           <>
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center">
+            <div className="flex items-start sm:items-center gap-3 mb-6">
+              <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
                 <ShieldCheck className="text-amber-500" size={24} />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-slate-900">정회원 인증이 필요합니다</h2>
-                <p className="text-sm text-slate-500">
+                <h2 className="text-lg font-bold text-slate-900 leading-snug">정회원 인증이 필요합니다</h2>
+                <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
                   치과의사 면허증을 업로드하시면 관리자 검토 후 정회원으로 승인됩니다.
                 </p>
               </div>
@@ -77,7 +77,7 @@ export default function LicenseGate() {
             {!isDone && (
               <div
                 {...getRootProps()}
-                className={`border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all mb-5 ${
+                className={`border-2 border-dashed rounded-2xl p-6 sm:p-10 text-center cursor-pointer transition-all mb-5 ${
                   isDragActive
                     ? 'border-teal-400 bg-teal-50'
                     : 'border-slate-200 hover:border-teal-300 hover:bg-slate-50'

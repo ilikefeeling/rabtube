@@ -44,6 +44,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
+      if (u) {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('rabtube_logged_in', 'true');
+        }
+      } else {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('rabtube_logged_in');
+        }
+      }
       await loadProfile(u);
       setLoading(false);
     });
@@ -52,6 +61,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     await fbSignOut(auth);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('rabtube_logged_in');
+    }
     setUser(null);
     setProfile(null);
   };

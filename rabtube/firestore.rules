@@ -39,6 +39,30 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // ── 품질 검수 결과 ────────────────────────────
+    match /quality_checks/{caseId} {
+      // 케이스 소유자 + 관리자만 읽기
+      allow read: if request.auth != null && (
+        get(/databases/$(database)/documents/cases/$(caseId)).data.userId == request.auth.uid
+        || isAdmin()
+      );
+      // 쓰기는 Cloud Functions (서버) 전용
+      allow write: if false;
+    }
+
+    // ── 신고 ─────────────────────────────────────
+    match /case_reports/{reportId} {
+      allow create: if request.auth != null && isApproved()
+        && request.resource.data.reporterUserId == request.auth.uid;
+      allow read: if request.auth != null && isAdmin();
+      allow update, delete: if false;
+    }
+
+    // ── 영상 해시 (중복 감지용) ──────────────────
+    match /video_hashes/{caseId} {
+      allow read, write: if false; // Cloud Functions 전용
+    }
+
     function isAdmin() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }

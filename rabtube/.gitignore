@@ -27,3 +27,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.vercel
+
+# Functions build & dependencies
+functions/node_modules/
+functions/lib/
+

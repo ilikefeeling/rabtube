@@ -6,6 +6,7 @@ import Header from '@/components/Header';
 import VideoCard from '@/components/VideoCard';
 import VideoPlayer from '@/components/VideoPlayer';
 import LicenseGate from '@/components/LicenseGate';
+import LandingPage from '@/components/LandingPage';
 import { getCases } from '@/lib/firebaseService';
 import { useAuth } from '@/lib/AuthContext';
 import type { CaseVideo, CaseCategory } from '@/types';
@@ -20,12 +21,18 @@ export default function HomePage() {
   const [activeCategory, setActiveCategory] = useState<string>('전체');
   const [loadingCases, setLoadingCases] = useState(true);
   const [selectedVideo, setSelectedVideo] = useState<CaseVideo | null>(null);
+  const [hasLoggedInHint, setHasLoggedInHint] = useState<boolean | null>(null);
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/auth/login');
+    if (typeof window !== 'undefined') {
+      const hint = localStorage.getItem('rabtube_logged_in') === 'true';
+      setHasLoggedInHint(hint);
+    } else {
+      setHasLoggedInHint(false);
     }
-  }, [user, authLoading, router]);
+  }, []);
+
+  // Removed redirect for unauthenticated users to show the new landing page instead
 
   useEffect(() => {
     if (!user) return;
@@ -51,11 +58,18 @@ export default function HomePage() {
   };
 
   if (authLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-50">
-        <div className="w-6 h-6 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+    if (hasLoggedInHint === null || hasLoggedInHint === true) {
+      return (
+        <div className="flex items-center justify-center min-h-screen bg-slate-50">
+          <div className="w-6 h-6 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" />
+        </div>
+      );
+    }
+    return <LandingPage />;
+  }
+
+  if (!user) {
+    return <LandingPage />;
   }
 
   return (
@@ -67,7 +81,7 @@ export default function HomePage() {
 
       {/* Filter Bar */}
       <div className="bg-white border-b border-slate-100 sticky top-14 z-30">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center gap-2.5 h-14 overflow-x-auto scrollbar-hide">
             {CATEGORIES.map(cat => (
               <button
@@ -87,7 +101,7 @@ export default function HomePage() {
       </div>
 
       {/* Main */}
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         
         {/* 실시간 인기 케이스 (전체 탭이면서 데이터가 있을 때만 노출) */}
         {activeCategory === '전체' && !loadingCases && cases.length > 0 && (
@@ -105,7 +119,7 @@ export default function HomePage() {
               </span>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-5">
               {[...cases]
                 .sort((a, b) => {
                   const likesA = a.likes?.length ?? 0;
@@ -117,7 +131,7 @@ export default function HomePage() {
                 .map((v, index) => (
                   <div key={v.id} className="relative group">
                     {/* Rank Badge */}
-                    <div className={`absolute -top-2.5 -left-2.5 z-10 w-7.5 h-7.5 rounded-full border-2 border-white text-white font-extrabold text-xs flex items-center justify-center shadow-md select-none ${
+                    <div className={`absolute -top-2 -left-2 z-10 w-7 h-7 rounded-full border-2 border-white text-white font-extrabold text-xs flex items-center justify-center shadow-md select-none ${
                       index === 0 ? 'bg-amber-500' :
                       index === 1 ? 'bg-slate-400' :
                       index === 2 ? 'bg-amber-700' : 'bg-slate-800'
@@ -170,7 +184,7 @@ export default function HomePage() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-5">
             {cases.map(v => (
               <VideoCard key={v.id} video={v} onClick={handleVideoClick} />
             ))}

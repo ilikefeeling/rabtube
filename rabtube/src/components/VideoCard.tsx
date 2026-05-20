@@ -75,24 +75,30 @@ export default function VideoCard({ video, onClick }: Props) {
         <p className="text-base font-bold text-slate-900 leading-snug line-clamp-2 mb-2.5">
           {video.title}
         </p>
-        <div className="flex items-center gap-2 text-xs text-slate-400">
-          {/* Avatar */}
-          <div className="w-5.5 h-5.5 rounded-full bg-slate-700 text-blue-200 text-[10px] font-bold flex items-center justify-center shrink-0">
-            {video.userProfile.name.slice(0, 1)}
+        <div className="flex flex-col gap-2 mt-2">
+          {/* Author & Tooth info */}
+          <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+            <div className="w-5 h-5 rounded-full bg-slate-700 text-blue-200 text-[9px] font-bold flex items-center justify-center shrink-0">
+              {video.userProfile.name.slice(0, 1)}
+            </div>
+            <span className="font-semibold text-slate-700 truncate max-w-[80px]">
+              {video.userProfile.name} 원장
+            </span>
+            <span className="bg-teal-50/70 border border-teal-100/80 px-1.5 py-0.5 rounded text-[10px] text-teal-600 font-bold shrink-0">
+              {video.toothNumber}
+            </span>
           </div>
-          <span className="text-sm font-semibold text-slate-700">{video.userProfile.name} 원장</span>
-          <span className="text-slate-300 font-bold">·</span>
-          <span className="bg-teal-50/50 border border-teal-100 px-2 py-0.5 rounded-md text-xs text-teal-600 font-bold shrink-0">
-            {video.toothNumber}
-          </span>
-          <div className="ml-auto flex items-center gap-2.5 text-xs text-slate-500 font-semibold shrink-0">
-            <span className="flex items-center gap-1"><Eye size={13} />{video.views}</span>
-            <span className="flex items-center gap-1"><Heart size={13} />{likeCount}</span>
+          {/* Views, Likes & Date */}
+          <div className="flex items-center justify-between text-[11px] text-slate-400 font-medium">
+            <div className="flex items-center gap-2">
+              <span className="flex items-center gap-0.5"><Eye size={12} className="text-slate-400" /> {video.views}</span>
+              <span className="flex items-center gap-0.5"><Heart size={12} className="text-slate-400" /> {likeCount}</span>
+            </div>
+            <span>
+              {formatDistanceToNow(video.createdAt instanceof Date ? video.createdAt : new Date(), { addSuffix: true, locale: ko })}
+            </span>
           </div>
         </div>
-        <p className="text-xs text-slate-400 font-medium mt-2">
-          {formatDistanceToNow(video.createdAt instanceof Date ? video.createdAt : new Date(), { addSuffix: true, locale: ko })}
-        </p>
       </div>
     </div>
   );
