@@ -20,8 +20,21 @@ import { promisify } from 'util';
 import sharp        from 'sharp';
 
 const execAsync = promisify(exec);
-const db        = admin.firestore();
-const storage   = admin.storage();
+const db = new Proxy({}, {
+  get: (target, prop) => {
+    const firestore = admin.firestore();
+    const value = Reflect.get(firestore, prop);
+    return typeof value === 'function' ? value.bind(firestore) : value;
+  }
+}) as admin.firestore.Firestore;
+
+const storage = new Proxy({}, {
+  get: (target, prop) => {
+    const storageInst = admin.storage();
+    const value = Reflect.get(storageInst, prop);
+    return typeof value === 'function' ? value.bind(storageInst) : value;
+  }
+}) as ReturnType<typeof admin.storage>;
 
 const THUMB_WIDTH  = 1280;
 const THUMB_HEIGHT = 720;

@@ -9,7 +9,13 @@
 
 import * as admin from 'firebase-admin';
 
-const db = admin.firestore();
+const db = new Proxy({}, {
+  get: (target, prop) => {
+    const firestore = admin.firestore();
+    const value = Reflect.get(firestore, prop);
+    return typeof value === 'function' ? value.bind(firestore) : value;
+  }
+}) as admin.firestore.Firestore;
 
 /* ─────────────────────────────────────
    커뮤니티 반응 점수 업데이트 (48h 후)

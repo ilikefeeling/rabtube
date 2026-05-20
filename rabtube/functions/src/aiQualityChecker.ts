@@ -15,8 +15,21 @@ import { DEFAULT_QUALITY_POLICY } from './qualityTypes';
 
 const videoClient  = new VideoIntelligence.VideoIntelligenceServiceClient();
 const visionClient = new Vision.ImageAnnotatorClient();
-const db           = admin.firestore();
-const storage      = admin.storage();
+const db = new Proxy({}, {
+  get: (target, prop) => {
+    const firestore = admin.firestore();
+    const value = Reflect.get(firestore, prop);
+    return typeof value === 'function' ? value.bind(firestore) : value;
+  }
+}) as admin.firestore.Firestore;
+
+const storage = new Proxy({}, {
+  get: (target, prop) => {
+    const storageInst = admin.storage();
+    const value = Reflect.get(storageInst, prop);
+    return typeof value === 'function' ? value.bind(storageInst) : value;
+  }
+}) as ReturnType<typeof admin.storage>;
 
 const COL_QUALITY    = 'quality_checks';
 const COL_VIDEO_HASH = 'video_hashes';
