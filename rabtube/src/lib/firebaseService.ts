@@ -38,6 +38,23 @@ export async function createUserProfile(
 }
 
 /**
+ * 관리자 회원 프로필 생성 (디버그/테스트용)
+ */
+export async function createAdminProfile(
+  uid: string,
+  data: Omit<UserProfile, 'uid' | 'createdAt' | 'status' | 'role'>
+) {
+  const userRef = doc(db, COLLECTIONS.USERS, uid);
+  await setDoc(userRef, {
+    ...data,
+    uid,
+    status: 'APPROVED',
+    role: 'admin',
+    createdAt: serverTimestamp(),
+  });
+}
+
+/**
  * 유저 프로필 조회
  */
 export async function getUserProfile(uid: string): Promise<UserProfile | null> {

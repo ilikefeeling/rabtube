@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { createUserProfile } from '@/lib/firebaseService';
-import { AlertCircle } from 'lucide-react';
+import { createUserProfile, createAdminProfile } from '@/lib/firebaseService';
+import { AlertCircle, Shield, Code, ArrowRight } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -44,7 +44,6 @@ export default function LoginPage() {
       await signInWithEmailAndPassword(auth, devEmail, devPassword);
       router.push('/');
     } catch (e: any) {
-      // 만약 계정이 존재하지 않는다면 자동으로 회원가입 및 프로필 생성 진행
       if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential') {
         try {
           const cred = await createUserWithEmailAndPassword(auth, devEmail, devPassword);
@@ -69,35 +68,78 @@ export default function LoginPage() {
     }
   };
 
+  const handleAdminLogin = async () => {
+    setLoading(true);
+    setError('');
+    const adminEmail = 'admin@rabtube.com';
+    const adminPassword = 'admin123!';
+    try {
+      await signInWithEmailAndPassword(auth, adminEmail, adminPassword);
+      router.push('/');
+    } catch (e: any) {
+      if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential') {
+        try {
+          const cred = await createUserWithEmailAndPassword(auth, adminEmail, adminPassword);
+          await createAdminProfile(cred.user.uid, {
+            name: '최고관리자',
+            email: adminEmail,
+            hospital: 'RabTube 본사',
+            region: '서울',
+            licenseNumber: '제99999호',
+          });
+          router.push('/');
+        } catch (signUpError: any) {
+          console.error(signUpError);
+          setError(`관리자 자동 계정 생성 실패: ${signUpError.code || signUpError.message}`);
+        }
+      } else {
+        console.error(e);
+        setError(`관리자 로그인 실패: ${e.code || e.message}`);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#0d2137] flex items-center justify-center px-4">
-      <div className="w-full max-w-sm">
-        {/* Logo */}
+    <div className="min-h-screen bg-[#0d2137] relative flex items-center justify-center px-4 overflow-hidden">
+      {/* Background Decorative Blur Orbs */}
+      <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-teal-500/10 rounded-full filter blur-[80px] pointer-events-none animate-pulse"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-amber-500/10 rounded-full filter blur-[80px] pointer-events-none animate-pulse" style={{ animationDelay: '2s' }}></div>
+
+      <div className="w-full max-w-md relative z-10">
+        {/* Logo and Header */}
         <div className="text-center mb-8">
-          <span className="font-serif text-3xl text-white">RabTube</span>
-          <p className="text-slate-400 text-sm mt-2">치과 개원의 케이스 플랫폼</p>
+          <Link href="/" className="font-serif text-4xl text-white tracking-wide hover:opacity-90 transition-opacity">
+            RabTube
+          </Link>
+          <p className="text-slate-400 text-sm mt-3 font-light tracking-wide">치과 개원의를 위한 프리미엄 케이스 플랫폼</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-7">
-          <h2 className="text-base font-medium text-slate-800 mb-5">로그인</h2>
+        {/* Glassmorphic Card Container */}
+        <div className="bg-slate-900/40 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl shadow-black/30">
+          <h2 className="text-xl font-semibold text-white mb-6 tracking-tight">로그인</h2>
 
-          <div className="space-y-4">
+          <div className="space-y-5">
+            {/* Email Field */}
             <div>
-              <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wide block mb-1.5">이메일</label>
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2">이메일 주소</label>
               <input
                 type="email"
-                className="input-field"
+                className="w-full bg-slate-950/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all"
                 placeholder="doctor@example.com"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleLogin()}
               />
             </div>
+
+            {/* Password Field */}
             <div>
-              <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wide block mb-1.5">비밀번호</label>
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2">비밀번호</label>
               <input
                 type="password"
-                className="input-field"
+                className="w-full bg-slate-950/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all"
                 placeholder="••••••••"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
@@ -105,40 +147,61 @@ export default function LoginPage() {
               />
             </div>
 
+            {/* Error Message */}
             {error && (
-              <div className="flex items-center gap-2 bg-red-50 text-red-600 text-xs p-3 rounded-lg">
-                <AlertCircle size={14} />
-                {error}
+              <div className="flex items-center gap-2.5 bg-red-500/10 border border-red-500/20 text-red-400 text-xs p-3.5 rounded-xl">
+                <AlertCircle size={15} />
+                <span>{error}</span>
               </div>
             )}
 
-            <button onClick={handleLogin} disabled={loading} className="btn-primary w-full">
-              {loading ? '로그인 중...' : '로그인'}
+            {/* Login Button */}
+            <button
+              onClick={handleLogin}
+              disabled={loading}
+              className="w-full py-3 px-4 rounded-xl text-sm font-semibold bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 active:scale-[0.99] text-white shadow-lg shadow-teal-500/20 transition-all duration-200 cursor-pointer disabled:opacity-50"
+            >
+              {loading ? '로그인 처리 중...' : '로그인'}
             </button>
 
-            {/* Developer Fast Access Option */}
-            <div className="relative my-4">
+            {/* Fast Access / Development Tools Divider */}
+            <div className="relative my-6">
               <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                <div className="w-full border-t border-slate-100"></div>
+                <div className="w-full border-t border-white/10"></div>
               </div>
-              <div className="relative flex justify-center text-xs">
-                <span className="bg-white px-2 text-[10px] text-slate-400 uppercase tracking-wider">Developer Tool</span>
+              <div className="relative flex justify-center text-[10px]">
+                <span className="bg-[#0b1b2d] px-3 text-slate-400 font-bold uppercase tracking-wider">간편 인증 (테스트용)</span>
               </div>
             </div>
 
-            <button
-              onClick={handleDevLogin}
-              disabled={loading}
-              className="w-full flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl text-xs font-semibold bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100 active:bg-slate-200 transition-all cursor-pointer"
-            >
-              🛠️ 개발자 계정으로 즉시 로그인
-            </button>
+            {/* Admin and Dev login actions grouped beautifully */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Administrator Quick Login */}
+              <button
+                onClick={handleAdminLogin}
+                disabled={loading}
+                className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-semibold bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 text-amber-300 hover:from-amber-500/20 hover:to-orange-500/20 hover:border-amber-500/40 hover:text-amber-200 active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50"
+              >
+                <Shield size={14} className="text-amber-400" />
+                <span>관리자 로그인</span>
+              </button>
+
+              {/* Developer Quick Login */}
+              <button
+                onClick={handleDevLogin}
+                disabled={loading}
+                className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-semibold bg-slate-800/40 border border-white/10 text-slate-300 hover:bg-slate-700/40 hover:text-white active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50"
+              >
+                <Code size={14} className="text-teal-400" />
+                <span>개발자 로그인</span>
+              </button>
+            </div>
           </div>
 
-          <p className="text-xs text-slate-400 text-center mt-5">
+          <p className="text-xs text-slate-400 text-center mt-6">
             아직 계정이 없으신가요?{' '}
-            <Link href="/auth/register" className="text-teal-600 font-medium hover:underline">
-              회원가입
+            <Link href="/auth/register" className="text-teal-400 font-medium hover:text-teal-300 hover:underline transition-colors">
+              회원가입 <ArrowRight size={12} className="inline-block" />
             </Link>
           </p>
         </div>
@@ -146,4 +209,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
