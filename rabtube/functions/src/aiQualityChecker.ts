@@ -8,7 +8,7 @@
  */
 
 import * as admin from 'firebase-admin';
-import VideoIntelligence from '@google-cloud/video-intelligence';
+import VideoIntelligence, { protos } from '@google-cloud/video-intelligence';
 import Vision from '@google-cloud/vision';
 import type { QualityCheckResult, QualityVerdict } from './qualityTypes';
 import { DEFAULT_QUALITY_POLICY } from './qualityTypes';
@@ -18,7 +18,6 @@ const visionClient = new Vision.ImageAnnotatorClient();
 const db           = admin.firestore();
 const storage      = admin.storage();
 
-const COL_CASES      = 'cases';
 const COL_QUALITY    = 'quality_checks';
 const COL_VIDEO_HASH = 'video_hashes';
 
@@ -115,7 +114,7 @@ export async function runQualityCheck(
 async function checkVideoDuration(gcsUri: string): Promise<number> {
   const [operation] = await videoClient.annotateVideo({
     inputUri: gcsUri,
-    features: [VideoIntelligence.protos.google.cloud.videointelligence.v1.Feature.VIDEO_ACTIVITY_RECOGNITION],
+    features: [protos.google.cloud.videointelligence.v1.Feature.LABEL_DETECTION],
     videoContext: { segments: [{ startTimeOffset: { seconds: 0 }, endTimeOffset: { seconds: 10 } }] },
   });
 
@@ -148,10 +147,10 @@ const DENTAL_LABELS = [
 async function checkDentalLabels(gcsUri: string): Promise<boolean> {
   const [operation] = await videoClient.annotateVideo({
     inputUri: gcsUri,
-    features: [VideoIntelligence.protos.google.cloud.videointelligence.v1.Feature.LABEL_DETECTION],
+    features: [protos.google.cloud.videointelligence.v1.Feature.LABEL_DETECTION],
     videoContext: {
       labelDetectionConfig: {
-        labelDetectionMode: VideoIntelligence.protos.google.cloud.videointelligence.v1.LabelDetectionMode.SHOT_AND_FRAME_MODE,
+        labelDetectionMode: protos.google.cloud.videointelligence.v1.LabelDetectionMode.SHOT_AND_FRAME_MODE,
         stationaryCamera: true,
       },
     },
