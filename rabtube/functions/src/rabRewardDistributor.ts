@@ -5,14 +5,9 @@
  */
 
 import * as admin from 'firebase-admin';
+import type { QualityVerdict } from './qualityTypes';
 
-const db = new Proxy({}, {
-  get: (target, prop) => {
-    const firestore = admin.firestore();
-    const value = Reflect.get(firestore, prop);
-    return typeof value === 'function' ? value.bind(firestore) : value;
-  }
-}) as admin.firestore.Firestore;
+const db  = admin.firestore();
 const COL = { BALANCES: 'rab_balances', TRANSACTIONS: 'rab_transactions' } as const;
 
 const POLICY = {
@@ -65,7 +60,7 @@ export async function issueUploadReward(
     const balRef  = db.collection(COL.BALANCES).doc(userId);
     const balSnap = await tx.get(balRef);
 
-    const cur = balSnap.exists
+    const cur = balSnap.exists()
       ? balSnap.data()!
       : { balance: 0, pendingBalance: 0, totalEarned: 0, totalSpent: 0 };
 
@@ -156,7 +151,7 @@ export async function confirmDuePending(): Promise<number> {
       await db.runTransaction(async t => {
         const balRef  = db.collection(COL.BALANCES).doc(tx.userId);
         const balSnap = await t.get(balRef);
-        if (!balSnap.exists) return;
+        if (!balSnap.exists()) return;
         const bal = balSnap.data()!;
         t.update(balRef, {
           balance:        (bal.balance ?? 0) + tx.amount,
@@ -181,7 +176,7 @@ async function creditBalance(
   await db.runTransaction(async tx => {
     const balRef  = db.collection(COL.BALANCES).doc(userId);
     const balSnap = await tx.get(balRef);
-    const cur = balSnap.exists ? balSnap.data()!
+    const cur = balSnap.exists() ? balSnap.data()!
       : { balance: 0, pendingBalance: 0, totalEarned: 0, totalSpent: 0 };
     const newBal = (cur.balance ?? 0) + amount;
     tx.set(balRef, { userId, balance: newBal, pendingBalance: cur.pendingBalance ?? 0,
@@ -202,7 +197,7 @@ async function debitBalance(
   await db.runTransaction(async tx => {
     const balRef  = db.collection(COL.BALANCES).doc(userId);
     const balSnap = await tx.get(balRef);
-    if (!balSnap.exists) return;
+    if (!balSnap.exists()) return;
     const cur = balSnap.data()!;
     const newBal = Math.max(0, (cur.balance ?? 0) - amount);
     tx.update(balRef, { balance: newBal, totalSpent: (cur.totalSpent ?? 0) + amount,

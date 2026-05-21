@@ -27,9 +27,19 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-.vercel
 
 # Functions build & dependencies
 functions/node_modules/
 functions/lib/
 
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp
+*.tmp
+diff_output*.txt

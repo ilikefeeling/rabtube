@@ -94,6 +94,7 @@ export default function CaseTimeline({ steps }: Props) {
                             onClick={() => setLightboxImg(url)}
                             className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border border-white/50 shadow-sm group cursor-pointer"
                           >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src={url} alt="" className="w-full h-full object-cover" />
                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 flex items-center justify-center transition-all">
                               <ZoomIn size={14} className="text-white opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -122,6 +123,7 @@ export default function CaseTimeline({ steps }: Props) {
           >
             ✕
           </button>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={lightboxImg}
             alt="확대 이미지"

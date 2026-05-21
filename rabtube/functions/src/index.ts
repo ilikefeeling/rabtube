@@ -55,7 +55,7 @@ export const onVideoUploaded = functions
       await db.collection('cases').doc(caseId).update({ duration });
 
       // ② 썸네일 생성 (비동기 병렬)
-      const [, qualityResult] = await Promise.allSettled([
+      const [thumbUrl, qualityResult] = await Promise.allSettled([
         generateThumbnail(filePath, caseId),
         runQualityCheck(caseId, filePath, object.metadata?.userId ?? ''),
       ]);
@@ -99,7 +99,7 @@ export const onCaseCreated = functions
 
     // 업로더 정보 조회
     const userSnap = await db.collection('users').doc(userId).get();
-    if (!userSnap.exists) return;
+    if (!userSnap.exists()) return;
     const userData = userSnap.data()!;
 
     const createdAt = userData.createdAt as admin.firestore.Timestamp
@@ -132,7 +132,7 @@ export const onQualityChecked = functions
 
     // 케이스 소유자 조회
     const caseSnap = await db.collection('cases').doc(caseId).get();
-    if (!caseSnap.exists) return;
+    if (!caseSnap.exists()) return;
     const userId = caseSnap.data()!.userId;
 
     if (verdict === 'pass' && score > 0) {
@@ -165,7 +165,7 @@ export const onReportCreated = functions
     if (result.autoHidden) {
       // 케이스 업로더에게 패널티
       const caseSnap = await db.collection('cases').doc(caseId).get();
-      if (caseSnap.exists) {
+      if (caseSnap.exists()) {
         const userId = caseSnap.data()!.userId;
         await applyPenalty(userId, caseId, '신고 누적 자동 비공개');
       }
@@ -227,7 +227,7 @@ export const adminOverrideQuality = functions.https.onCall(
     if (!context.auth) throw new functions.https.HttpsError('unauthenticated', '로그인 필요');
 
     const callerSnap = await db.collection('users').doc(context.auth.uid).get();
-    if (!callerSnap.exists || callerSnap.data()!.role !== 'admin') {
+    if (!callerSnap.exists() || callerSnap.data()!.role !== 'admin') {
       throw new functions.https.HttpsError('permission-denied', '관리자 권한 필요');
     }
 

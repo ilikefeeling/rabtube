@@ -9,58 +9,7 @@ export type CaseCategory =
 
 export type Visibility = '회원전용' | '비공개' | '전체공개';
 export type Difficulty = '초급' | '중급' | '고급';
-
-/* ═══════════════════════════════════════════
-   치료 타임라인 단계 (Case Step)
-   ═══════════════════════════════════════════ */
-
-/** 치료 단계 유형: cause(원인/초진) → process(치료 과정) → result(결과) */
-export type StepType = 'cause' | 'process' | 'result';
-
-/** 단계당 최대 사진 수 */
-export const MAX_IMAGES_PER_STEP = 5;
-/** 전체 케이스 최대 사진 수 */
-export const MAX_IMAGES_TOTAL = 30;
-
-/** 케이스 치료 단계 하나 (사진 + 설명) */
-export interface CaseStep {
-  id: string;              // 클라이언트 생성 고유 ID
-  type: StepType;          // 'cause' | 'process' | 'result'
-  label: string;           // 단계 이름 (예: "발치", "골이식", "보철물 장착")
-  description: string;     // 단계 설명
-  imageUrls: string[];     // Firebase Storage 업로드 완료된 URL 배열
-  order: number;           // 정렬 순서 (0-based)
-}
-
-/** 업로드 폼에서 사용하는 로컬 단계 (아직 업로드 안 된 File 객체 포함) */
-export interface CaseStepDraft {
-  id: string;
-  type: StepType;
-  label: string;
-  description: string;
-  files: File[];           // 아직 업로드 전인 로컬 File 객체
-  previews: string[];      // URL.createObjectURL로 생성한 미리보기 URL
-  order: number;
-}
-
-/* ═══════════════════════════════════════════
-   회원 상태 (선가입-후승인 전략)
-   ═══════════════════════════════════════════ */
-
-/**
- * - ASSOCIATE: 준회원 (면허 서류 미제출)
- * - PENDING:   검토대기 (면허 서류 제출 완료, 관리자 검토 중)
- * - APPROVED:  정회원 (관리자 승인 완료)
- * - REJECTED:  반려 (관리자 반려, 재제출 가능)
- *
- * 하위호환: 기존 'approved' 상태 유저도 정회원으로 처리
- */
-export type UserStatus = 'ASSOCIATE' | 'PENDING' | 'APPROVED' | 'REJECTED' | 'approved' | 'pending' | 'rejected';
-
-/** 정회원 여부를 판별하는 헬퍼 (하위호환 포함) */
-export function isApprovedStatus(status: UserStatus | string | undefined): boolean {
-  return status === 'APPROVED' || status === 'approved';
-}
+export type UserStatus = 'pending' | 'approved' | 'rejected';
 
 export interface UserProfile {
   uid: string;
@@ -73,18 +22,9 @@ export interface UserProfile {
   role: 'user' | 'admin';
   createdAt: Date;
   avatarUrl?: string;
-
-  // ── 본인인증 정보 (PASS/카카오 연동 시 자동 주입) ──
-  birthdate?: string;         // YYYYMMDD
-  phone?: string;             // 01012345678
-  ciValue?: string;           // 고유식별값 (unique, 중복가입 방지)
-  verifiedName?: string;      // 본인인증으로 확인된 실명
-
-  // ── 면허 서류 정보 ──
-  licenseFileUrl?: string;    // Firebase Storage 경로
-  licenseSubmittedAt?: Date;  // 서류 제출 일시
-  reviewedAt?: Date;          // 관리자 검토 일시
-  rejectionReason?: string;   // 반려 사유
+  licenseUrl?: string;
+  licenseSubmittedAt?: Date;
+  rejectionReason?: string;
 }
 
 export interface CaseVideo {
@@ -109,15 +49,38 @@ export interface CaseVideo {
   likes: string[]; // array of userIds
   createdAt: Date;
   updatedAt: Date;
-
-  // ── 치료 타임라인 (선택, 하위호환: 기존 영상만 케이스는 undefined) ──
-  steps?: CaseStep[];
 }
 
 export interface UploadProgress {
   phase: 'idle' | 'uploading' | 'processing' | 'done' | 'error';
   percent: number;
   error?: string;
+}
+
+/* ── Case Step (타임라인 에디터) ── */
+
+export type StepType = 'cause' | 'process' | 'result';
+
+export interface CaseStepDraft {
+  id: string;
+  type: StepType;
+  label: string;
+  description: string;
+  files: File[];
+  previews: string[];
+  order: number;
+}
+
+export const MAX_IMAGES_PER_STEP = 5;
+
+// Firestore에 저장된 읽기 전용 타입
+export interface CaseStep {
+  id: string;
+  type: StepType;
+  label: string;
+  description: string;
+  imageUrls: string[];
+  order: number;
 }
 
 /* ── RAB Point System ── */
@@ -161,6 +124,84 @@ export interface PointBalance {
   updatedAt: Date;
 }
 
+/* ── Stripe 구독 결제 ── */
+
+export type SubscriptionTier = 'free' | 'pro' | 'clinic';
+export type SubscriptionStatus = 'active' | 'canceled' | 'past_due' | 'trialing';
+export type PaymentStatus = 'pending' | 'succeeded' | 'failed' | 'refunded';
+
+export interface Subscription {
+  userId:             string;
+  tier:               SubscriptionTier;
+  status:             SubscriptionStatus;
+  stripeCustomerId:   string;
+  stripeSubId:        string;
+  currentPeriodStart: Date;
+  currentPeriodEnd:   Date;
+  cancelAtPeriodEnd:  boolean;
+  createdAt:          Date;
+  updatedAt:          Date;
+}
+
+export interface PaymentRecord {
+  id:               string;
+  userId:           string;
+  type:             'subscription' | 'rab_purchase' | 'rab_cashout';
+  status:           PaymentStatus;
+  amountKrw:        number;   // 원화 금액
+  amountRab:        number;   // RAB 금액 (환전 시)
+  stripePaymentId?: string;
+  description:      string;
+  createdAt:        Date;
+}
+
+export interface RabCashoutRequest {
+  id:         string;
+  userId:     string;
+  rabAmount:  number;   // 신청 RAB
+  krwAmount:  number;   // 환전 원화
+  status:     'pending' | 'processing' | 'completed' | 'rejected';
+  bankName:   string;
+  accountNo:  string;
+  accountHolder: string;
+  rejectedReason?: string;
+  createdAt:  Date;
+  processedAt?: Date;
+}
+
+export const SUBSCRIPTION_PLANS = {
+  free: {
+    name: '스타터',
+    priceKrw: 0,
+    priceRab: 0,
+    uploadPerMonth: 5,
+    features: ['가입 보너스 50 RAB', '월 5건 업로드', '전체 케이스 시청', '기본 검색'],
+  },
+  pro: {
+    name: '프로',
+    priceKrw: 29000,
+    priceRab: 200,
+    uploadPerMonth: 50,
+    stripePriceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID ?? '',
+    features: ['월 50건 업로드', '무제한 시청', '프리미엄 케이스', '다운로드', '홍보 부스트'],
+  },
+  clinic: {
+    name: '클리닉',
+    priceKrw: 79000,
+    priceRab: 600,
+    uploadPerMonth: 999,
+    stripePriceId: process.env.NEXT_PUBLIC_STRIPE_CLINIC_PRICE_ID ?? '',
+    features: ['무제한 업로드', '무제한 시청', '5인 서브계정', '무제한 다운로드', '분석 대시보드'],
+  },
+} as const;
+
+export const RAB_EXCHANGE = {
+  krwPerRab:       10,     // 1 RAB = 10원 (Phase 2 기준)
+  minCashoutRab:   1000,   // 최소 환전 1,000 RAB
+  cashoutFeeRate:  0.05,   // 환전 수수료 5%
+  rabPerKrw1000:   90,     // ₩1,000 → 90 RAB (10% 보너스)
+} as const;
+
 // RAB 포인트 정책 상수
 export const RAB_POLICY = {
   SIGNUP_BONUS: 50,
@@ -178,4 +219,3 @@ export const RAB_POLICY = {
   NEW_USER_MONTHS: 3,       // 신규 회원 기간 (절반 지급)
   NEW_USER_RATE: 0.5,       // 신규 회원 보상 비율
 } as const;
-

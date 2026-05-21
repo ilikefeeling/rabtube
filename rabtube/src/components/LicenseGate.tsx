@@ -58,8 +58,8 @@ export default function LicenseGate() {
     <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-5 sm:p-8 relative overflow-hidden">
 
-        {/* ── ASSOCIATE: 면허증 업로드 ── */}
-        {(status === 'ASSOCIATE' || status === 'REJECTED' && showReupload) && (
+        {/* ── PENDING 또는 REJECTED 후 재업로드: 면허증 업로드 ── */}
+        {(status === 'pending' && !profile?.licenseUrl || status === 'rejected' && showReupload) && (
           <>
             <div className="flex items-start sm:items-center gap-3 mb-6">
               <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
@@ -134,7 +134,7 @@ export default function LicenseGate() {
         )}
 
         {/* ── PENDING: 검토 대기 ── */}
-        {status === 'PENDING' && (
+        {status === 'pending' && !!profile?.licenseUrl && (
           <div className="text-center py-4">
             <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mx-auto mb-5">
               <Clock className="text-blue-500 animate-pulse" size={28} />
@@ -159,7 +159,7 @@ export default function LicenseGate() {
         )}
 
         {/* ── REJECTED: 반려 ── */}
-        {status === 'REJECTED' && !showReupload && (
+        {status === 'rejected' && !showReupload && (
           <div className="text-center py-4">
             <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-5">
               <AlertTriangle className="text-red-500" size={28} />

@@ -204,6 +204,7 @@ export default function CaseStepEditor({ steps, onChange, disabled }: Props) {
                   <div className="flex flex-wrap gap-2">
                     {step.previews.map((url, imgIdx) => (
                       <div key={imgIdx} className="relative w-20 h-20 rounded-lg overflow-hidden border border-slate-200 group">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={url} alt="" className="w-full h-full object-cover" />
                         {!disabled && (
                           <button

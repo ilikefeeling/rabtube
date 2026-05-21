@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { X, Heart, Share2, Eye } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { toggleLike, incrementViews } from '@/lib/firebaseService';
@@ -27,17 +27,20 @@ export default function VideoPlayer({ video, onClose }: Props) {
   const [likes, setLikes] = useState<string[]>(video.likes ?? []);
   const liked = user ? likes.includes(user.uid) : false;
 
+  const viewTracked = useRef(false);
+
   useEffect(() => {
+    if (viewTracked.current) return;
+    viewTracked.current = true;
     incrementViews(video.id);
     // 시청료 결제 (본인 케이스 제외)
     if (user && user.uid !== video.userId) {
       processViewPayment(user.uid, video.userId, video.id, video.title)
         .catch(console.error);
     }
-    // Trap scroll
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = ''; };
-  }, [video.id, user]);
+  }, [video.id, video.userId, video.title, user]);
 
   const handleLike = async () => {
     if (!user) return;
@@ -76,62 +79,62 @@ export default function VideoPlayer({ video, onClose }: Props) {
         </div>
 
         {/* Info */}
-        <div className="p-5">
-          <div className="flex items-center gap-2.5 mb-3.5">
-            <span className={`text-xs font-extrabold px-2.5 py-1 rounded-md uppercase tracking-wider border border-current/15 shrink-0 shadow-sm ${catStyle}`}>
+        <div className="p-4">
+          <div className="flex items-start gap-2 mb-3">
+            <span className={`text-[10px] font-semibold px-2 py-1 rounded uppercase tracking-wide shrink-0 ${catStyle}`}>
               {video.category}
             </span>
-            <h2 className="text-xl font-bold text-slate-900 leading-snug">{video.title}</h2>
+            <h2 className="text-[15px] font-medium text-slate-800 leading-snug">{video.title}</h2>
           </div>
 
           {/* Tags */}
-          <div className="flex flex-wrap gap-2 mb-4">
-            <span className="text-xs px-2.5 py-1 bg-teal-50/50 border border-teal-100/80 rounded-md text-teal-700 font-bold">
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            <span className="text-[11px] px-2 py-0.5 bg-slate-50 border border-slate-100 rounded text-slate-500">
               {video.toothNumber}
             </span>
             {video.tags?.map(tag => (
-              <span key={tag} className="text-xs px-2.5 py-1 bg-slate-50 border border-slate-150 rounded-md text-slate-600 font-semibold">
+              <span key={tag} className="text-[11px] px-2 py-0.5 bg-slate-50 border border-slate-100 rounded text-slate-500">
                 {tag}
               </span>
             ))}
-            <span className="text-xs px-2.5 py-1 bg-slate-50 border border-slate-150 rounded-md text-slate-600 font-semibold">
+            <span className="text-[11px] px-2 py-0.5 bg-slate-50 border border-slate-100 rounded text-slate-500">
               난이도: {video.difficulty}
             </span>
           </div>
 
           {/* Description */}
           {video.description && (
-            <p className="text-[15px] text-slate-600 leading-relaxed mb-4.5 border-t border-slate-100 pt-4 font-normal">
+            <p className="text-sm text-slate-500 leading-relaxed mb-3 border-t border-slate-50 pt-3">
               {video.description}
             </p>
           )}
 
           {/* Footer */}
-          <div className="flex items-center gap-4.5 border-t border-slate-100 pt-4">
-            <div className="w-11 h-11 rounded-full bg-slate-700 text-blue-200 text-base font-bold flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-3 border-t border-slate-50 pt-3">
+            <div className="w-9 h-9 rounded-full bg-slate-700 text-blue-300 text-sm font-semibold flex items-center justify-center shrink-0">
               {video.userProfile.name.slice(0, 1)}
             </div>
             <div>
-              <p className="text-base font-bold text-slate-900">{video.userProfile.name} 원장</p>
-              <p className="text-sm text-slate-500 font-medium">{video.userProfile.hospital} · {video.userProfile.region}</p>
+              <p className="text-sm font-medium text-slate-800">{video.userProfile.name} 원장</p>
+              <p className="text-xs text-slate-400">{video.userProfile.hospital} · {video.userProfile.region}</p>
             </div>
-            <div className="ml-auto flex items-center gap-3">
-              <span className="flex items-center gap-1.5 text-sm text-slate-500 font-semibold">
-                <Eye size={14} />{video.views + 1}
+            <div className="ml-auto flex items-center gap-2">
+              <span className="flex items-center gap-1 text-xs text-slate-400">
+                <Eye size={13} />{video.views + 1}
               </span>
               <button
                 onClick={handleLike}
-                className={`flex items-center gap-2 text-sm px-4 py-2 rounded-xl border font-bold transition-all ${
+                className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border transition-all ${
                   liked
                     ? 'bg-teal-50 border-teal-200 text-teal-700'
-                    : 'bg-white border-slate-200 text-slate-600 hover:border-teal-200'
+                    : 'bg-white border-slate-200 text-slate-500 hover:border-teal-200'
                 }`}
               >
-                <Heart size={14} fill={liked ? 'currentColor' : 'none'} />
+                <Heart size={13} fill={liked ? 'currentColor' : 'none'} />
                 {likes.length}
               </button>
-              <button className="flex items-center gap-2 text-sm px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:border-slate-300 font-bold transition-all">
-                <Share2 size={14} />공유
+              <button className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-slate-200 text-slate-500 hover:border-slate-300 transition-all">
+                <Share2 size={13} />공유
               </button>
             </div>
           </div>

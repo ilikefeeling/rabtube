@@ -3,15 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Noto Sans KR', 'Segoe UI', 'DM Sans', sans-serif;
+  --font-sans: 'DM Sans', sans-serif;
   --font-serif: 'DM Serif Display', serif;
 }
 
-body { 
-  font-family: var(--font-sans); 
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+body { font-family: var(--font-sans); }
 
 @layer components {
   .btn-primary {

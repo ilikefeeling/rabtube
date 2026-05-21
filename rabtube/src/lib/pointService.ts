@@ -406,3 +406,19 @@ export async function confirmPendingTransactions(userId: string): Promise<number
   }
   return confirmed;
 }
+
+/** 11. 관리자 RAB 지급 / 차감 */
+export async function creditBalanceAdmin(
+  userId: string,
+  amount: number,   // 양수: 지급, 음수: 차감
+  description: string,
+  relatedCaseId?: string
+): Promise<void> {
+  await recordTx(
+    userId,
+    amount > 0 ? 'ADMIN_GRANT' : 'ADMIN_DEDUCT',
+    amount,
+    description,
+    { relatedCaseId }
+  );
+}

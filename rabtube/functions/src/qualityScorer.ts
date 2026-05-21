@@ -8,14 +8,9 @@
  */
 
 import * as admin from 'firebase-admin';
+import type { QualityCheckResult } from './qualityTypes';
 
-const db = new Proxy({}, {
-  get: (target, prop) => {
-    const firestore = admin.firestore();
-    const value = Reflect.get(firestore, prop);
-    return typeof value === 'function' ? value.bind(firestore) : value;
-  }
-}) as admin.firestore.Firestore;
+const db = admin.firestore();
 
 /* ─────────────────────────────────────
    커뮤니티 반응 점수 업데이트 (48h 후)
@@ -23,7 +18,7 @@ const db = new Proxy({}, {
 
 export async function updateCommunityScore(caseId: string): Promise<number> {
   const caseSnap = await db.collection('cases').doc(caseId).get();
-  if (!caseSnap.exists) return 0;
+  if (!caseSnap.exists()) return 0;
 
   const caseData = caseSnap.data()!;
   const views    = caseData.views   ?? 0;
@@ -44,7 +39,7 @@ export async function updateCommunityScore(caseId: string): Promise<number> {
 
   // quality_checks 문서 업데이트
   const qualitySnap = await db.collection('quality_checks').doc(caseId).get();
-  if (!qualitySnap.exists) return communityScore;
+  if (!qualitySnap.exists()) return communityScore;
 
   const existing = qualitySnap.data()!;
   const aiScore  = existing.score ?? 0;
@@ -120,7 +115,7 @@ export async function handleReport(
 
   await db.runTransaction(async tx => {
     const caseSnap = await tx.get(caseRef);
-    if (!caseSnap.exists) return;
+    if (!caseSnap.exists()) return;
 
     const caseData = caseSnap.data()!;
     flagCount = (caseData.reportCount ?? 0) + 1;

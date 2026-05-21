@@ -8,29 +8,17 @@
  */
 
 import * as admin from 'firebase-admin';
-import * as VideoIntelligence from '@google-cloud/video-intelligence';
+import VideoIntelligence from '@google-cloud/video-intelligence';
 import Vision from '@google-cloud/vision';
 import type { QualityCheckResult, QualityVerdict } from './qualityTypes';
 import { DEFAULT_QUALITY_POLICY } from './qualityTypes';
 
 const videoClient  = new VideoIntelligence.VideoIntelligenceServiceClient();
 const visionClient = new Vision.ImageAnnotatorClient();
-const db = new Proxy({}, {
-  get: (target, prop) => {
-    const firestore = admin.firestore();
-    const value = Reflect.get(firestore, prop);
-    return typeof value === 'function' ? value.bind(firestore) : value;
-  }
-}) as admin.firestore.Firestore;
+const db           = admin.firestore();
+const storage      = admin.storage();
 
-const storage = new Proxy({}, {
-  get: (target, prop) => {
-    const storageInst = admin.storage();
-    const value = Reflect.get(storageInst, prop);
-    return typeof value === 'function' ? value.bind(storageInst) : value;
-  }
-}) as ReturnType<typeof admin.storage>;
-
+const COL_CASES      = 'cases';
 const COL_QUALITY    = 'quality_checks';
 const COL_VIDEO_HASH = 'video_hashes';
 
@@ -127,7 +115,7 @@ export async function runQualityCheck(
 async function checkVideoDuration(gcsUri: string): Promise<number> {
   const [operation] = await videoClient.annotateVideo({
     inputUri: gcsUri,
-    features: [VideoIntelligence.protos.google.cloud.videointelligence.v1.Feature.LABEL_DETECTION],
+    features: [VideoIntelligence.protos.google.cloud.videointelligence.v1.Feature.VIDEO_ACTIVITY_RECOGNITION],
     videoContext: { segments: [{ startTimeOffset: { seconds: 0 }, endTimeOffset: { seconds: 10 } }] },
   });
 

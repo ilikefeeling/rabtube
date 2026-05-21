@@ -78,22 +78,12 @@ export default function TestHelperPage() {
               <div className="space-y-3">
                 <h3 className="text-xs font-bold text-slate-400 tracking-wide uppercase">1. 면허 승인 상태 시뮬레이션</h3>
                 <div className="grid grid-cols-2 gap-2">
+
                   <button
-                    onClick={() => updateProfileFields({ status: 'ASSOCIATE', rejectionReason: '' })}
+                    onClick={() => updateProfileFields({ status: 'pending', rejectionReason: '' })}
                     disabled={loading}
                     className={`px-4 py-2.5 text-xs font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 border ${
-                      profile?.status === 'ASSOCIATE'
-                        ? 'bg-amber-100 border-amber-400 text-amber-800 ring-2 ring-amber-400/10'
-                        : 'bg-white border-slate-200 text-slate-700 hover:border-amber-400 hover:bg-slate-50'
-                    }`}
-                  >
-                    ASSOCIATE (준회원)
-                  </button>
-                  <button
-                    onClick={() => updateProfileFields({ status: 'PENDING', rejectionReason: '' })}
-                    disabled={loading}
-                    className={`px-4 py-2.5 text-xs font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 border ${
-                      profile?.status === 'PENDING'
+                      profile?.status === 'pending'
                         ? 'bg-blue-100 border-blue-400 text-blue-800 ring-2 ring-blue-400/10'
                         : 'bg-white border-slate-200 text-slate-700 hover:border-blue-400 hover:bg-slate-50'
                     }`}
@@ -101,10 +91,10 @@ export default function TestHelperPage() {
                     PENDING (검토대기)
                   </button>
                   <button
-                    onClick={() => updateProfileFields({ status: 'REJECTED', rejectionReason: '제출된 면허증 사진이 흐릿하여 식별 불가합니다.' })}
+                    onClick={() => updateProfileFields({ status: 'rejected', rejectionReason: '제출된 면허증 사진이 흐릿하여 식별 불가합니다.' })}
                     disabled={loading}
                     className={`px-4 py-2.5 text-xs font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 border ${
-                      profile?.status === 'REJECTED'
+                      profile?.status === 'rejected'
                         ? 'bg-red-100 border-red-400 text-red-800 ring-2 ring-red-400/10'
                         : 'bg-white border-slate-200 text-slate-700 hover:border-red-400 hover:bg-slate-50'
                     }`}
@@ -112,10 +102,10 @@ export default function TestHelperPage() {
                     REJECTED (반려)
                   </button>
                   <button
-                    onClick={() => updateProfileFields({ status: 'APPROVED', rejectionReason: '' })}
+                    onClick={() => updateProfileFields({ status: 'approved', rejectionReason: '' })}
                     disabled={loading}
                     className={`px-4 py-2.5 text-xs font-bold rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 border ${
-                      profile?.status === 'APPROVED' || profile?.status === 'approved'
+                      profile?.status === 'approved'
                         ? 'bg-teal-100 border-teal-400 text-teal-800 ring-2 ring-teal-400/10'
                         : 'bg-white border-slate-200 text-slate-700 hover:border-teal-400 hover:bg-slate-50'
                     }`}
