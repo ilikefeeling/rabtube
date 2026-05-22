@@ -413,7 +413,7 @@ export default function LandingPage() {
           {/* LEFT */}
           <div>
             <p className="eyebrow">치과 개원의 전용 수익형 플랫폼</p>
-            <h1>내 케이스에<br/><em>내가 가격을 매긴다</em><br/>수익형 업로드</h1>
+            <h1>내 케이스의<br/><em>가격은 내가 정한다</em><br/>수익형 업로드</h1>
             <p className="hero-sub">
               당신의 진료 케이스에 <strong>직접 가격을 설정</strong>하세요.<br/>
               동료가 시청할 때마다 수익이 자동 적립됩니다.<br/>
