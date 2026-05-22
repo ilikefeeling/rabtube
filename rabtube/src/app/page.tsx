@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
+import LandingPage from '@/components/LandingPage';
 import VideoCard from '@/components/VideoCard';
 import VideoPlayer from '@/components/VideoPlayer';
 import { getCases } from '@/lib/firebaseService';
@@ -19,11 +20,7 @@ export default function HomePage() {
   const [loadingCases, setLoadingCases] = useState(true);
   const [selectedVideo, setSelectedVideo] = useState<CaseVideo | null>(null);
 
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/auth/login');
-    }
-  }, [user, authLoading, router]);
+
 
   useEffect(() => {
     if (!user) return;
@@ -48,6 +45,10 @@ export default function HomePage() {
         <div className="w-6 h-6 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" />
       </div>
     );
+  }
+
+  if (!user) {
+    return <LandingPage />;
   }
 
   return (
