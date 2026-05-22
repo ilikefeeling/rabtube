@@ -93,6 +93,29 @@ export async function getMyCases(userId: string): Promise<CaseVideo[]> {
   return snap.docs.map(d => docToCase(d));
 }
 
+// 검색 엔진용: 카테고리 1차 필터링 후 최대 100건 가져오기
+export async function getAllCasesForSearch(category?: string): Promise<CaseVideo[]> {
+  let q = query(
+    collection(db, COLLECTIONS.CASES),
+    where('visibility', '!=', '비공개'),
+    orderBy('visibility'),
+    orderBy('createdAt', 'desc'),
+    limit(100)
+  );
+  if (category && category !== '전체') {
+    q = query(
+      collection(db, COLLECTIONS.CASES),
+      where('category', '==', category),
+      where('visibility', '!=', '비공개'),
+      orderBy('visibility'),
+      orderBy('createdAt', 'desc'),
+      limit(100)
+    );
+  }
+  const snap = await getDocs(q);
+  return snap.docs.map(d => docToCase(d));
+}
+
 export async function incrementViews(caseId: string) {
   await updateDoc(doc(db, COLLECTIONS.CASES, caseId), {
     views: increment(1),

@@ -22,10 +22,11 @@ export default function LandingPage() {
   const [titleError, setTitleError] = useState(false);
 
   // Calculator Logic
+  const [casePrice, setCasePrice] = useState(5);
   const baseBonus = Math.floor((quality / 100) * 20);
   const uploadEarn = uploads * (10 + baseBonus);
-  const viewEarn = Math.round(uploads * views * 3.5);
-  const spendCost = spend * 5;
+  const viewEarn = Math.round(uploads * views * casePrice * 0.7);
+  const spendCost = spend * casePrice;
   const netRab = uploadEarn + viewEarn - spendCost;
   
   // Demo Bonus Logic
@@ -411,27 +412,27 @@ export default function LandingPage() {
         <div className="hero-wrap">
           {/* LEFT */}
           <div>
-            <p className="eyebrow">치과 개원의 케이스 플랫폼</p>
-            <h1>올릴수록<br/><em>쌓이는 수익</em><br/>케이스 업로드</h1>
+            <p className="eyebrow">치과 개원의 전용 수익형 플랫폼</p>
+            <h1>내 케이스에<br/><em>내가 가격을 매긴다</em><br/>수익형 업로드</h1>
             <p className="hero-sub">
-              진료 케이스 영상 하나가 <strong>지속적인 수익</strong>이 됩니다.<br/>
-              업로드하면 RAB 토큰 보상, 동료가 시청할 때마다<br/>
-              시청료의 70%가 자동으로 내 계정에 적립됩니다.
+              당신의 진료 케이스에 <strong>직접 가격을 설정</strong>하세요.<br/>
+              동료가 시청할 때마다 수익이 자동 적립됩니다.<br/>
+              케이스 10건 × 월 20회 시청 = <strong>월 700+ RAB 패시브 인컴</strong>
             </p>
             <div className="hero-cta">
               <Link href="/auth/register" className="btn-hero">
-                무료로 시작하기
+                지금 수익 시작하기
                 <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               </Link>
-              <a href="#flow" className="btn-learn">
-                업로드 방법 보기
+              <a href="#rewards" className="btn-learn">
+                수익 시뮬레이션 해보기
                 <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
               </a>
             </div>
             <div className="reward-row">
-              <div className="rpill rpill-g">🎁 가입 즉시 +50 RAB</div>
-              <div className="rpill rpill-y">🏆 Gold 업로드 +30 RAB</div>
-              <div className="rpill rpill-s">🪙 시청마다 +3.5 RAB</div>
+              <div className="rpill rpill-g">💰 가격 자율 설정 (1~100 RAB)</div>
+              <div className="rpill rpill-y">🏆 업로드 보상 최대 +30 RAB</div>
+              <div className="rpill rpill-s">🪙 시청마다 자동 수익 적립</div>
             </div>
           </div>
           {/* RIGHT: Upload UI Card */}
@@ -511,13 +512,22 @@ export default function LandingPage() {
                     </select>
                   </div>
                 </div>
+                <div className="field">
+                  <label>💰 시청 가격 설정 (RAB)</label>
+                  <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+                    <input type="range" min="1" max="20" defaultValue="5" style={{flex: 1}} />
+                    <span style={{color: 'var(--teal)', fontWeight: 600, fontFamily: 'var(--mono)', fontSize: '14px', minWidth: '55px'}}>5 RAB</span>
+                  </div>
+                  <div style={{fontSize: '10px', color: 'var(--off3)', marginTop: '4px'}}>시청 1회당 수익 · 학습자가 이 가격을 지불합니다</div>
+                </div>
                 <div className="reward-preview">
-                  <div className="rp-title">예상 보상</div>
+                  <div className="rp-title">📊 예상 수익 시뮬레이션</div>
                   <div className="rp-rows">
-                    <div className="rp-row"><span className="rp-label">기본 업로드 보상</span><span className="rp-val">+10 RAB</span></div>
+                    <div className="rp-row"><span className="rp-label">업로드 보상</span><span className="rp-val">+10 RAB</span></div>
                     <div className="rp-row"><span className="rp-label">품질 보너스 (예상)</span><span className="rp-val" id="qualBonus">+{demoBonus} RAB</span></div>
+                    <div className="rp-row"><span className="rp-label" style={{color: 'var(--teal)'}}>월 시청 수익 (20회 × 5 RAB)</span><span className="rp-val" style={{color: 'var(--teal)'}}>+70 RAB</span></div>
                     <div className="rp-divider"></div>
-                    <div className="rp-row"><span className="rp-label" style={{fontWeight: 500, color: 'var(--off)'}}>업로드 보상 합계</span><span className="rp-total" id="totalBonus">{10 + demoBonus} RAB</span></div>
+                    <div className="rp-row"><span className="rp-label" style={{fontWeight: 600, color: 'var(--off)'}}>월 예상 총수익</span><span className="rp-total" id="totalBonus">{10 + demoBonus + 70} RAB</span></div>
                   </div>
                 </div>
               </div>
@@ -540,17 +550,16 @@ export default function LandingPage() {
       {/* UPLOAD FLOW */}
       <section id="flow">
         <div className="si">
-          <p className="sk rv">업로드 플로우</p>
-          <h2 className="rv d1">업로드부터 보상까지<br/><em>6단계</em></h2>
-          <div className="sdesc rv d2">케이스를 올리는 순간부터 수익이 시작됩니다. 아래 6단계를 따라 첫 케이스를 공유해 보세요.</div>
+          <p className="sk rv">업로드 → 수익화 플로우</p>
+          <h2 className="rv d1">업로드부터 수익까지<br/><em>5단계</em></h2>
+          <div className="sdesc rv d2">케이스를 올리고 가격을 설정하는 순간부터 패시브 인컴이 시작됩니다.</div>
           <div className="flow-wrap">
             <div className="flow-grid">
-              <div className="flow-step rv d1"><span className="fs-num">STEP 01</span><span className="fs-icon">📁</span><div className="fs-title">영상 파일 선택</div><div className="fs-desc">드래그앤드롭 또는 파일 선택. MP4·MOV·AVI, 최대 2GB 지원.</div></div>
-              <div className="flow-step rv d2"><span className="fs-num">STEP 02</span><span className="fs-icon">🏷️</span><div className="fs-title">메타데이터 입력</div><div className="fs-desc">카테고리, 치아 번호, 제목, 난이도, 공개 설정을 입력합니다.</div></div>
-              <div className="flow-step rv d3"><span className="fs-num">STEP 03</span><span className="fs-icon">🚀</span><div className="fs-title">Firebase 업로드</div><div className="fs-desc">진행률 실시간 표시. 업로드 완료 후 즉시 피드에 노출됩니다.</div><div className="fs-rab">→ Firestore 메타저장</div></div>
-              <div className="flow-step rv d4"><span className="fs-num">STEP 04</span><span className="fs-icon">🤖</span><div className="fs-title">AI 자동 검수</div><div className="fs-desc">Google Video Intelligence + Vision API가 콘텐츠 품질을 자동 판정합니다.</div><div className="fs-rab">→ 48h 내 완료</div></div>
-              <div className="flow-step rv d5"><span className="fs-num">STEP 05</span><span className="fs-icon">🏅</span><div className="fs-title">품질 등급 확정</div><div className="fs-desc">AI 점수 + 48h 시청 데이터를 합산해 Gold/Silver/Bronze/기본 등급이 확정됩니다.</div></div>
-              <div className="flow-step rv d6"><span className="fs-num">STEP 06</span><span className="fs-icon">💰</span><div className="fs-title">RAB 보상 지급</div><div className="fs-desc">등급에 따라 10~30 RAB가 확정 지급됩니다. 이후 시청마다 +3.5 RAB 자동 적립.</div><div className="fs-rab" style={{color: 'var(--gold)'}}>+10~30 RAB 확정</div></div>
+              <div className="flow-step rv d1"><span className="fs-num">STEP 01</span><span className="fs-icon">📁</span><div className="fs-title">케이스 영상 업로드</div><div className="fs-desc">영상을 선택하고 카테고리·난이도 등 메타데이터를 입력합니다.</div></div>
+              <div className="flow-step rv d2"><span className="fs-num">STEP 02</span><span className="fs-icon">💰</span><div className="fs-title">시청 가격 직접 설정</div><div className="fs-desc">내 케이스의 가치를 내가 결정합니다. 1~100 RAB 범위에서 자유롭게 설정하세요.</div><div className="fs-rab" style={{color: 'var(--teal)'}}>핵심: 가격 결정권은 업로더에게</div></div>
+              <div className="flow-step rv d3"><span className="fs-num">STEP 03</span><span className="fs-icon">🤖</span><div className="fs-title">AI 품질 검수 + 등급</div><div className="fs-desc">AI가 48시간 내 자동 검수. Gold/Silver/Bronze 등급에 따라 10~30 RAB 업로드 보상 확정.</div><div className="fs-rab">→ 업로드 보상 +10~30 RAB</div></div>
+              <div className="flow-step rv d4"><span className="fs-num">STEP 04</span><span className="fs-icon">▶️</span><div className="fs-title">동료 시청 → 자동 수익</div><div className="fs-desc">다른 치과의사가 시청할 때마다 설정한 가격(수수료 제외)이 즉시 내 계정에 적립됩니다.</div><div className="fs-rab" style={{color: 'var(--teal)'}}>시청마다 자동 수익 발생!</div></div>
+              <div className="flow-step rv d5"><span className="fs-num">STEP 05</span><span className="fs-icon">📈</span><div className="fs-title">패시브 인컴 누적</div><div className="fs-desc">케이스가 쌓일수록 수익은 기하급수적으로 증가합니다. RAB는 현금 충전 및 향후 환전도 가능.</div><div className="fs-rab" style={{color: 'var(--gold)'}}>10건 × 월 20회 = 700+ RAB/월</div></div>
             </div>
           </div>
         </div>
@@ -561,8 +570,8 @@ export default function LandingPage() {
       {/* REWARD CALCULATOR */}
       <section id="rewards" className="calc-bg">
         <div className="si">
-          <p className="sk rv">보상 계산기</p>
-          <h2 className="rv d1">내가 올리면<br/><em>얼마나</em> 받을까?</h2>
+          <p className="sk rv">💰 수익 시뮬레이터</p>
+          <h2 className="rv d1">내 케이스로<br/><em>얼마나 벌 수 있을까?</em></h2>
           <div className="calc-layout">
             {/* Calculator */}
             <div className="calc-panel rvl">
@@ -585,12 +594,16 @@ export default function LandingPage() {
                 <div className="cf-label">내 월 시청 소비 <span className="cf-val">{spend}건</span></div>
                 <input type="range" min="0" max="60" value={spend} onChange={(e) => setSpend(parseInt(e.target.value))} />
               </div>
+              <div className="calc-field">
+                <div className="cf-label">평균 열람 가격 설정 <span className="cf-val">{casePrice} RAB</span></div>
+                <input type="range" min="1" max="20" value={casePrice} onChange={(e) => setCasePrice(parseInt(e.target.value))} />
+              </div>
 
               <div className="calc-result">
                 <div className="cr-rows">
                   <div className="cr-row"><span className="cr-l">업로드 보상</span><span className="cr-v cr-earn">+{uploadEarn} RAB</span></div>
-                  <div className="cr-row"><span className="cr-l">시청료 배분 (70%)</span><span className="cr-v cr-earn">+{viewEarn} RAB</span></div>
-                  <div className="cr-row"><span className="cr-l">시청 소비</span><span className="cr-v cr-spend">-{spendCost} RAB</span></div>
+                  <div className="cr-row"><span className="cr-l">시청 수익 (수수료 제외)</span><span className="cr-v cr-earn">+{viewEarn} RAB</span></div>
+                  <div className="cr-row"><span className="cr-l">시청 소비 ({casePrice} RAB/건)</span><span className="cr-v cr-spend">-{spendCost} RAB</span></div>
                   <div className="cr-div"></div>
                   <div className="cr-row"><span className="cr-l" style={{fontWeight: 500}}>월 순 획득</span><span className={`cr-v cr-net ${netRab >= 0 ? 'pos' : 'neg'}`}>{netRab >= 0 ? '+' : ''}{netRab} RAB</span></div>
                 </div>
@@ -618,11 +631,11 @@ export default function LandingPage() {
               <div className="rd-card rv d2">
                 <div className="rd-header">
                   <span className="rd-icon">▶️</span>
-                  <span className="rd-rab" style={{color: 'var(--teal)'}}>+3.5 RAB / 시청</span>
+                  <span className="rd-rab" style={{color: 'var(--teal)'}}>가격 자율 설정</span>
                 </div>
                 <div className="rd-title">시청료 자동 배분</div>
-                <p className="rd-desc">다른 회원이 내 케이스를 시청하면 시청료(5 RAB)의 70%인 3.5 RAB이 즉시 내 계정에 적립됩니다. 케이스가 쌓일수록 패시브 인컴이 늘어납니다.</p>
-                <div className="rd-tags"><span className="rd-tag">즉시 적립</span><span className="rd-tag">시청료 70%</span><span className="rd-tag">본인 케이스 제외</span></div>
+                <p className="rd-desc">다른 회원이 내 케이스를 시청하면 내가 설정한 가격에서 플랫폼 수수료를 제외한 금액이 즉시 내 계정에 적립됩니다. 케이스가 쌓일수록 패시브 인컴이 늘어납니다.</p>
+                <div className="rd-tags"><span className="rd-tag">즉시 적립</span><span className="rd-tag">수익 분배</span><span className="rd-tag">본인 케이스 제외</span></div>
               </div>
               <div className="rd-card rv d3">
                 <div className="rd-header">
@@ -818,7 +831,7 @@ export default function LandingPage() {
               { q: "AI 검수에서 실패하면 어떻게 되나요?", a: "검수 실패 시 케이스는 자동으로 비공개 처리됩니다. 업로드 보상은 지급되지 않으며, 반복 위반 시 패널티가 적용될 수 있습니다. 실패 이유는 알림으로 상세히 안내됩니다. 수정 후 재업로드가 가능합니다." },
               { q: "환자 프라이버시는 어떻게 보호하나요?", a: "Google Vision API가 자동으로 얼굴을 감지하여 환자 얼굴이 포함된 영상은 업로드 단계에서 차단합니다. 또한 모든 케이스는 기본적으로 '회원 전용' 공개로 설정되어 치과 면허 인증 회원만 시청 가능합니다. 원하시면 '비공개' 설정도 가능합니다." },
               { q: "월 업로드 건수에 제한이 있나요?", a: "RAB 보상은 월 10건까지 지급됩니다. 10건 초과 업로드는 피드에 공개되지만 보상은 다음 달로 이월됩니다. 이는 어뷰징 방지와 토큰 공급량 조절을 위한 정책입니다. 추후 구독 등급에 따라 상한이 확대될 예정입니다." },
-              { q: "RAB 토큰은 어떻게 사용하나요?", a: "현재 RAB는 케이스 시청(-5 RAB), 다운로드(-10 RAB), 홍보 부스트(-50 RAB)에 사용할 수 있습니다. Phase 2(6개월 이내)에는 현금 환전 기능이 추가될 예정이며, Phase 3에서는 블록체인 기반 실거래 토큰으로 전환됩니다." },
+              { q: "RAB 토큰은 어떻게 사용하나요?", a: "현재 RAB는 업로더가 설정한 가격에 따라 케이스 시청에 사용할 수 있으며, 현금 결제로 충전이 가능합니다. 다운로드, 홍보 부스트 등 다양한 기능에도 활용될 예정입니다. 향후 현금 환전 기능 및 블록체인 기반 실거래 토큰 전환이 계획되어 있습니다." },
               { q: "가입하려면 무엇이 필요한가요?", a: "치과 면허 번호, 이메일, 병원명, 지역 정보로 가입할 수 있습니다. 치과 면허를 보유한 개원의만 가입 가능하며, 인증 완료 즉시 50 RAB 가입 보너스가 지급됩니다. 별도 결제 없이 무료로 시작하실 수 있습니다." }
             ].map((faq, idx) => (
               <div key={idx} className={`faq-item ${openFaq === idx ? 'open' : ''}`}>
@@ -839,17 +852,17 @@ export default function LandingPage() {
       <section className="cta-sec">
         <div className="cta-glow"></div>
         <div className="cta-inner">
-          <p className="sk rv" style={{justifyContent: 'center'}}>지금 첫 케이스를 올려보세요</p>
-          <h2 className="rv">가입 즉시 <em>50 RAB</em><br/>첫 업로드 후 <em>+10 RAB</em></h2>
-          <p className="sdesc rv d2" style={{textAlign: 'center', margin: '0 auto 40px'}}>신용카드 없이 무료 시작. 첫 케이스가 Gold 등급을 받으면 총 80 RAB 적립.</p>
+          <p className="sk rv" style={{justifyContent: 'center'}}>내 케이스로 수익을 시작하세요</p>
+          <h2 className="rv">가입 즉시 <em>50 RAB</em><br/>가격은 <em>내가 결정</em></h2>
+          <p className="sdesc rv d2" style={{textAlign: 'center', margin: '0 auto 40px'}}>무료 가입 후 첫 케이스를 올리고 가격을 설정하세요.<br/>시청될 때마다 수익이 자동으로 쌓입니다.</p>
           <div className="cta-btns rv d3">
             <Link href="/auth/register" className="btn-cta">
-              무료 가입 후 첫 케이스 업로드
+              무료 가입 후 수익 시작하기
               <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </Link>
             <Link href="/auth/login" className="btn-cta2">이미 회원이신가요?</Link>
           </div>
-          <p className="cta-note rv d4">면허 번호로 인증 · 영구 무료 플랜 제공 · <a href="#">개인정보처리방침</a></p>
+          <p className="cta-note rv d4">면허 번호로 인증 · 영구 무료 · 가격 자율 설정 · <a href="#">개인정보처리방침</a></p>
         </div>
       </section>
 

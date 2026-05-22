@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Upload, Bookmark, Users, LogOut, Settings, CreditCard, ArrowDownToLine } from 'lucide-react';
+import { Upload, Bookmark, Users, LogOut, Settings, CreditCard, ArrowDownToLine, Search } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import RabBadge from '@/components/RabBadge';
 
@@ -33,6 +33,9 @@ export default function Header() {
         <nav className="flex items-center gap-1">
           <Link href="/" className="flex items-center gap-1.5 text-slate-400 hover:text-white text-sm px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors">
             케이스 피드
+          </Link>
+          <Link href="/search" className="flex items-center gap-1.5 text-slate-400 hover:text-white text-sm px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors">
+            <Search size={14} />검색
           </Link>
           <Link href="/my" className="flex items-center gap-1.5 text-slate-400 hover:text-white text-sm px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors">
             <Bookmark size={14} />내 케이스

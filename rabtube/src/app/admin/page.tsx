@@ -11,6 +11,8 @@ import Header from '@/components/Header';
 import StatCard from '@/components/admin/StatCard';
 import AdjustModal from '@/components/admin/AdjustModal';
 import { useAuth } from '@/lib/AuthContext';
+import { db } from '@/lib/firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { useAdmin } from '@/hooks/useAdmin';
 import {
   updateMemberStatus,
@@ -32,6 +34,7 @@ const TX_LABELS: Record<PointTxType, string> = {
   ADMIN_DEDUCT:         '관리자 차감',
   REPORT_REWARD:        '신고 보상',
   PENALTY_DEDUCT:       '패널티',
+  RAB_PURCHASE:         'RAB 충전',
 };
 
 const TX_COLOR: Record<string, string> = {
@@ -51,7 +54,7 @@ export default function AdminPage() {
   const router = useRouter();
   const { stats, members, recentTxs, loading, error, refresh, isAdmin } = useAdmin();
 
-  const [activeTab, setActiveTab]       = useState<'overview' | 'members' | 'txs' | 'supply'>('overview');
+  const [activeTab, setActiveTab]       = useState<'overview' | 'members' | 'txs' | 'supply' | 'settings'>('overview');
   const [searchQuery, setSearchQuery]   = useState('');
   const [selectedMember, setSelectedMember] = useState<MemberWithBalance | null>(null);
   const [adjustTarget, setAdjustTarget] = useState<MemberWithBalance | null>(null);
@@ -61,6 +64,30 @@ export default function AdminPage() {
   useEffect(() => {
     if (!authLoading && (!user || !isAdmin)) router.push('/');
   }, [user, authLoading, isAdmin, router]);
+
+  const [commissionRate, setCommissionRate] = useState<number>(30);
+  const [savingSettings, setSavingSettings] = useState(false);
+
+  useEffect(() => {
+    if (activeTab === 'settings') {
+      getDoc(doc(db, 'settings', 'admin')).then(snap => {
+        if (snap.exists() && typeof snap.data().platformCommissionRate === 'number') {
+          setCommissionRate(Math.round(snap.data().platformCommissionRate * 100));
+        }
+      });
+    }
+  }, [activeTab]);
+
+  const handleSaveSettings = async () => {
+    setSavingSettings(true);
+    try {
+      await setDoc(doc(db, 'settings', 'admin'), { platformCommissionRate: commissionRate / 100 }, { merge: true });
+      alert('설정이 저장되었습니다.');
+    } catch (e) {
+      alert('설정 저장 실패');
+    }
+    setSavingSettings(false);
+  };
 
   const filteredMembers = members.filter(m =>
     searchQuery === '' ||
@@ -103,6 +130,7 @@ export default function AdminPage() {
     { id: 'members',  label: `회원 관리 (${members.length})` },
     { id: 'txs',      label: `트랜잭션 (실시간)` },
     { id: 'supply',   label: 'RAB 공급 현황' },
+    { id: 'settings', label: '플랫폼 설정' },
   ];
 
   return (
@@ -396,6 +424,44 @@ export default function AdminPage() {
                 <p className="text-xs text-slate-400">{r.desc}</p>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* ── SETTINGS ── */}
+        {activeTab === 'settings' && (
+          <div className="max-w-xl">
+            <div className="card p-6">
+              <h3 className="text-sm font-medium text-slate-800 mb-5">수수료 및 정산 설정</h3>
+              <div className="mb-6">
+                <label className="block text-xs font-medium text-slate-500 mb-2">
+                  플랫폼 수수료율 (%)
+                </label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    className="input-field w-32"
+                    value={commissionRate}
+                    onChange={e => setCommissionRate(Number(e.target.value))}
+                  />
+                  <span className="text-sm text-slate-600">%</span>
+                </div>
+                <p className="text-[11px] text-slate-400 mt-2">
+                  데이터 열람 시 업로더에게 지급되는 정산금에서 차감될 수수료 비율입니다.
+                  예: 30% 설정 시 업로더가 70% 수익을 가져갑니다. 변경 시점 이후의 결제부터 적용됩니다.
+                </p>
+              </div>
+              <div className="border-t border-slate-100 pt-5 text-right">
+                <button
+                  onClick={handleSaveSettings}
+                  disabled={savingSettings}
+                  className="px-4 py-2 bg-teal-600 text-white text-sm font-medium rounded-xl hover:bg-teal-700 disabled:opacity-50"
+                >
+                  {savingSettings ? '저장 중...' : '저장하기'}
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </main>

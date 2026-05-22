@@ -15,10 +15,11 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 // RAB 구매 패키지
 const RAB_PACKAGES: Record<number, { rab: number; label: string }> = {
-  1000:  { rab: 90,   label: '₩1,000 → 90 RAB (기본+10%)' },
-  5000:  { rab: 500,  label: '₩5,000 → 500 RAB (기본+20%)' },
-  10000: { rab: 1100, label: '₩10,000 → 1,100 RAB (기본+25%)' },
-  50000: { rab: 6000, label: '₩50,000 → 6,000 RAB (기본+30%)' },
+  5000:   { rab: 500,   label: '₩5,000 → 500 RAB' },
+  10000:  { rab: 1100,  label: '₩10,000 → 1,100 RAB (보너스+10%)' },
+  30000:  { rab: 3500,  label: '₩30,000 → 3,500 RAB (보너스+16%)' },
+  50000:  { rab: 6000,  label: '₩50,000 → 6,000 RAB (보너스+20%)' },
+  100000: { rab: 13000, label: '₩100,000 → 13,000 RAB (보너스+30%)' },
 };
 
 export async function POST(req: NextRequest) {

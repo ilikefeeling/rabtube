@@ -35,12 +35,12 @@ export default function VideoPlayer({ video, onClose }: Props) {
     incrementViews(video.id);
     // 시청료 결제 (본인 케이스 제외)
     if (user && user.uid !== video.userId) {
-      processViewPayment(user.uid, video.userId, video.id, video.title)
+      processViewPayment(user.uid, video.userId, video.id, video.title, video.price ?? 0)
         .catch(console.error);
     }
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = ''; };
-  }, [video.id, video.userId, video.title, user]);
+  }, [video.id, video.userId, video.title, video.price, user]);
 
   const handleLike = async () => {
     if (!user) return;
@@ -107,6 +107,33 @@ export default function VideoPlayer({ video, onClose }: Props) {
             <p className="text-sm text-slate-500 leading-relaxed mb-3 border-t border-slate-50 pt-3">
               {video.description}
             </p>
+          )}
+
+          {/* Clinical Metadata */}
+          {video.clinical && (
+            <div className="mb-3 border-t border-slate-50 pt-3 text-[11px] text-slate-600">
+              <h3 className="font-semibold text-slate-700 mb-1.5">임상 정보</h3>
+              <div className="grid grid-cols-2 gap-y-1.5 gap-x-4">
+                {video.clinical.diagnosis && video.clinical.diagnosis.length > 0 && (
+                  <div><span className="text-slate-400 mr-1">진단명:</span>{video.clinical.diagnosis.join(', ')}</div>
+                )}
+                {video.clinical.technique && video.clinical.technique.length > 0 && (
+                  <div><span className="text-slate-400 mr-1">시술/테크닉:</span>{video.clinical.technique.join(', ')}</div>
+                )}
+                {video.clinical.materials && video.clinical.materials.length > 0 && (
+                  <div className="col-span-2"><span className="text-slate-400 mr-1">사용재료:</span>{video.clinical.materials.join(', ')}</div>
+                )}
+                {video.clinical.boneClassification && (
+                  <div><span className="text-slate-400 mr-1">골분류:</span>{video.clinical.boneClassification}</div>
+                )}
+                {(video.clinical.patientAge || video.clinical.patientGender) && (
+                  <div><span className="text-slate-400 mr-1">환자:</span>{video.clinical.patientAge} {video.clinical.patientGender}</div>
+                )}
+                {video.clinical.systemicConditions && video.clinical.systemicConditions.length > 0 && (
+                  <div className="col-span-2"><span className="text-slate-400 mr-1">전신질환:</span>{video.clinical.systemicConditions.join(', ')}</div>
+                )}
+              </div>
+            </div>
           )}
 
           {/* Footer */}
