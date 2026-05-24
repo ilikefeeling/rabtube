@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Upload, Bookmark, Users, LogOut, Settings, CreditCard, ArrowDownToLine, Search } from 'lucide-react';
@@ -9,6 +10,18 @@ import RabBadge from '@/components/RabBadge';
 export default function Header() {
   const { user, profile, signOut } = useAuth();
   const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('click', handleOutsideClick);
+    return () => document.removeEventListener('click', handleOutsideClick);
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
@@ -45,10 +58,10 @@ export default function Header() {
           </Link>
           {profile?.role === 'admin' && (
             <>
-              <Link href="/admin" className="flex items-center gap-1.5 text-slate-400 hover:text-white text-sm px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors">
+              <Link href="/admin" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-slate-400 hover:text-white text-sm px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors">
                 <Settings size={14} />관리
               </Link>
-              <Link href="/admin/cashout" className="flex items-center gap-1.5 text-slate-400 hover:text-white text-sm px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors">
+              <Link href="/admin/cashout" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-slate-400 hover:text-white text-sm px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors">
                 <ArrowDownToLine size={14} />환전처리
               </Link>
             </>
@@ -63,28 +76,58 @@ export default function Header() {
               <Link href="/upload" className="flex items-center gap-1.5 bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium px-4 py-1.5 rounded-lg transition-colors">
                 <Upload size={14} />케이스 업로드
               </Link>
-              <div className="relative group">
-                <div className="w-8 h-8 rounded-full bg-slate-700 text-blue-300 text-xs font-semibold flex items-center justify-center cursor-pointer">
+              <div ref={dropdownRef} className="relative group">
+                <button 
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsOpen(prev => !prev);
+                  }}
+                  className="list-none outline-none cursor-pointer w-8 h-8 rounded-full bg-slate-700 text-blue-300 text-xs font-semibold flex items-center justify-center hover:bg-slate-600 transition-colors"
+                >
                   {initials}
-                </div>
-                <div className="absolute right-0 top-10 bg-white border border-slate-100 rounded-xl shadow-lg p-1 min-w-[140px] hidden group-hover:block">
-                  <div className="px-3 py-2 border-b border-slate-100 mb-1">
-                    <p className="text-xs font-medium text-slate-800">{profile?.name} 원장</p>
-                    <p className="text-[11px] text-slate-400">{profile?.hospital}</p>
+                </button>
+                
+                {isOpen && (
+                  <div className="absolute right-0 top-10 bg-white border border-slate-100 rounded-xl shadow-lg p-1 min-w-[140px] z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div className="px-3 py-2 border-b border-slate-100 mb-1">
+                      <p className="text-xs font-medium text-slate-800">{profile?.name} 원장</p>
+                      <p className="text-[11px] text-slate-400">{profile?.hospital}</p>
+                    </div>
+                    <Link 
+                      href="/points" 
+                      onClick={() => setIsOpen(false)}
+                      className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50 rounded-lg"
+                    >
+                      💰 포인트 내역
+                    </Link>
+                    <Link 
+                      href="/my" 
+                      onClick={() => setIsOpen(false)}
+                      className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50 rounded-lg"
+                    >
+                      <Bookmark size={12} /> 내 케이스 관리
+                    </Link>
+                    {profile?.role === 'admin' && (
+                      <Link 
+                        href="/billing" 
+                        onClick={() => setIsOpen(false)}
+                        className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50 rounded-lg"
+                      >
+                        <CreditCard size={12} />결제 관리
+                      </Link>
+                    )}
+                    <button
+                      onClick={() => {
+                        setIsOpen(false);
+                        handleSignOut();
+                      }}
+                      className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50 rounded-lg"
+                    >
+                      <LogOut size={12} />로그아웃
+                    </button>
                   </div>
-                  <Link href="/points" className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50 rounded-lg">
-                    💰 포인트 내역
-                  </Link>
-                  <Link href="/billing" className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50 rounded-lg">
-                    <CreditCard size={12} />결제 관리
-                  </Link>
-                  <button
-                    onClick={handleSignOut}
-                    className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50 rounded-lg"
-                  >
-                    <LogOut size={12} />로그아웃
-                  </button>
-                </div>
+                )}
               </div>
             </>
           ) : (

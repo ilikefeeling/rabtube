@@ -7,7 +7,7 @@ import { Upload, CheckCircle, AlertCircle, ChevronLeft, ChevronDown, ChevronUp, 
 import Link from 'next/link';
 import Header from '@/components/Header';
 import { useAuth } from '@/lib/AuthContext';
-import { uploadCaseVideo, getCustomMaterials } from '@/lib/firebaseService';
+import { getCaseById, updateCaseVideo, getCustomMaterials } from '@/lib/firebaseService';
 import { DIAGNOSIS_OPTIONS, TECHNIQUE_OPTIONS, MATERIAL_PRESETS } from '@/lib/clinicalPresets';
 import { SYSTEMIC_CONDITIONS } from '@/types';
 import type { CaseCategory, Difficulty, Visibility, UploadProgress, BoneClassification, PatientAgeRange, SystemicCondition, ClinicalMetadata } from '@/types';
@@ -16,7 +16,9 @@ const CATEGORIES: CaseCategory[] = ['임플란트', '보철', '치주', '교정'
 const BONE_CLASSES: BoneClassification[] = ['Class I', 'Class II', 'Class III', 'Class IV', '해당없음'];
 const PATIENT_AGES: PatientAgeRange[] = ['10대', '20대', '30대', '40대', '50대', '60대', '70대이상'];
 
-export default function UploadPage() {
+export default function EditPage({ params }: { params: { id: string } }) {
+  const [loadingInitial, setLoadingInitial] = useState(true);
+  const [oldVideoUrl, setOldVideoUrl] = useState<string | null>(null);
   const { user, profile } = useAuth();
   const router = useRouter();
 
@@ -57,6 +59,34 @@ export default function UploadPage() {
 
   // 팝업 면책동의 State
   const [isPolicyModalOpen, setIsPolicyModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!params.id) return;
+    getCaseById(params.id).then(c => {
+      if(c) {
+        setTitle(c.title);
+        setDescription(c.description || "");
+        setCategory(c.category);
+        setToothNumber(c.toothNumber);
+        setTags(c.tags?.join(", ") || "");
+        setDifficulty(c.difficulty);
+        setVisibility(c.visibility);
+        setPrice(c.price || 0);
+        setOldVideoUrl(c.videoUrl);
+        if (c.clinical) {
+          setDiagnosis(c.clinical.diagnosis || []);
+          setTechnique(c.clinical.technique || []);
+          setSelectedMaterials(c.clinical.materials || []);
+          setBoneClassification(c.clinical.boneClassification || "");
+          setPatientAge(c.clinical.patientAge || "");
+          setPatientGender(c.clinical.patientGender || "");
+          setSystemicConditions((c.clinical.systemicConditions || []) as SystemicCondition[]);
+          setIsClinicalOpen(true);
+        }
+      }
+      setLoadingInitial(false);
+    }).catch(console.error);
+  }, [params.id]);
 
   // 재료 목록 불러오기
   useEffect(() => {
@@ -104,7 +134,7 @@ export default function UploadPage() {
   });
 
   const handleSubmit = async () => {
-    if (!file || !title || !category || !user || !profile || !consentAgreed) return;
+    if (!title || !category || !user || !profile || !consentAgreed) return;
     if (price < 0 || price > 10000) {
       alert('열람 가격은 0 RAB에서 10,000 RAB 사이여야 합니다.');
       return;
@@ -125,8 +155,8 @@ export default function UploadPage() {
 
       const hasClinicalData = diagnosis.length > 0 || technique.length > 0 || selectedMaterials.length > 0 || boneClassification || patientAge || patientGender || systemicConditions.length > 0;
 
-      await uploadCaseVideo(
-        file,
+      await updateCaseVideo(
+        params.id,
         user.uid,
         {
           title,
@@ -140,7 +170,8 @@ export default function UploadPage() {
           clinical: hasClinicalData ? clinical : undefined,
           consentAgreed,
         },
-        profile,
+        file,
+        file ? oldVideoUrl : null,
         (p) => setProgress(p)
       );
 
@@ -156,6 +187,11 @@ export default function UploadPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {loadingInitial && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80">
+          <div className="w-8 h-8 border-4 border-teal-500/30 border-t-teal-500 rounded-full animate-spin" />
+        </div>
+      )}
       <Header />
 
       <main className="max-w-2xl mx-auto px-6 py-8">
@@ -165,11 +201,11 @@ export default function UploadPage() {
         </Link>
 
         <div className="card p-6">
-          <h1 className="text-lg font-medium text-slate-800 mb-1">케이스 영상 업로드</h1>
+          <h1 className="text-lg font-medium text-slate-800 mb-1">케이스 영상 수정</h1>
           <p className="text-xs text-slate-400 mb-6">치료 케이스를 동료 원장님들과 공유해 주세요</p>
 
           {/* Dropzone */}
-          {!file ? (
+          {(!file && !oldVideoUrl) ? (
             <div
               {...getRootProps()}
               className={`border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-all mb-6 ${
@@ -194,11 +230,11 @@ export default function UploadPage() {
                   <Upload size={18} className="text-teal-600" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-700 truncate">{file.name}</p>
-                  <p className="text-xs text-slate-400">{(file.size / 1024 / 1024).toFixed(1)} MB</p>
+                  <p className="text-sm font-medium text-slate-700 truncate">{file ? file.name : "기존 영상 유지"}</p>
+                  <p className="text-xs text-slate-400">{file ? (file.size / 1024 / 1024).toFixed(1) + " MB" : "(변경 시 새 파일 선택)"}</p>
                 </div>
                 {!isUploading && !isDone && (
-                  <button onClick={() => setFile(null)} className="text-xs text-slate-400 hover:text-slate-600">변경</button>
+                  <button onClick={() => { setFile(null); setOldVideoUrl(null); }} className="text-xs text-slate-400 hover:text-slate-600">변경</button>
                 )}
               </div>
 
@@ -572,10 +608,10 @@ export default function UploadPage() {
             <Link href="/" className="btn-secondary flex-1 text-center">취소</Link>
             <button
               onClick={handleSubmit}
-              disabled={!file || !title || !category || !consentAgreed || isUploading || isDone}
+              disabled={(!file && !oldVideoUrl) || !title || !category || !consentAgreed || isUploading || isDone}
               className="btn-primary flex-1"
             >
-              {isDone ? '✓ 업로드 완료' : isUploading ? `${progress.percent}% 업로드 중...` : '업로드 시작'}
+              {isDone ? '✓ 업로드 완료' : isUploading ? `${progress.percent}% 업로드 중...` : '수정 시작'}
             </button>
           </div>
         </div>

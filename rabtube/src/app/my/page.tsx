@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Plus, Eye, Heart, Trash2 } from 'lucide-react';
+import { Plus, Eye, Heart, Trash2, Edit } from 'lucide-react';
 import Header from '@/components/Header';
 import VideoPlayer from '@/components/VideoPlayer';
 import { getMyCases, deleteCaseVideo } from '@/lib/firebaseService';
@@ -81,12 +81,22 @@ export default function MyCasesPage() {
                     <span className="flex items-center gap-0.5"><Heart size={10} />{v.likes?.length ?? 0}</span>
                   </div>
                 </div>
-                <button
-                  onClick={() => handleDelete(v)}
-                  className="shrink-0 w-8 h-8 flex items-center justify-center text-slate-300 hover:text-red-400 hover:bg-red-50 rounded-lg transition-colors"
-                >
-                  <Trash2 size={14} />
-                </button>
+                <div className="shrink-0 flex items-center gap-1">
+                  <Link
+                    href={`/edit/${v.id}`}
+                    className="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
+                    title="수정"
+                  >
+                    <Edit size={14} />
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(v)}
+                    className="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                    title="삭제"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>

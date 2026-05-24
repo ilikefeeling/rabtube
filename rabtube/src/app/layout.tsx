@@ -19,18 +19,6 @@ const dmSerif = DM_Serif_Display({
 export const metadata: Metadata = {
   title: 'Rabtube - 치과 케이스 플랫폼',
   description: '치과 개원의를 위한 전문 케이스 영상 커뮤니티',
-  icons: {
-    icon: [
-      { url: '/favicon.ico' },
-      { url: '/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
-    ],
-    shortcut: '/favicon.ico',
-    apple: '/apple-touch-icon.png',
-  },
-  manifest: '/site.webmanifest',
-  appleWebApp: {
-    title: 'Rabtube',
-  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

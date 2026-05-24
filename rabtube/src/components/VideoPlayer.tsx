@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { X, Heart, Share2, Eye } from 'lucide-react';
+import { X, Heart, Eye, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { toggleLike, incrementViews } from '@/lib/firebaseService';
 import { processViewPayment } from '@/lib/pointService';
@@ -26,6 +26,9 @@ export default function VideoPlayer({ video, onClose }: Props) {
   const { user } = useAuth();
   const [likes, setLikes] = useState<string[]>(video.likes ?? []);
   const liked = user ? likes.includes(user.uid) : false;
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [videoError, setVideoError] = useState<string | null>(null);
 
   const viewTracked = useRef(false);
 
@@ -63,16 +66,39 @@ export default function VideoPlayer({ video, onClose }: Props) {
         onClick={e => e.stopPropagation()}
       >
         {/* Video */}
-        <div className="relative bg-[#0d2137] aspect-video">
+        <div className="relative bg-[#0d2137] aspect-video flex items-center justify-center">
+          {isLoading && !videoError && (
+            <div className="absolute inset-0 flex items-center justify-center bg-[#0d2137]">
+              <div className="w-8 h-8 border-4 border-teal-500/30 border-t-teal-500 rounded-full animate-spin" />
+            </div>
+          )}
+          {videoError && (
+            <div className="absolute inset-0 flex items-center justify-center bg-[#0d2137] text-white p-6 text-center z-10">
+              <div>
+                <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-3" />
+                <p className="text-sm font-medium">{videoError}</p>
+                <p className="text-xs text-slate-400 mt-2">MP4, WebM 형식이 아닌 영상(예: iPhone MOV)은 크롬에서 재생되지 않을 수 있습니다.</p>
+              </div>
+            </div>
+          )}
           <video
             src={video.videoUrl}
             controls
-            className="w-full h-full"
+            controlsList="nodownload"
+            onContextMenu={e => e.preventDefault()}
+            className={`w-full h-full ${isLoading || videoError ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
             autoPlay
+            muted
+            playsInline
+            onCanPlay={() => setIsLoading(false)}
+            onError={() => {
+              setIsLoading(false);
+              setVideoError("영상을 불러오거나 재생할 수 없습니다.");
+            }}
           />
           <button
             onClick={onClose}
-            className="absolute top-3 right-3 w-8 h-8 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-colors"
+            className="absolute top-3 right-3 w-8 h-8 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-colors z-20"
           >
             <X size={14} />
           </button>
@@ -159,9 +185,6 @@ export default function VideoPlayer({ video, onClose }: Props) {
               >
                 <Heart size={13} fill={liked ? 'currentColor' : 'none'} />
                 {likes.length}
-              </button>
-              <button className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg border border-slate-200 text-slate-500 hover:border-slate-300 transition-all">
-                <Share2 size={13} />공유
               </button>
             </div>
           </div>

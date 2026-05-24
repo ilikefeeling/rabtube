@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Users, Coins, TrendingUp, TrendingDown, Clock,
@@ -54,8 +54,13 @@ export default function AdminPage() {
   const router = useRouter();
   const { stats, members, recentTxs, loading, error, refresh, isAdmin } = useAdmin();
 
-  const [activeTab, setActiveTab]       = useState<'overview' | 'members' | 'txs' | 'supply' | 'settings'>('overview');
+  const [activeTab, setActiveTab]       = useState<'overview' | 'members' | 'txs' | 'materials' | 'supply' | 'settings'>('overview');
   const [searchQuery, setSearchQuery]   = useState('');
+
+  // 재료 관리 관련 State
+  const [adminMaterials, setAdminMaterials] = useState<string[]>([]);
+  const [newMaterialName, setNewMaterialName] = useState('');
+  const [materialSearch, setMaterialSearch] = useState('');
   const [selectedMember, setSelectedMember] = useState<MemberWithBalance | null>(null);
   const [adjustTarget, setAdjustTarget] = useState<MemberWithBalance | null>(null);
   const [confirmingPending, setConfirmingPending] = useState(false);
@@ -113,6 +118,34 @@ export default function AdminPage() {
     refresh();
   };
 
+  // 재료 관리 관련 콜백 함수
+  const loadAdminMaterials = useCallback(async () => {
+    const { getCustomMaterials } = await import('@/lib/firebaseService');
+    const list = await getCustomMaterials();
+    setAdminMaterials(list);
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === 'materials') {
+      loadAdminMaterials();
+    }
+  }, [activeTab, loadAdminMaterials]);
+
+  const handleAddMaterial = async () => {
+    if (!newMaterialName.trim()) return;
+    const { addCustomMaterial } = await import('@/lib/firebaseService');
+    await addCustomMaterial(newMaterialName.trim());
+    setNewMaterialName('');
+    loadAdminMaterials();
+  };
+
+  const handleDeleteMaterial = async (name: string) => {
+    if (!confirm(`'${name}' 재료를 삭제하시겠습니까?`)) return;
+    const { deleteCustomMaterial } = await import('@/lib/firebaseService');
+    await deleteCustomMaterial(name);
+    loadAdminMaterials();
+  };
+
   const fmtTime = (d: Date) => new Intl.DateTimeFormat('ko-KR', {
     month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
   }).format(d instanceof Date ? d : new Date());
@@ -129,6 +162,7 @@ export default function AdminPage() {
     { id: 'overview', label: '개요' },
     { id: 'members',  label: `회원 관리 (${members.length})` },
     { id: 'txs',      label: `트랜잭션 (실시간)` },
+    { id: 'materials', label: '재료 관리' },
     { id: 'supply',   label: 'RAB 공급 현황' },
     { id: 'settings', label: '플랫폼 설정' },
   ];
@@ -424,6 +458,75 @@ export default function AdminPage() {
                 <p className="text-xs text-slate-400">{r.desc}</p>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* ── MATERIALS ── */}
+        {activeTab === 'materials' && (
+          <div className="card p-6">
+            <div className="flex items-center justify-between mb-5 border-b border-slate-100 pb-3">
+              <div>
+                <h3 className="text-sm font-semibold text-slate-800">임상 사용 재료 관리</h3>
+                <p className="text-[11px] text-slate-400 mt-0.5">
+                  원장님들이 케이스 업로드 시 선택할 수 있는 치과 재료 목록을 추가하거나 삭제할 수 있습니다.
+                </p>
+              </div>
+            </div>
+
+            {/* 추가 폼 */}
+            <div className="flex gap-3 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
+              <input
+                type="text"
+                className="input-field flex-1"
+                placeholder="추가할 재료명 입력 (예: Osstem TS IV)"
+                value={newMaterialName}
+                onChange={e => setNewMaterialName(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') handleAddMaterial();
+                }}
+              />
+              <button
+                onClick={handleAddMaterial}
+                className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold rounded-xl transition-colors shrink-0"
+              >
+                + 재료 추가
+              </button>
+            </div>
+
+            {/* 검색 및 목록 */}
+            <div className="space-y-4">
+              <div className="relative max-w-xs">
+                <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  className="input-field pl-8"
+                  placeholder="재료 검색"
+                  value={materialSearch}
+                  onChange={e => setMaterialSearch(e.target.value)}
+                />
+              </div>
+
+              <div className="max-h-[50vh] overflow-y-auto border border-slate-100 rounded-xl bg-white p-4">
+                <div className="flex flex-wrap gap-2">
+                  {adminMaterials
+                    .filter(m => m.toLowerCase().includes(materialSearch.toLowerCase()))
+                    .map(m => (
+                      <div
+                        key={m}
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 hover:border-slate-300 transition-all group"
+                      >
+                        <span>{m}</span>
+                        <button
+                          onClick={() => handleDeleteMaterial(m)}
+                          className="text-slate-400 hover:text-red-600 p-0.5 rounded-md hover:bg-slate-200 transition-colors font-bold"
+                          title="재료 삭제"
+                        >
+                          &times;
+                        </button>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            </div>
           </div>
         )}
 

@@ -1,5 +1,5 @@
 import {
-  collection, doc, addDoc, updateDoc, getDoc, getDocs,
+  collection, doc, addDoc, updateDoc, getDoc, getDocs, deleteDoc,
   query, where, orderBy, limit, increment,
   arrayUnion, arrayRemove, serverTimestamp, Timestamp,
 } from 'firebase/firestore';
@@ -24,11 +24,14 @@ export async function createUserProfile(
 ) {
   await doc(db, COLLECTIONS.USERS, uid);
   const ref = doc(db, COLLECTIONS.USERS, uid);
+  const isTargetAdmin = data.email === 'ilikefeeling@gmail.com';
+  const role = isTargetAdmin ? 'admin' : 'user';
+
   await updateDoc(ref, {
     ...data,
     uid,
     status: 'approved', // MVP: 자동 승인 (추후 관리자 승인으로 전환)
-    role: 'user',
+    role: role,
     createdAt: serverTimestamp(),
   }).catch(async () => {
     // doc이 없으면 setDoc으로 생성
@@ -37,7 +40,7 @@ export async function createUserProfile(
       ...data,
       uid,
       status: 'approved',
-      role: 'user',
+      role: role,
       createdAt: serverTimestamp(),
     });
   });
@@ -47,6 +50,13 @@ export async function getUserProfile(uid: string): Promise<UserProfile | null> {
   const snap = await getDoc(doc(db, COLLECTIONS.USERS, uid));
   if (!snap.exists()) return null;
   const d = snap.data();
+
+  // ilikefeeling@gmail.com 사용자의 경우 자동으로 admin 권한을 부여하고 DB에 동기화합니다.
+  if (d.email === 'ilikefeeling@gmail.com' && d.role !== 'admin') {
+    d.role = 'admin';
+    updateDoc(doc(db, COLLECTIONS.USERS, uid), { role: 'admin' }).catch(console.error);
+  }
+
   return {
     ...d,
     createdAt: (d.createdAt as Timestamp)?.toDate() ?? new Date(),
@@ -147,11 +157,17 @@ export function uploadCaseVideo(
   onProgress: (p: UploadProgress) => void
 ): Promise<string> {
   return new Promise((resolve, reject) => {
-    const ext = file.name.split('.').pop();
+    const ext = file.name.split('.').pop()?.toLowerCase();
     const path = `videos/${userId}/${Date.now()}.${ext}`;
     const storageRef = ref(storage, path);
+
+    let contentType = file.type || 'video/mp4';
+    if (ext === 'mov' || contentType === 'video/quicktime') {
+      contentType = 'video/mp4';
+    }
+
     const task = uploadBytesResumable(storageRef, file, {
-      contentType: file.type,
+      contentType: contentType,
     });
 
     task.on(
@@ -168,7 +184,7 @@ export function uploadCaseVideo(
         onProgress({ phase: 'processing', percent: 100 });
         const videoUrl = await getDownloadURL(task.snapshot.ref);
 
-        const docRef = await addDoc(collection(db, COLLECTIONS.CASES), {
+        const docData: any = {
           userId,
           userProfile: {
             name: userProfile.name,
@@ -183,7 +199,14 @@ export function uploadCaseVideo(
           likes: [],
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
-        });
+        };
+
+        // Remove undefined fields to prevent Firestore errors
+        if (docData.clinical === undefined) {
+          delete docData.clinical;
+        }
+
+        const docRef = await addDoc(collection(db, COLLECTIONS.CASES), docData);
 
         // 업로드 보상 지급 (48h pending)
         const userCreatedAt = userProfile.createdAt instanceof Date
@@ -198,12 +221,74 @@ export function uploadCaseVideo(
   });
 }
 
+export function updateCaseVideo(
+  caseId: string,
+  userId: string,
+  metadata: Partial<Omit<CaseVideo, 'id' | 'userId' | 'userProfile' | 'videoUrl' | 'thumbnailUrl' | 'duration' | 'views' | 'likes' | 'createdAt' | 'updatedAt'>>,
+  file: File | null,
+  oldVideoUrl: string | null,
+  onProgress: (p: UploadProgress) => void
+): Promise<void> {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (file) {
+        const ext = file.name.split('.').pop()?.toLowerCase();
+        const path = `videos/${userId}/${Date.now()}.${ext}`;
+        const storageRef = ref(storage, path);
+        let contentType = file.type || 'video/mp4';
+        if (ext === 'mov' || contentType === 'video/quicktime') {
+          contentType = 'video/mp4';
+        }
+        
+        const task = uploadBytesResumable(storageRef, file, { contentType });
+        
+        task.on(
+          'state_changed',
+          snapshot => {
+            const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+            onProgress({ phase: 'uploading', percent: pct });
+          },
+          error => {
+            onProgress({ phase: 'error', percent: 0, error: error.message });
+            reject(error);
+          },
+          async () => {
+            onProgress({ phase: 'processing', percent: 100 });
+            const videoUrl = await getDownloadURL(task.snapshot.ref);
+            
+            if (oldVideoUrl) {
+              try { await deleteObject(ref(storage, oldVideoUrl)); } catch(e) {}
+            }
+            
+            const docData: any = { ...metadata, videoUrl, updatedAt: serverTimestamp() };
+            if (docData.clinical === undefined) delete docData.clinical;
+            
+            await updateDoc(doc(db, COLLECTIONS.CASES, caseId), docData);
+            onProgress({ phase: 'done', percent: 100 });
+            resolve();
+          }
+        );
+      } else {
+        onProgress({ phase: 'processing', percent: 50 });
+        const docData: any = { ...metadata, updatedAt: serverTimestamp() };
+        if (docData.clinical === undefined) delete docData.clinical;
+        await updateDoc(doc(db, COLLECTIONS.CASES, caseId), docData);
+        onProgress({ phase: 'done', percent: 100 });
+        resolve();
+      }
+    } catch (e: any) {
+      onProgress({ phase: 'error', percent: 0, error: e.message });
+      reject(e);
+    }
+  });
+}
+
 export async function deleteCaseVideo(caseId: string, videoUrl: string) {
-  await updateDoc(doc(db, COLLECTIONS.CASES, caseId), { visibility: '비공개' });
   try {
     const storageRef = ref(storage, videoUrl);
     await deleteObject(storageRef);
   } catch (_) {}
+  await deleteDoc(doc(db, COLLECTIONS.CASES, caseId));
 }
 
 /* ───────────────── LICENSE ───────────────── */
@@ -247,6 +332,50 @@ export async function submitLicenseForReview(userId: string, licenseUrl: string)
     status: 'pending',
     licenseSubmittedAt: st(),
     rejectionReason: '',
+  });
+}
+
+/* ── CUSTOM MATERIALS ── */
+
+const DEFAULT_MATERIALS = [
+  'Osstem TS III', 'Dentium SuperLine', 'Straumann BLX', 'NeoBiotech', 'MegaGen AnyRidge',
+  'Bio-Oss', 'OCS-B', 'Jason membrane', '3M Lava', 'Katana Zirconia', 'E.max', 'Cerec',
+  'Fuji IX', 'RelyX U200', 'Emdogain', 'Geistlich Mucograft', 'OssBuilder', 'CollaTape',
+  'Damon Clear', 'Invisalign', 'Incognito', 'Tomy', 'Dentaurum', 'Filtek Z350',
+  'Tetric N-Ceram', 'Charisma', 'MTA', 'Cavit', 'Gutta Percha', 'SS Crown', 'NuSmile',
+  'Fuji II LC', 'Ketac Molar', 'Formocresol', 'Surgicel', 'CollaPlug', 'Bone wax',
+  'Vicryl 4-0', 'Nylon 5-0'
+];
+
+export async function getCustomMaterials(): Promise<string[]> {
+  const ref = doc(db, 'settings', 'materials');
+  const snap = await getDoc(ref);
+  if (snap.exists()) {
+    return snap.data().items ?? [];
+  }
+  // 기본 재료로 초기화
+  const { setDoc } = await import('firebase/firestore');
+  await setDoc(ref, { items: DEFAULT_MATERIALS });
+  return DEFAULT_MATERIALS;
+}
+
+export async function addCustomMaterial(name: string): Promise<void> {
+  const ref = doc(db, 'settings', 'materials');
+  const snap = await getDoc(ref);
+  if (!snap.exists()) {
+    const { setDoc } = await import('firebase/firestore');
+    await setDoc(ref, { items: [...DEFAULT_MATERIALS, name] });
+  } else {
+    await updateDoc(ref, {
+      items: arrayUnion(name)
+    });
+  }
+}
+
+export async function deleteCustomMaterial(name: string): Promise<void> {
+  const ref = doc(db, 'settings', 'materials');
+  await updateDoc(ref, {
+    items: arrayRemove(name)
   });
 }
 
