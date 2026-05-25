@@ -9,12 +9,13 @@ export type CaseCategory =
 
 export type Visibility = '회원전용' | '비공개' | '전체공개';
 export type Difficulty = '초급' | '중급' | '고급';
-export type UserStatus = 'pending' | 'approved' | 'rejected';
+export type UserStatus = 'pending' | 'approved' | 'rejected' | 'deleted';
 
 export interface UserProfile {
   uid: string;
   name: string;
   email: string;
+  phoneNumber?: string;
   hospital: string;
   region: string;
   licenseNumber: string;
@@ -145,7 +146,8 @@ export type PointTxType =
   | 'ADMIN_DEDUCT'        // 관리자 차감
   | 'REPORT_REWARD'       // 신고 보상
   | 'PENALTY_DEDUCT'      // 불량 업로드 패널티
-  | 'RAB_PURCHASE';       // 현금 결제 충전
+  | 'RAB_PURCHASE'        // 현금 결제 충전
+  | 'UPLOAD_FEE_SPEND';   // 업로드 1회성 과금 (수수료)
 
 export type PointTxStatus = 'pending' | 'confirmed' | 'cancelled';
 
@@ -177,6 +179,8 @@ export interface PointBalance {
 export interface AdminSettings {
   id: string; // usually 'default'
   platformCommissionRate: number; // 플랫폼 수수료 (예: 0.3 = 30%)
+  enableUploadReward?: boolean;   // 업로드 보상(100 RAB) 토글
+  uploadFeeRab?: number;          // 사용되지 않음(과금은 사용자가 설정한 가격과 동일하게 부과)
   updatedAt: Date;
 }
 

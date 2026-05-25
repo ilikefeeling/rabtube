@@ -35,6 +35,7 @@ const TX_LABELS: Record<PointTxType, string> = {
   REPORT_REWARD:        '신고 보상',
   PENALTY_DEDUCT:       '패널티',
   RAB_PURCHASE:         'RAB 충전',
+  UPLOAD_FEE_SPEND:     '업로드 수수료',
 };
 
 const TX_COLOR: Record<string, string> = {
@@ -44,7 +45,7 @@ const TX_COLOR: Record<string, string> = {
   REPORT_REWARD: 'text-teal-600',
   VIEW_SPEND: 'text-red-500', DOWNLOAD_SPEND: 'text-red-500',
   BOOST_SPEND: 'text-red-500', ADMIN_DEDUCT: 'text-red-500',
-  PENALTY_DEDUCT: 'text-red-500',
+  PENALTY_DEDUCT: 'text-red-500', UPLOAD_FEE_SPEND: 'text-red-500',
 };
 
 const fmt = (n: number) => n >= 1e6 ? `${(n/1e6).toFixed(1)}M` : n >= 1e3 ? `${(n/1e3).toFixed(1)}K` : String(Math.round(n ?? 0));
@@ -56,6 +57,7 @@ export default function AdminPage() {
 
   const [activeTab, setActiveTab]       = useState<'overview' | 'members' | 'txs' | 'materials' | 'supply' | 'settings'>('overview');
   const [searchQuery, setSearchQuery]   = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected' | 'deleted'>('all');
 
   // 재료 관리 관련 State
   const [adminMaterials, setAdminMaterials] = useState<string[]>([]);
@@ -94,12 +96,17 @@ export default function AdminPage() {
     setSavingSettings(false);
   };
 
-  const filteredMembers = members.filter(m =>
-    searchQuery === '' ||
-    m.name.includes(searchQuery) ||
-    m.hospital?.includes(searchQuery) ||
-    m.email?.includes(searchQuery)
-  );
+  const filteredMembers = members.filter(m => {
+    const matchesSearch = searchQuery === '' ||
+      m.name.includes(searchQuery) ||
+      m.hospital?.includes(searchQuery) ||
+      m.email?.includes(searchQuery) ||
+      m.phoneNumber?.includes(searchQuery);
+
+    const matchesStatus = statusFilter === 'all' || m.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
 
   const handleConfirmPending = async () => {
     setConfirmingPending(true);
@@ -112,10 +119,25 @@ export default function AdminPage() {
     finally { setConfirmingPending(false); }
   };
 
-  const handleStatusChange = async (uid: string, status: 'approved' | 'rejected') => {
+  const handleStatusChange = async (uid: string, status: 'pending' | 'approved' | 'rejected' | 'deleted') => {
     if (!user) return;
     await updateMemberStatus(uid, status, user.uid);
     refresh();
+  };
+
+  const handleDeleteMemberClick = async (m: MemberWithBalance) => {
+    if (!user) return;
+    const confirmMsg = `정말 ${m.name} 원장님(이메일: ${m.email})의 계정을 영구 삭제하시겠습니까?\n\n삭제 시 회원 정보와 가입 시 등록된 휴대폰 번호 중복 방지 데이터가 완전히 소멸되며, 해당 번호로 재가입이 즉시 가능해집니다.`;
+    if (!confirm(confirmMsg)) return;
+
+    try {
+      const { deleteMember } = await import('@/lib/adminService');
+      await deleteMember(m.uid, m.phoneNumber, user.uid);
+      alert('회원이 완전히 영구 삭제되었습니다.');
+      refresh();
+    } catch (e: any) {
+      alert(`삭제 실패: ${e.message}`);
+    }
   };
 
   // 재료 관리 관련 콜백 함수
@@ -307,25 +329,50 @@ export default function AdminPage() {
         {/* ── MEMBERS ── */}
         {activeTab === 'members' && (
           <div>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="relative flex-1 max-w-xs">
-                <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  className="input-field pl-8"
-                  placeholder="이름, 병원명, 이메일 검색"
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                />
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5">
+              <div className="flex items-center gap-3">
+                <div className="relative w-64">
+                  <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    className="input-field pl-8 text-xs py-1.5"
+                    placeholder="이름, 병원명, 이메일, 연락처 검색"
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                <span className="text-xs text-slate-400">검색 결과 {filteredMembers.length}명</span>
               </div>
-              <span className="text-xs text-slate-400">{filteredMembers.length}명</span>
+
+              {/* 상태별 퀵 필터 탭 */}
+              <div className="flex items-center gap-1 bg-slate-200/60 p-0.5 rounded-lg border border-slate-200">
+                {[
+                  { id: 'all', label: '전체' },
+                  { id: 'pending', label: '승인 대기' },
+                  { id: 'approved', label: '승인 완료' },
+                  { id: 'rejected', label: '반려/정지' },
+                  { id: 'deleted', label: '삭제됨' },
+                ].map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setStatusFilter(tab.id as any)}
+                    className={`px-3 py-1 rounded-[6px] text-[11px] font-semibold transition-all ${
+                      statusFilter === tab.id
+                        ? 'bg-white text-teal-800 shadow-[0_1px_2px_rgba(0,0,0,0.05)]'
+                        : 'text-slate-500 hover:text-slate-700'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="card overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-100">
-                    {['이름', '병원', '지역', '잔액', '누적획득', '누적소비', '상태', ''].map(h => (
-                      <th key={h} className="px-4 py-2.5 text-left text-[11px] font-medium text-slate-400 uppercase tracking-wide">{h}</th>
+                    {['이름/이메일', '병원명', '연락처', '지역', 'RAB 잔액', '누적획득', '누적소비', '상태', '회원작업'].map(h => (
+                      <th key={h} className="px-4 py-2.5 text-left text-[11px] font-medium text-slate-400 uppercase tracking-wide whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -343,7 +390,8 @@ export default function AdminPage() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-xs text-slate-600">{m.hospital}</td>
+                      <td className="px-4 py-3 text-xs text-slate-600 font-medium">{m.hospital}</td>
+                      <td className="px-4 py-3 text-xs text-slate-500 font-mono whitespace-nowrap">{m.phoneNumber || '-'}</td>
                       <td className="px-4 py-3 text-xs text-slate-500">{m.region}</td>
                       <td className="px-4 py-3">
                         <span className="text-sm font-medium text-slate-800">{fmt(m.balance)}</span>
@@ -355,38 +403,67 @@ export default function AdminPage() {
                       <td className="px-4 py-3 text-xs text-teal-600">+{fmt(m.totalEarned)}</td>
                       <td className="px-4 py-3 text-xs text-red-400">-{fmt(m.totalSpent)}</td>
                       <td className="px-4 py-3">
-                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded uppercase ${
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded tracking-wide ${
                           m.status === 'approved' ? 'bg-teal-50 text-teal-700' :
-                          m.status === 'rejected' ? 'bg-red-50 text-red-600' :
+                          m.status === 'rejected' ? 'bg-rose-50 text-rose-600' :
+                          m.status === 'deleted'  ? 'bg-slate-100 text-slate-600' :
                           'bg-amber-50 text-amber-600'
                         }`}>
-                          {m.status === 'approved' ? '승인' : m.status === 'rejected' ? '거절' : '대기'}
+                          {m.status === 'approved' ? '승인 완료' : m.status === 'rejected' ? '반려/정지' : m.status === 'deleted' ? '삭제됨' : '승인 대기'}
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1.5 flex-wrap">
                           <button
                             onClick={() => setAdjustTarget(m)}
-                            className="text-[11px] px-2.5 py-1 rounded-md bg-teal-50 text-teal-700 hover:bg-teal-100 transition-colors font-medium"
+                            className="text-[11px] px-2 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors font-medium border border-slate-200"
+                            title="RAB 수동 지급 및 차감"
                           >
                             RAB 조정
                           </button>
-                          {m.status !== 'approved' && (
-                            <button
-                              onClick={() => handleStatusChange(m.uid, 'approved')}
-                              className="text-[11px] px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
-                            >
-                              승인
-                            </button>
+                          
+                          {m.status === 'pending' && (
+                            <>
+                              <button
+                                onClick={() => handleStatusChange(m.uid, 'approved')}
+                                className="text-[11px] px-2.5 py-1 rounded-md bg-teal-600 text-white hover:bg-teal-700 transition-colors font-semibold"
+                              >
+                                승인
+                              </button>
+                              <button
+                                onClick={() => handleStatusChange(m.uid, 'rejected')}
+                                className="text-[11px] px-2.5 py-1 rounded-md bg-rose-50 text-rose-600 hover:bg-rose-100 transition-colors font-medium border border-rose-100"
+                              >
+                                반려
+                              </button>
+                            </>
                           )}
+
                           {m.status === 'approved' && (
                             <button
                               onClick={() => handleStatusChange(m.uid, 'rejected')}
-                              className="text-[11px] px-2.5 py-1 rounded-md bg-red-50 text-red-500 hover:bg-red-100 transition-colors"
+                              className="text-[11px] px-2.5 py-1 rounded-md bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors border border-amber-200"
                             >
                               정지
                             </button>
                           )}
+
+                          {(m.status === 'rejected' || m.status === 'deleted') && (
+                            <button
+                              onClick={() => handleStatusChange(m.uid, 'approved')}
+                              className="text-[11px] px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors border border-blue-200 font-medium"
+                            >
+                              재승인
+                            </button>
+                          )}
+
+                          <button
+                            onClick={() => handleDeleteMemberClick(m)}
+                            className="text-[11px] px-2 py-1 rounded-md bg-red-50 hover:bg-red-100 text-red-600 transition-colors border border-red-200 font-medium ml-auto"
+                            title="회원 데이터 영구 삭제"
+                          >
+                            삭제
+                          </button>
                         </div>
                       </td>
                     </tr>

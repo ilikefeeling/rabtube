@@ -81,20 +81,22 @@ export default function MyCasesPage() {
                     <span className="flex items-center gap-0.5"><Heart size={10} />{v.likes?.length ?? 0}</span>
                   </div>
                 </div>
-                <div className="shrink-0 flex items-center gap-1">
+                <div className="shrink-0 flex items-center gap-2">
                   <Link
                     href={`/edit/${v.id}`}
-                    className="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
+                    className="flex flex-col items-center justify-center w-14 h-14 bg-slate-50 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors border border-slate-200 shadow-sm"
                     title="수정"
                   >
-                    <Edit size={14} />
+                    <Edit size={22} className="mb-0.5" />
+                    <span className="text-[10px] font-bold">수정</span>
                   </Link>
                   <button
                     onClick={() => handleDelete(v)}
-                    className="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                    className="flex flex-col items-center justify-center w-14 h-14 bg-slate-50 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors border border-slate-200 shadow-sm"
                     title="삭제"
                   >
-                    <Trash2 size={14} />
+                    <Trash2 size={22} className="mb-0.5" />
+                    <span className="text-[10px] font-bold">삭제</span>
                   </button>
                 </div>
               </div>

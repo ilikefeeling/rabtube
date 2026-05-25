@@ -168,20 +168,22 @@ async function recordTx(
    관리자 설정 조회 (수수료율 등)
 ───────────────────────────────────── */
 
-export async function getAdminSettings(): Promise<{ platformCommissionRate: number }> {
+export async function getAdminSettings(): Promise<{ platformCommissionRate: number, enableUploadReward: boolean, uploadFeeRab: number }> {
   try {
     const snap = await getDoc(doc(db, 'settings', 'admin'));
     if (snap.exists()) {
       const data = snap.data();
-      if (typeof data.platformCommissionRate === 'number') {
-        return { platformCommissionRate: data.platformCommissionRate };
-      }
+      return {
+        platformCommissionRate: typeof data.platformCommissionRate === 'number' ? data.platformCommissionRate : 0.3,
+        enableUploadReward: typeof data.enableUploadReward === 'boolean' ? data.enableUploadReward : true,
+        uploadFeeRab: typeof data.uploadFeeRab === 'number' ? data.uploadFeeRab : 0,
+      };
     }
   } catch (err) {
     console.error('Failed to get admin settings', err);
   }
-  // 기본 수수료율 30% (설정이 없거나 오류 시 fallback)
-  return { platformCommissionRate: 0.3 };
+  // 기본 설정 (설정이 없거나 오류 시 fallback)
+  return { platformCommissionRate: 0.3, enableUploadReward: true, uploadFeeRab: 0 };
 }
 
 /* ─────────────────────────────────────
@@ -243,6 +245,16 @@ export async function awardUploadReward(
   caseId: string,
   userCreatedAt: Date
 ): Promise<{ awarded: boolean; reason?: string; amount: number }> {
+  // 관리자 설정에서 보상 기능이 꺼져 있으면 지급하지 않음
+  const adminSettings = await getAdminSettings();
+  if (!adminSettings.enableUploadReward) {
+    return {
+      awarded: false,
+      reason: `업로드 보상 기능이 비활성화 상태입니다.`,
+      amount: 0,
+    };
+  }
+
   // 월 상한 확인
   const monthlyCount = await getMonthlyUploadRewardCount(userId);
   if (monthlyCount >= RAB_POLICY.MONTHLY_UPLOAD_CAP) {
@@ -302,6 +314,24 @@ export async function awardLikeReward(
     RAB_POLICY.LIKE_REWARD,
     `케이스 좋아요 수신 +${RAB_POLICY.LIKE_REWARD} RAB`,
     { relatedCaseId: caseId, relatedUserId: likerUserId }
+  );
+}
+
+/** 4-5. 영상 업로드 수수료 (1회성) */
+export async function processUploadFee(
+  uploaderUserId: string,
+  caseId: string,
+  caseTitle: string,
+  uploadFeeRab: number
+): Promise<void> {
+  if (uploadFeeRab <= 0) return;
+
+  await recordTx(
+    uploaderUserId,
+    'UPLOAD_FEE_SPEND',
+    -uploadFeeRab,
+    `케이스 업로드 수수료: ${caseTitle}`,
+    { relatedCaseId: caseId }
   );
 }
 

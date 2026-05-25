@@ -3,15 +3,7 @@
 import { useState } from 'react';
 import { X, Coins } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
-
-// 백엔드와 완전히 일치하는 보너스 RAB 패키지 정책
-const RAB_PACKAGES: Record<number, { rab: number; label: string }> = {
-  5000:   { rab: 500,   label: '기본 500 RAB (10% 보너스 상당)' },
-  10000:  { rab: 1100,  label: '기본 + 10% 추가 보너스' },
-  30000:  { rab: 3500,  label: '기본 + 16% 추가 보너스' },
-  50000:  { rab: 6000,  label: '기본 + 20% 추가 보너스' },
-  100000: { rab: 13000, label: '기본 + 30% 초고액 보너스' },
-};
+import { calculateBilling, MIN_RAB, MAX_RAB } from '@/lib/billingService';
 
 interface Props {
   onClose: () => void;
@@ -20,23 +12,27 @@ interface Props {
 
 export default function PurchaseModal({ onClose, onSuccess }: Props) {
   const { user } = useAuth();
-  const [amountKrw, setAmountKrw] = useState<number>(10000);
+  const [rabAmount, setRabAmount] = useState<number>(MIN_RAB);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const pkg = RAB_PACKAGES[amountKrw] || { rab: 0, label: '' };
-  const rabAmount = pkg.rab;
+  // 실시간 과금 계산
+  const billing = calculateBilling(rabAmount);
 
   const handlePurchase = async () => {
     if (!user) return;
+    if (rabAmount < MIN_RAB || rabAmount > MAX_RAB) {
+      alert(`구매 수량은 최소 ${MIN_RAB.toLocaleString()} RAB 부터 최대 ${MAX_RAB.toLocaleString()} RAB 까지 가능합니다.`);
+      return;
+    }
+
     setIsProcessing(true);
     try {
-      // 1. Stripe Checkout API 호출
       const res = await fetch('/api/stripe/rab-purchase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: user.uid,
-          krwAmount: amountKrw,
+          rabAmount: rabAmount,
           email: user.email || '',
         }),
       });
@@ -47,7 +43,6 @@ export default function PurchaseModal({ onClose, onSuccess }: Props) {
         throw new Error(data.error || '결제 요청 실패');
       }
 
-      // 2. Stripe 결제 페이지(Checkout Session URL)로 안전하게 리다이렉트
       if (data.url) {
         window.location.href = data.url;
       } else {
@@ -58,6 +53,22 @@ export default function PurchaseModal({ onClose, onSuccess }: Props) {
       alert(`결제 요청 중 오류가 발생했습니다: ${e.message}`);
       setIsProcessing(false);
     }
+  };
+
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = Number(e.target.value);
+    setRabAmount(val);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let val = Number(e.target.value);
+    if (isNaN(val)) return;
+    setRabAmount(val);
+  };
+
+  const handleInputBlur = () => {
+    if (rabAmount < MIN_RAB) setRabAmount(MIN_RAB);
+    if (rabAmount > MAX_RAB) setRabAmount(MAX_RAB);
   };
 
   return (
@@ -74,29 +85,52 @@ export default function PurchaseModal({ onClose, onSuccess }: Props) {
         </div>
 
         <div className="p-5">
-          <label className="block text-xs font-medium text-slate-500 mb-2">충전 금액 (원)</label>
-          <select
-            className="input-field w-full mb-4 cursor-pointer"
-            value={amountKrw}
-            onChange={e => setAmountKrw(Number(e.target.value))}
-            disabled={isProcessing}
-          >
-            <option value={5000}>5,000원</option>
-            <option value={10000}>10,000원</option>
-            <option value={30000}>30,000원</option>
-            <option value={50000}>50,000원</option>
-            <option value={100000}>100,000원</option>
-          </select>
+          <label className="block text-xs font-medium text-slate-500 mb-2">충전할 RAB 수량 (최소 {MIN_RAB.toLocaleString()} RAB / $10)</label>
+          
+          <div className="relative mb-4">
+            <input
+              type="number"
+              min={MIN_RAB}
+              max={MAX_RAB}
+              value={rabAmount}
+              onChange={handleInputChange}
+              onBlur={handleInputBlur}
+              disabled={isProcessing}
+              className="input-field w-full pr-12 text-lg font-bold text-center"
+            />
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-medium">
+              RAB
+            </span>
+          </div>
+
+          <div className="mb-6 px-1">
+            <input
+              type="range"
+              min={MIN_RAB}
+              max={MAX_RAB}
+              step={10}
+              value={rabAmount}
+              onChange={handleSliderChange}
+              disabled={isProcessing}
+              className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-teal-500"
+            />
+            <div className="flex justify-between mt-2 text-[10px] text-slate-400 font-medium">
+              <span>{MIN_RAB.toLocaleString()} RAB</span>
+              <span>{MAX_RAB.toLocaleString()} RAB</span>
+            </div>
+          </div>
 
           <div className="bg-amber-50 border border-amber-100/60 rounded-xl p-4 mb-6 text-center">
-            <p className="text-[11px] text-amber-600 font-medium mb-1">지급 예정 RAB</p>
-            <p className="text-2xl font-bold text-amber-700">{rabAmount.toLocaleString()} RAB</p>
-            <p className="text-[10px] text-amber-500 mt-1.5 font-medium">{pkg.label}</p>
+            <p className="text-[11px] text-amber-600 font-medium mb-1">총 결제 금액 (USD)</p>
+            <p className="text-3xl font-bold text-amber-700">${billing.price.toFixed(2)}</p>
+            <p className="text-[10px] text-amber-500 mt-1.5 font-medium">
+              대량 구매 보너스(할인율): <span className="font-bold">{billing.rate}%</span> 적용
+            </p>
           </div>
 
           <button
             onClick={handlePurchase}
-            disabled={isProcessing}
+            disabled={isProcessing || rabAmount < MIN_RAB}
             className="w-full bg-teal-600 hover:bg-teal-700 text-white font-medium text-sm py-3 rounded-xl disabled:opacity-50 transition-colors flex items-center justify-center gap-1.5"
           >
             {isProcessing ? (
@@ -105,7 +139,7 @@ export default function PurchaseModal({ onClose, onSuccess }: Props) {
                 Stripe 안전 결제창으로 이동 중...
               </>
             ) : (
-              `${amountKrw.toLocaleString()}원 결제하기`
+              `$${billing.price.toFixed(2)} USD 결제하기`
             )}
           </button>
         </div>
@@ -113,3 +147,4 @@ export default function PurchaseModal({ onClose, onSuccess }: Props) {
     </div>
   );
 }
+

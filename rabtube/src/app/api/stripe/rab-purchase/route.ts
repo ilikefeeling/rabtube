@@ -2,33 +2,31 @@ export const dynamic = 'force-dynamic';
 
 /**
  * POST /api/stripe/rab-purchase
- * RAB 토큰 직접 구매 세션 생성
+ * RAB 토큰 직접 구매 세션 생성 (연속형 과금율 계산)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { RAB_EXCHANGE } from '@/types';
+import { calculateBilling } from '@/lib/billingService';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-06-20',
 });
 
-// RAB 구매 패키지
-const RAB_PACKAGES: Record<number, { rab: number; label: string }> = {
-  5000:   { rab: 500,   label: '₩5,000 → 500 RAB' },
-  10000:  { rab: 1100,  label: '₩10,000 → 1,100 RAB (보너스+10%)' },
-  30000:  { rab: 3500,  label: '₩30,000 → 3,500 RAB (보너스+16%)' },
-  50000:  { rab: 6000,  label: '₩50,000 → 6,000 RAB (보너스+20%)' },
-  100000: { rab: 13000, label: '₩100,000 → 13,000 RAB (보너스+30%)' },
-};
-
 export async function POST(req: NextRequest) {
   try {
-    const { userId, krwAmount, email } = await req.json();
+    const { userId, rabAmount, email } = await req.json();
 
-    const pkg = RAB_PACKAGES[krwAmount];
-    if (!pkg) {
-      return NextResponse.json({ error: '잘못된 구매 금액' }, { status: 400 });
+    if (!rabAmount || rabAmount <= 0) {
+      return NextResponse.json({ error: '잘못된 구매 수량' }, { status: 400 });
+    }
+
+    const billing = calculateBilling(rabAmount);
+    
+    // Stripe 최소 결제 금액(약 $0.50) 방어: 최소 50센트 이상
+    const unitAmountCents = Math.round(billing.price * 100);
+    if (unitAmountCents < 50) {
+      return NextResponse.json({ error: '최소 결제 금액은 $0.50 이상이어야 합니다.' }, { status: 400 });
     }
 
     const session = await stripe.checkout.sessions.create({
@@ -38,13 +36,13 @@ export async function POST(req: NextRequest) {
       line_items: [
         {
           price_data: {
-            currency: 'krw',
+            currency: 'usd',
             product_data: {
-              name: `RabTube RAB 토큰 ${pkg.rab.toLocaleString()}개`,
-              description: pkg.label,
+              name: `RabTube RAB 토큰 ${billing.rab.toLocaleString()}개`,
+              description: `할인율 ${billing.rate}% 적용 ($${billing.price})`,
               images: [`${process.env.NEXT_PUBLIC_APP_URL}/rab-token.png`],
             },
-            unit_amount: krwAmount,
+            unit_amount: unitAmountCents,
           },
           quantity: 1,
         },
@@ -52,10 +50,10 @@ export async function POST(req: NextRequest) {
       metadata: {
         userId,
         type:      'rab_purchase',
-        krwAmount: String(krwAmount),
-        rabAmount: String(pkg.rab),
+        usdAmount: String(billing.price),
+        rabAmount: String(billing.rab),
       },
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/points?purchase=success&rab=${pkg.rab}`,
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/points?purchase=success&rab=${billing.rab}`,
       cancel_url:  `${process.env.NEXT_PUBLIC_APP_URL}/points?purchase=canceled`,
       locale: 'ko',
     });

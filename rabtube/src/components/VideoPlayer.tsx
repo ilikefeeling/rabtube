@@ -58,54 +58,68 @@ export default function VideoPlayer({ video, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/80 z-50 overflow-y-auto"
       onClick={onClose}
     >
-      <div
-        className="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl"
-        onClick={e => e.stopPropagation()}
-      >
-        {/* Video */}
-        <div className="relative bg-[#0d2137] aspect-video flex items-center justify-center">
-          {isLoading && !videoError && (
-            <div className="absolute inset-0 flex items-center justify-center bg-[#0d2137]">
-              <div className="w-8 h-8 border-4 border-teal-500/30 border-t-teal-500 rounded-full animate-spin" />
-            </div>
-          )}
-          {videoError && (
-            <div className="absolute inset-0 flex items-center justify-center bg-[#0d2137] text-white p-6 text-center z-10">
-              <div>
-                <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-3" />
-                <p className="text-sm font-medium">{videoError}</p>
-                <p className="text-xs text-slate-400 mt-2">MP4, WebM 형식이 아닌 영상(예: iPhone MOV)은 크롬에서 재생되지 않을 수 있습니다.</p>
-              </div>
-            </div>
-          )}
-          <video
-            src={video.videoUrl}
-            controls
-            controlsList="nodownload"
-            onContextMenu={e => e.preventDefault()}
-            className={`w-full h-full ${isLoading || videoError ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
-            autoPlay
-            muted
-            playsInline
-            onCanPlay={() => setIsLoading(false)}
-            onError={() => {
-              setIsLoading(false);
-              setVideoError("영상을 불러오거나 재생할 수 없습니다.");
-            }}
-          />
-          <button
-            onClick={onClose}
-            className="absolute top-3 right-3 w-8 h-8 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-colors z-20"
-          >
-            <X size={14} />
-          </button>
-        </div>
+      <div className="min-h-full flex items-start sm:items-center justify-center p-2 pt-12 sm:p-4">
+        <div
+          className="bg-white rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl relative"
+          onClick={e => e.stopPropagation()}
+        >
+          {/* Video */}
+          <div className="relative bg-[#0d2137] w-full flex items-center justify-center overflow-hidden" style={{ minHeight: '30vh' }}>
 
-        {/* Info */}
-        <div className="p-4">
+            {isLoading && !videoError && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#0d2137]/80">
+                <div className="w-10 h-10 border-4 border-teal-500 border-t-transparent rounded-full animate-spin" />
+              </div>
+            )}
+            
+            {/* Blurred Background for Vertical Videos */}
+            {video.thumbnailUrl && (
+              <div 
+                className="absolute inset-0 z-0 opacity-50 blur-xl scale-110"
+                style={{ 
+                  backgroundImage: `url(${video.thumbnailUrl})`, 
+                  backgroundSize: 'cover', 
+                  backgroundPosition: 'center' 
+                }}
+              />
+            )}
+
+            {videoError ? (
+              <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#0d2137] text-white p-6 text-center">
+                <AlertCircle size={32} className="text-red-400 mb-3" />
+                <p className="font-medium">영상을 불러올 수 없습니다</p>
+                <p className="text-sm text-slate-400 mt-1">삭제되었거나 접근할 수 없는 영상입니다</p>
+              </div>
+            ) : (
+              <video
+                src={video.videoUrl}
+                controls
+                controlsList="nodownload"
+                onContextMenu={e => e.preventDefault()}
+                className="relative z-10 w-full max-h-[75vh] object-contain drop-shadow-2xl"
+                autoPlay
+                muted
+                playsInline
+                onCanPlay={() => setIsLoading(false)}
+                onError={() => {
+                  setIsLoading(false);
+                  setVideoError("영상을 불러오거나 재생할 수 없습니다.");
+                }}
+              />
+            )}
+            <button
+              onClick={onClose}
+              className="absolute top-3 right-3 w-8 h-8 bg-black/50 hover:bg-black/70 text-white rounded-full flex items-center justify-center transition-colors z-20"
+            >
+              <X size={14} />
+            </button>
+          </div>
+
+          {/* Info */}
+          <div className="p-4">
           <div className="flex items-start gap-2 mb-3">
             <span className={`text-[10px] font-semibold px-2 py-1 rounded uppercase tracking-wide shrink-0 ${catStyle}`}>
               {video.category}
@@ -187,6 +201,7 @@ export default function VideoPlayer({ video, onClose }: Props) {
                 {likes.length}
               </button>
             </div>
+          </div>
           </div>
         </div>
       </div>

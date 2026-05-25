@@ -51,7 +51,7 @@ export default function BillingPage() {
   const { balance, refresh: refreshPoints } = usePoints();
 
   const [subscription, setSubscription] = useState<Subscription | null>(null);
-  const [tab, setTab]                   = useState<'subscription' | 'rab' | 'cashout'>('subscription');
+  const [tab, setTab]                   = useState<'rab' | 'cashout'>('rab');
   const [loading, setLoading]           = useState(true);
   const [actionLoading, setActionLoading] = useState('');
   const [toast, setToast]               = useState('');
@@ -196,8 +196,8 @@ export default function BillingPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-lg font-medium text-slate-800">결제 & 환전</h1>
-            <p className="text-xs text-slate-400 mt-0.5">구독 관리 · RAB 구매 · 현금 환전</p>
+            <h1 className="text-lg font-medium text-slate-800">충전 & 환전</h1>
+            <p className="text-xs text-slate-400 mt-0.5">Rab 충전 · 현금 환전</p>
           </div>
           <div className="bg-amber-50 border border-amber-100 rounded-xl px-4 py-2.5 text-right">
             <p className="text-[10px] text-amber-600 font-medium uppercase tracking-wide">내 RAB 잔액</p>
@@ -208,8 +208,7 @@ export default function BillingPage() {
         {/* Tabs */}
         <div className="flex gap-2 mb-6 border-b border-slate-200">
           {[
-            { id: 'subscription', label: '구독 관리', icon: <Crown size={14} /> },
-            { id: 'rab',          label: 'RAB 구매',  icon: <Coins size={14} /> },
+            { id: 'rab',          label: 'Rab 충전',  icon: <Coins size={14} /> },
             { id: 'cashout',      label: 'RAB 환전',  icon: <ArrowDownToLine size={14} /> },
           ].map(t => (
             <button
@@ -226,103 +225,10 @@ export default function BillingPage() {
           ))}
         </div>
 
-        {/* ── SUBSCRIPTION ── */}
-        {tab === 'subscription' && (
-          <div className="space-y-4">
-            {/* Current status */}
-            {subscription && subscription.status === 'active' && (
-              <div className="bg-teal-50 border border-teal-100 rounded-xl p-4 flex items-center gap-3">
-                <CheckCircle size={16} className="text-teal-600 shrink-0" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-teal-800">
-                    {SUBSCRIPTION_PLANS[subscription.tier].name} 구독 활성 중
-                  </p>
-                  <p className="text-xs text-teal-600 mt-0.5">
-                    {subscription.currentPeriodEnd.toLocaleDateString('ko-KR')} 갱신
-                    {subscription.cancelAtPeriodEnd && ' · 기간 만료 후 해지 예정'}
-                  </p>
-                </div>
-                {!subscription.cancelAtPeriodEnd && (
-                  <button
-                    onClick={handleCancel}
-                    disabled={actionLoading === 'cancel'}
-                    className="text-xs text-slate-400 hover:text-red-500 transition-colors"
-                  >
-                    {actionLoading === 'cancel' ? '처리 중...' : '구독 취소'}
-                  </button>
-                )}
-              </div>
-            )}
-
-            {/* Plans */}
-            <div className="grid grid-cols-3 gap-3">
-              {(['free', 'pro', 'clinic'] as const).map(tier => {
-                const plan  = SUBSCRIPTION_PLANS[tier];
-                const isActive = currentTier === tier;
-                const isPro    = tier === 'pro';
-
-                return (
-                  <div
-                    key={tier}
-                    className={`card p-5 relative ${
-                      isPro ? 'border-teal-200 bg-teal-50/30' : ''
-                    } ${isActive ? 'ring-1 ring-teal-400' : ''}`}
-                  >
-                    {isPro && (
-                      <span className="absolute top-0 right-0 bg-teal-500 text-white text-[9px] font-bold px-2.5 py-1 rounded-bl-lg rounded-tr-lg uppercase tracking-wide">
-                        추천
-                      </span>
-                    )}
-                    <div className="flex items-center gap-2 mb-3">
-                      {tier === 'free' && <Zap size={14} className="text-slate-400" />}
-                      {tier === 'pro'  && <Crown size={14} className="text-teal-500" />}
-                      {tier === 'clinic' && <Building2 size={14} className="text-blue-500" />}
-                      <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">{tier}</span>
-                    </div>
-                    <p className="font-medium text-slate-800 text-base mb-1">{plan.name}</p>
-                    <div className="mb-4">
-                      <span className="text-2xl font-medium text-slate-800">
-                        {plan.priceKrw === 0 ? '무료' : `₩${fmt(plan.priceKrw)}`}
-                      </span>
-                      {plan.priceKrw > 0 && <span className="text-xs text-slate-400 ml-1">/월</span>}
-                    </div>
-                    <ul className="space-y-1.5 mb-4">
-                      {plan.features.map((f, i) => (
-                        <li key={i} className="text-xs text-slate-500 flex items-center gap-1.5">
-                          <CheckCircle size={10} className="text-teal-500 shrink-0" />{f}
-                        </li>
-                      ))}
-                    </ul>
-                    {isActive ? (
-                      <div className="text-center text-xs text-teal-600 font-medium py-2 bg-teal-50 rounded-lg">
-                        현재 사용 중
-                      </div>
-                    ) : tier !== 'free' ? (
-                      <button
-                        onClick={() => handleSubscribe(tier as 'pro' | 'clinic')}
-                        disabled={!!actionLoading}
-                        className="w-full py-2 text-sm font-medium bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors disabled:opacity-50"
-                      >
-                        {actionLoading === tier ? '처리 중...' : `${plan.name} 시작`}
-                      </button>
-                    ) : null}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* RAB 구독 결제 안내 */}
-            <div className="bg-amber-50 border border-amber-100 rounded-xl p-4">
-              <p className="text-xs font-medium text-amber-700 mb-1">💡 RAB 토큰으로 구독 결제 가능</p>
-              <p className="text-xs text-amber-600">Pro: 200 RAB/월 · 클리닉: 600 RAB/월 — 현금 대비 15% 할인. (구현 예정)</p>
-            </div>
-          </div>
-        )}
-
         {/* ── RAB PURCHASE ── */}
         {tab === 'rab' && (
           <div>
-            <p className="text-sm text-slate-500 mb-5">RAB 토큰을 구매하여 케이스 시청, 다운로드, 홍보 부스트에 사용하세요.</p>
+            <p className="text-sm text-slate-500 mb-5">Rab을 충전하여 케이스 시청, 다운로드, 홍보 부스트에 사용하세요.</p>
             <div className="grid grid-cols-2 gap-3 mb-6">
               {RAB_PACKAGES.map(pkg => (
                 <div
@@ -353,15 +259,15 @@ export default function BillingPage() {
                     disabled={!!actionLoading}
                     className="w-full py-2 text-sm font-medium bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition-colors disabled:opacity-50"
                   >
-                    {actionLoading === String(pkg.krw) ? '처리 중...' : '구매하기'}
+                    {actionLoading === String(pkg.krw) ? '처리 중...' : '충전하기'}
                   </button>
                 </div>
               ))}
             </div>
             <div className="bg-slate-50 rounded-xl p-4 text-xs text-slate-500 space-y-1">
               <p>• 결제는 Stripe를 통해 안전하게 처리됩니다</p>
-              <p>• 구매 즉시 RAB가 계정에 지급됩니다</p>
-              <p>• 구매한 RAB는 환불되지 않습니다</p>
+              <p>• 충전 즉시 Rab가 계정에 지급됩니다</p>
+              <p>• 충전한 Rab는 환불되지 않습니다</p>
             </div>
           </div>
         )}

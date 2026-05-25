@@ -7,7 +7,7 @@ import {
   collection, doc, getDocs, getDoc, setDoc, query,
   where, orderBy, limit, startAfter, runTransaction,
   serverTimestamp, Timestamp, onSnapshot,
-  QueryDocumentSnapshot, DocumentData,
+  QueryDocumentSnapshot, DocumentData, deleteDoc,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import type { UserProfile, PointTransaction, PointBalance } from '@/types';
@@ -239,7 +239,7 @@ export async function adminAdjustPoints(input: AdminAdjustmentInput): Promise<vo
 
 export async function updateMemberStatus(
   targetUserId: string,
-  status: 'approved' | 'rejected',
+  status: 'pending' | 'approved' | 'rejected' | 'deleted',
   adminUserId: string
 ): Promise<void> {
   const adminSnap = await getDoc(doc(db, COL.USERS, adminUserId));
@@ -247,6 +247,28 @@ export async function updateMemberStatus(
     throw new Error('관리자 권한이 없습니다');
   }
   await setDoc(doc(db, COL.USERS, targetUserId), { status }, { merge: true });
+}
+
+export async function deleteMember(
+  targetUserId: string,
+  phoneNumber: string | undefined,
+  adminUserId: string
+): Promise<void> {
+  const adminSnap = await getDoc(doc(db, COL.USERS, adminUserId));
+  if (!adminSnap.exists() || adminSnap.data().role !== 'admin') {
+    throw new Error('관리자 권한이 없습니다');
+  }
+  
+  // 1. users 문서 삭제
+  await deleteDoc(doc(db, COL.USERS, targetUserId));
+  
+  // 2. phone_numbers 중복 방지용 문서 삭제
+  if (phoneNumber) {
+    const cleanPhone = phoneNumber.replace(/[^0-9]/g, '');
+    if (cleanPhone) {
+      await deleteDoc(doc(db, 'phone_numbers', cleanPhone));
+    }
+  }
 }
 
 /* ─────────────────────────────────────

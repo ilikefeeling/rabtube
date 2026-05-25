@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 export default function LandingPage() {
+  const t = useTranslations('Landing');
   const [navSolid, setNavSolid] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
@@ -12,6 +14,8 @@ export default function LandingPage() {
   const [quality, setQuality] = useState(75);
   const [views, setViews] = useState(20);
   const [spend, setSpend] = useState(10);
+  const [calcTab, setCalcTab] = useState<'revenue' | 'purchase'>('revenue');
+  const [purchaseAmount, setPurchaseAmount] = useState<number>(3000);
 
   // Upload Demo State
   const [uploadState, setUploadState] = useState<'idle' | 'uploading' | 'done'>('idle');
@@ -20,6 +24,22 @@ export default function LandingPage() {
   const [uploadDiff, setUploadDiff] = useState('중급');
   const [uploadProgress, setUploadProgress] = useState(0);
   const [titleError, setTitleError] = useState(false);
+  const [demoPrice, setDemoPrice] = useState(5);
+
+  // Continuous Billing Logic
+  const BASE_PRICE = 0.01988;
+  const getPurchaseRate = (x: number) => {
+    if (x <= 1) return 30;
+    return 30 + 20 * (x - 1) / 9999;
+  };
+  const getPurchaseUsd = (x: number) => {
+    const rate = getPurchaseRate(x);
+    return x * BASE_PRICE * (1 + rate / 100);
+  };
+  const getUploadFeeRab = (price: number) => {
+    const rate = getPurchaseRate(price);
+    return price * rate / 100;
+  };
 
   // Calculator Logic
   const [casePrice, setCasePrice] = useState(5);
@@ -394,12 +414,12 @@ export default function LandingPage() {
           <span className="logo-dot"></span>RabTube
         </a>
         <div className="nav-links">
-          <a href="#flow">업로드 방법</a>
-          <a href="#rewards">보상 계산기</a>
-          <a href="#tiers">품질 등급</a>
-          <a href="#faq">FAQ</a>
+          <a href="#flow">{t('nav_flow')}</a>
+          <a href="#rewards">{t('nav_rewards')}</a>
+          <a href="#tiers">{t('nav_tiers')}</a>
+          <a href="#faq">{t('nav_faq')}</a>
           <Link href="/auth/register" className="btn-start">
-            지금 업로드
+            {t('nav_cta')}
             <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </Link>
         </div>
@@ -412,43 +432,43 @@ export default function LandingPage() {
         <div className="hero-wrap">
           {/* LEFT */}
           <div>
-            <p className="eyebrow">치과 개원의 전용 수익형 플랫폼</p>
-            <h1>내 케이스의<br/><em>가격은 내가 정한다</em><br/>수익형 업로드</h1>
+            <p className="eyebrow">{t('eyebrow')}</p>
+            <h1 dangerouslySetInnerHTML={{ __html: t.raw('hero_title') }} />
             <p className="hero-sub">
-              당신의 진료 케이스에 <strong>직접 가격을 설정</strong>하세요.<br/>
-              동료가 시청할 때마다 수익이 자동 적립됩니다.<br/>
-              케이스 10건 × 월 20회 시청 = <strong>월 700+ RAB 패시브 인컴</strong>
+              <span dangerouslySetInnerHTML={{ __html: t.raw('hero_sub_1') }} /><br/>
+              <span dangerouslySetInnerHTML={{ __html: t.raw('hero_sub_2') }} /><br/>
+              <span dangerouslySetInnerHTML={{ __html: t.raw('hero_sub_3') }} />
             </p>
             <div className="hero-cta">
               <Link href="/auth/register" className="btn-hero">
-                지금 수익 시작하기
+                {t('btn_hero')}
                 <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               </Link>
               <a href="#rewards" className="btn-learn">
-                수익 시뮬레이션 해보기
+                {t('btn_learn')}
                 <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
               </a>
             </div>
             <div className="reward-row">
-              <div className="rpill rpill-g">💰 가격 자율 설정 (1~100 RAB)</div>
-              <div className="rpill rpill-y">🏆 업로드 보상 최대 +30 RAB</div>
-              <div className="rpill rpill-s">🪙 시청마다 자동 수익 적립</div>
+              <div className="rpill rpill-g">{t('rpill_g')}</div>
+              <div className="rpill rpill-y">{t('rpill_y')}</div>
+              <div className="rpill rpill-s">{t('rpill_s')}</div>
             </div>
           </div>
           {/* RIGHT: Upload UI Card */}
           <div className="upload-card" id="heroCard">
             <div className="uc-header">
               <div className="uc-dots"><div className="ucd ucdr"></div><div className="ucd ucdy"></div><div className="ucd ucdg"></div></div>
-              <span className="uc-title">케이스 업로드</span>
+              <span className="uc-title">{t('uc_title')}</span>
               <span style={{fontSize: '10px', color: 'var(--off3)'}}>rabtube.vercel.app</span>
             </div>
             <div className="uc-body">
               {/* Dropzone state */}
               <div className="dropzone" id="dz" style={{ display: uploadState === 'idle' ? 'block' : 'none' }}>
                 <span className="dz-icon">📁</span>
-                <div className="dz-text">케이스 영상을 드래그하거나 선택</div>
-                <div className="dz-sub">MP4, MOV, AVI · 최대 2GB</div>
-                <div className="dz-btn">파일 선택</div>
+                <div className="dz-text">{t('uc_dz_text')}</div>
+                <div className="dz-sub">{t('uc_dz_sub')}</div>
+                <div className="dz-btn">{t('uc_dz_btn')}</div>
               </div>
               
               {/* Progress state */}
@@ -461,37 +481,43 @@ export default function LandingPage() {
                   </div>
                 </div>
                 <div className="up-bar-wrap"><div className="up-bar" id="upBar" style={{ width: `${uploadProgress}%` }}></div></div>
-                <div className="up-pct" id="upPct">{uploadProgress}% 업로드 중...</div>
+                <div className="up-pct" id="upPct">{uploadProgress}% {t('uc_up_pct')}</div>
               </div>
               
               {/* Done state */}
               <div className="done-state" id="doneState" style={{ display: uploadState === 'done' ? 'block' : 'none' }}>
                 <span className="done-icon">✅</span>
-                <div className="done-title">업로드 완료!</div>
-                <div className="done-sub">AI 품질 검수가 시작됩니다.<br/>48시간 후 보상이 확정됩니다.</div>
-                <div className="done-rab">🪙 +10 RAB 적립 예정</div>
+                <div className="done-title">{t('uc_done_title')}</div>
+                <div className="done-sub" dangerouslySetInnerHTML={{ __html: t.raw('uc_done_sub') }}></div>
+                <div className="done-rab">{t('uc_done_rab')}</div>
               </div>
               
               {/* Form */}
               <div id="formArea" style={{ display: uploadState === 'idle' ? 'block' : 'none' }}>
                 <div className="field-row">
                   <div className="field">
-                    <label>카테고리</label>
+                    <label>{t('uc_cat_label')}</label>
                     <select id="catSel" value={uploadCat} onChange={(e) => setUploadCat(e.target.value)}>
-                      <option>임플란트</option><option>보철</option><option>치주</option><option>교정</option><option>보존</option><option>소아</option><option>구강외과</option>
+                      <option>{t('uc_cat_op1')}</option>
+                      <option>{t('uc_cat_op2')}</option>
+                      <option>{t('uc_cat_op3')}</option>
+                      <option>{t('uc_cat_op4')}</option>
+                      <option>{t('uc_cat_op5')}</option>
+                      <option>{t('uc_cat_op6')}</option>
+                      <option>{t('uc_cat_op7')}</option>
                     </select>
                   </div>
                   <div className="field">
-                    <label>치아 번호</label>
-                    <input type="text" placeholder="예) #16" id="toothInp" />
+                    <label>{t('uc_tooth_label')}</label>
+                    <input type="text" placeholder={t('uc_tooth_ph')} id="toothInp" />
                   </div>
                 </div>
                 <div className="field">
-                  <label>케이스 제목</label>
+                  <label>{t('uc_title_label')}</label>
                   <input 
                     type="text" 
                     id="titleInp" 
-                    placeholder="상악 구치부 임플란트 즉시 식립" 
+                    placeholder={t('uc_title_ph')} 
                     value={uploadTitle}
                     onChange={(e) => {
                       setUploadTitle(e.target.value);
@@ -502,32 +528,39 @@ export default function LandingPage() {
                 </div>
                 <div className="field-row">
                   <div className="field">
-                    <label>공개 설정</label>
-                    <select><option>회원 전용</option><option>비공개</option><option>전체 공개</option></select>
+                    <label>{t('uc_vis_label')}</label>
+                    <select>
+                      <option>{t('uc_vis_op1')}</option>
+                      <option>{t('uc_vis_op2')}</option>
+                      <option>{t('uc_vis_op3')}</option>
+                    </select>
                   </div>
                   <div className="field">
-                    <label>난이도</label>
+                    <label>{t('uc_diff_label')}</label>
                     <select id="diffSel" value={uploadDiff} onChange={(e) => setUploadDiff(e.target.value)}>
-                      <option>초급</option><option>중급</option><option>고급</option>
+                      <option>{t('uc_diff_op1')}</option>
+                      <option>{t('uc_diff_op2')}</option>
+                      <option>{t('uc_diff_op3')}</option>
                     </select>
                   </div>
                 </div>
                 <div className="field">
-                  <label>💰 시청 가격 설정 (RAB)</label>
+                  <label>{t('uc_price_label')}</label>
                   <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
-                    <input type="range" min="1" max="20" defaultValue="5" style={{flex: 1}} />
-                    <span style={{color: 'var(--teal)', fontWeight: 600, fontFamily: 'var(--mono)', fontSize: '14px', minWidth: '55px'}}>5 RAB</span>
+                    <input type="range" min="1" max="100" value={demoPrice} onChange={(e) => setDemoPrice(parseInt(e.target.value))} style={{flex: 1}} />
+                    <span style={{color: 'var(--teal)', fontWeight: 600, fontFamily: 'var(--mono)', fontSize: '14px', minWidth: '65px'}}>{demoPrice} RAB</span>
                   </div>
-                  <div style={{fontSize: '10px', color: 'var(--off3)', marginTop: '4px'}}>시청 1회당 수익 · 학습자가 이 가격을 지불합니다</div>
+                  <div style={{fontSize: '10px', color: 'var(--off3)', marginTop: '4px'}}>{t('uc_price_sub')}</div>
                 </div>
                 <div className="reward-preview">
-                  <div className="rp-title">📊 예상 수익 시뮬레이션</div>
+                  <div className="rp-title">{t('uc_rp_title')}</div>
                   <div className="rp-rows">
-                    <div className="rp-row"><span className="rp-label">업로드 보상</span><span className="rp-val">+10 RAB</span></div>
-                    <div className="rp-row"><span className="rp-label">품질 보너스 (예상)</span><span className="rp-val" id="qualBonus">+{demoBonus} RAB</span></div>
-                    <div className="rp-row"><span className="rp-label" style={{color: 'var(--teal)'}}>월 시청 수익 (20회 × 5 RAB)</span><span className="rp-val" style={{color: 'var(--teal)'}}>+70 RAB</span></div>
+                    <div className="rp-row"><span className="rp-label">{t('uc_rp_ul_reward')}</span><span className="rp-val">+10 RAB</span></div>
+                    <div className="rp-row"><span className="rp-label">{t('uc_rp_bonus')}</span><span className="rp-val" id="qualBonus">+{demoBonus} RAB</span></div>
+                    <div className="rp-row"><span className="rp-label" style={{color: 'var(--red)'}}>{t('uc_rp_fee')} ({getPurchaseRate(demoPrice).toFixed(3)}%)</span><span className="rp-val" style={{color: 'var(--red)'}}>-{getUploadFeeRab(demoPrice).toFixed(3)} RAB</span></div>
+                    <div className="rp-row"><span className="rp-label" style={{color: 'var(--teal)'}}>{t('uc_rp_monthly')} (20x × {demoPrice} RAB)</span><span className="rp-val" style={{color: 'var(--teal)'}}>+{Math.round(20 * demoPrice * 0.7)} RAB</span></div>
                     <div className="rp-divider"></div>
-                    <div className="rp-row"><span className="rp-label" style={{fontWeight: 600, color: 'var(--off)'}}>월 예상 총수익</span><span className="rp-total" id="totalBonus">{10 + demoBonus + 70} RAB</span></div>
+                    <div className="rp-row"><span className="rp-label" style={{fontWeight: 600, color: 'var(--off)'}}>{t('uc_rp_net')}</span><span className="rp-total" id="totalBonus">{(10 + demoBonus - getUploadFeeRab(demoPrice) + 20 * demoPrice * 0.7).toFixed(1)} RAB</span></div>
                   </div>
                 </div>
               </div>
@@ -538,7 +571,7 @@ export default function LandingPage() {
                 style={{ display: uploadState === 'idle' ? 'flex' : 'none' }}
               >
                 <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-                케이스 업로드 시작
+                {t('uc_btn_upload')}
               </button>
             </div>
           </div>
@@ -550,16 +583,16 @@ export default function LandingPage() {
       {/* UPLOAD FLOW */}
       <section id="flow">
         <div className="si">
-          <p className="sk rv">업로드 → 수익화 플로우</p>
-          <h2 className="rv d1">업로드부터 수익까지<br/><em>5단계</em></h2>
-          <div className="sdesc rv d2">케이스를 올리고 가격을 설정하는 순간부터 패시브 인컴이 시작됩니다.</div>
+          <p className="sk rv">{t('flow_eyebrow')}</p>
+          <h2 className="rv d1" dangerouslySetInnerHTML={{ __html: t.raw('flow_title') }}></h2>
+          <div className="sdesc rv d2">{t('flow_desc')}</div>
           <div className="flow-wrap">
             <div className="flow-grid">
-              <div className="flow-step rv d1"><span className="fs-num">STEP 01</span><span className="fs-icon">📁</span><div className="fs-title">케이스 영상 업로드</div><div className="fs-desc">영상을 선택하고 카테고리·난이도 등 메타데이터를 입력합니다.</div></div>
-              <div className="flow-step rv d2"><span className="fs-num">STEP 02</span><span className="fs-icon">💰</span><div className="fs-title">시청 가격 직접 설정</div><div className="fs-desc">내 케이스의 가치를 내가 결정합니다. 1~100 RAB 범위에서 자유롭게 설정하세요.</div><div className="fs-rab" style={{color: 'var(--teal)'}}>핵심: 가격 결정권은 업로더에게</div></div>
-              <div className="flow-step rv d3"><span className="fs-num">STEP 03</span><span className="fs-icon">🤖</span><div className="fs-title">AI 품질 검수 + 등급</div><div className="fs-desc">AI가 48시간 내 자동 검수. Gold/Silver/Bronze 등급에 따라 10~30 RAB 업로드 보상 확정.</div><div className="fs-rab">→ 업로드 보상 +10~30 RAB</div></div>
-              <div className="flow-step rv d4"><span className="fs-num">STEP 04</span><span className="fs-icon">▶️</span><div className="fs-title">동료 시청 → 자동 수익</div><div className="fs-desc">다른 치과의사가 시청할 때마다 설정한 가격(수수료 제외)이 즉시 내 계정에 적립됩니다.</div><div className="fs-rab" style={{color: 'var(--teal)'}}>시청마다 자동 수익 발생!</div></div>
-              <div className="flow-step rv d5"><span className="fs-num">STEP 05</span><span className="fs-icon">📈</span><div className="fs-title">패시브 인컴 누적</div><div className="fs-desc">케이스가 쌓일수록 수익은 기하급수적으로 증가합니다. RAB는 현금 충전 및 향후 환전도 가능.</div><div className="fs-rab" style={{color: 'var(--gold)'}}>10건 × 월 20회 = 700+ RAB/월</div></div>
+              <div className="flow-step rv d1"><span className="fs-num">STEP 01</span><span className="fs-icon">📁</span><div className="fs-title">{t('flow_s1_t')}</div><div className="fs-desc">{t('flow_s1_d')}</div></div>
+              <div className="flow-step rv d2"><span className="fs-num">STEP 02</span><span className="fs-icon">💰</span><div className="fs-title">{t('flow_s2_t')}</div><div className="fs-desc">{t('flow_s2_d')}</div><div className="fs-rab" style={{color: 'var(--teal)'}}>{t('flow_s2_r')}</div></div>
+              <div className="flow-step rv d3"><span className="fs-num">STEP 03</span><span className="fs-icon">🤖</span><div className="fs-title">{t('flow_s3_t')}</div><div className="fs-desc">{t('flow_s3_d')}</div><div className="fs-rab">{t('flow_s3_r')}</div></div>
+              <div className="flow-step rv d4"><span className="fs-num">STEP 04</span><span className="fs-icon">▶️</span><div className="fs-title">{t('flow_s4_t')}</div><div className="fs-desc">{t('flow_s4_d')}</div><div className="fs-rab" style={{color: 'var(--teal)'}}>{t('flow_s4_r')}</div></div>
+              <div className="flow-step rv d5"><span className="fs-num">STEP 05</span><span className="fs-icon">📈</span><div className="fs-title">{t('flow_s5_t')}</div><div className="fs-desc">{t('flow_s5_d')}</div><div className="fs-rab" style={{color: 'var(--gold)'}}>{t('flow_s5_r')}</div></div>
             </div>
           </div>
         </div>
@@ -570,51 +603,152 @@ export default function LandingPage() {
       {/* REWARD CALCULATOR */}
       <section id="rewards" className="calc-bg">
         <div className="si">
-          <p className="sk rv">💰 수익 시뮬레이터</p>
-          <h2 className="rv d1">내 케이스로<br/><em>얼마나 벌 수 있을까?</em></h2>
+          <p className="sk rv">{t('calc_eyebrow')}</p>
+          <h2 className="rv d1" dangerouslySetInnerHTML={{ __html: t.raw('calc_title') }}></h2>
           <div className="calc-layout">
             {/* Calculator */}
-            <div className="calc-panel rvl">
-              <div className="cp-title">월 수익 시뮬레이터</div>
-              <div className="cp-sub">슬라이더를 조정해 예상 월 수익을 확인하세요</div>
+            <div className="calc-panel rvl" style={{ width: '100%' }}>
+              <div style={{ display: 'flex', gap: '8px', borderBottom: '.5px solid var(--line)', marginBottom: '24px', paddingBottom: '12px' }}>
+                <button
+                  onClick={() => setCalcTab('revenue')}
+                  style={{
+                    flex: 1,
+                    background: calcTab === 'revenue' ? 'var(--teald)' : 'transparent',
+                    border: 'none',
+                    color: calcTab === 'revenue' ? 'var(--teal)' : 'var(--off3)',
+                    padding: '10px',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                    fontSize: '13px',
+                    transition: 'all .2s'
+                  }}
+                >
+                  📈 {t('calc_tab_rev')}
+                </button>
+                <button
+                  onClick={() => setCalcTab('purchase')}
+                  style={{
+                    flex: 1,
+                    background: calcTab === 'purchase' ? 'var(--teald)' : 'transparent',
+                    border: 'none',
+                    color: calcTab === 'purchase' ? 'var(--teal)' : 'var(--off3)',
+                    padding: '10px',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                    fontSize: '13px',
+                    transition: 'all .2s'
+                  }}
+                >
+                  🪙 {t('calc_tab_pur')}
+                </button>
+              </div>
 
-              <div className="calc-field">
-                <div className="cf-label">월 업로드 건수 <span className="cf-val">{uploads}건</span></div>
-                <input type="range" min="1" max="10" value={uploads} onChange={(e) => setUploads(parseInt(e.target.value))} />
-              </div>
-              <div className="calc-field">
-                <div className="cf-label">평균 품질 점수 <span className="cf-val">{quality}점</span></div>
-                <input type="range" min="0" max="100" value={quality} onChange={(e) => setQuality(parseInt(e.target.value))} />
-              </div>
-              <div className="calc-field">
-                <div className="cf-label">케이스당 월 시청 수 <span className="cf-val">{views}회</span></div>
-                <input type="range" min="0" max="100" value={views} onChange={(e) => setViews(parseInt(e.target.value))} />
-              </div>
-              <div className="calc-field">
-                <div className="cf-label">내 월 시청 소비 <span className="cf-val">{spend}건</span></div>
-                <input type="range" min="0" max="60" value={spend} onChange={(e) => setSpend(parseInt(e.target.value))} />
-              </div>
-              <div className="calc-field">
-                <div className="cf-label">평균 열람 가격 설정 <span className="cf-val">{casePrice} RAB</span></div>
-                <input type="range" min="1" max="20" value={casePrice} onChange={(e) => setCasePrice(parseInt(e.target.value))} />
-              </div>
+              {calcTab === 'revenue' ? (
+                <>
+                  <div className="cp-title">{t('calc_tab_rev')}</div>
+                  <div className="cp-sub"></div>
 
-              <div className="calc-result">
-                <div className="cr-rows">
-                  <div className="cr-row"><span className="cr-l">업로드 보상</span><span className="cr-v cr-earn">+{uploadEarn} RAB</span></div>
-                  <div className="cr-row"><span className="cr-l">시청 수익 (수수료 제외)</span><span className="cr-v cr-earn">+{viewEarn} RAB</span></div>
-                  <div className="cr-row"><span className="cr-l">시청 소비 ({casePrice} RAB/건)</span><span className="cr-v cr-spend">-{spendCost} RAB</span></div>
-                  <div className="cr-div"></div>
-                  <div className="cr-row"><span className="cr-l" style={{fontWeight: 500}}>월 순 획득</span><span className={`cr-v cr-net ${netRab >= 0 ? 'pos' : 'neg'}`}>{netRab >= 0 ? '+' : ''}{netRab} RAB</span></div>
-                </div>
-                <div className="cr-monthly">
-                  <div className="crm-label">월 누적 RAB</div>
-                  <div><span className="crm-val">{Math.max(0, netRab)}</span><span className="crm-unit">RAB</span></div>
-                  <div className="crm-note">
-                    {netRab > 200 ? '훌륭합니다! 꾸준히 올리세요 🏆' : netRab > 50 ? '좋은 출발입니다 👍' : netRab > 0 ? '업로드를 늘려보세요' : '시청보다 업로드를 늘려보세요'}
+                  <div className="calc-field">
+                    <div className="cf-label">{t('calc_rev_u_l')} <span className="cf-val">{uploads}</span></div>
+                    <input type="range" min="1" max="10" value={uploads} onChange={(e) => setUploads(parseInt(e.target.value))} />
                   </div>
-                </div>
-              </div>
+                  <div className="calc-field">
+                    <div className="cf-label">{t('calc_rev_q_l')} <span className="cf-val">{quality}%</span></div>
+                    <input type="range" min="0" max="100" value={quality} onChange={(e) => setQuality(parseInt(e.target.value))} />
+                  </div>
+                  <div className="calc-field">
+                    <div className="cf-label">{t('calc_rev_v_l')} <span className="cf-val">{views}</span></div>
+                    <input type="range" min="0" max="100" value={views} onChange={(e) => setViews(parseInt(e.target.value))} />
+                  </div>
+                  <div className="calc-field">
+                    <div className="cf-label">{t('calc_rev_p_l')} <span className="cf-val">{casePrice} RAB</span></div>
+                    <input type="range" min="1" max="100" value={casePrice} onChange={(e) => setCasePrice(parseInt(e.target.value))} />
+                  </div>
+
+                  <div className="calc-result">
+                    <div className="cr-rows">
+                      <div className="cr-row"><span className="cr-l">{t('calc_rev_out_2')}</span><span className="cr-v cr-earn">+{uploadEarn} RAB</span></div>
+                      <div className="cr-row"><span className="cr-l">{t('uc_rp_fee')}</span><span className="cr-v cr-spend">-{ (uploads * getUploadFeeRab(casePrice)).toFixed(2) } RAB</span></div>
+                      <div className="cr-row"><span className="cr-l">{t('calc_rev_out_3')}</span><span className="cr-v cr-earn">+{viewEarn} RAB</span></div>
+                      <div className="cr-div"></div>
+                      <div className="cr-row"><span className="cr-l" style={{fontWeight: 500}}>{t('calc_rev_out_1')}</span><span className={`cr-v cr-net ${netRab - (uploads * getUploadFeeRab(casePrice)) >= 0 ? 'pos' : 'neg'}`}>{netRab - (uploads * getUploadFeeRab(casePrice)) >= 0 ? '+' : ''}{(netRab - (uploads * getUploadFeeRab(casePrice))).toFixed(1)} RAB</span></div>
+                    </div>
+                    <div className="cr-monthly">
+                      <div className="crm-label">Total RAB</div>
+                      <div><span className="crm-val">{Math.max(0, Math.round(netRab - (uploads * getUploadFeeRab(casePrice))))}</span><span className="crm-unit">RAB</span></div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="cp-title">{t('calc_tab_pur')}</div>
+                  <div className="cp-sub"></div>
+
+                  <div className="calc-field" style={{ marginBottom: '24px' }}>
+                    <div className="cf-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span>{t('calc_pur_amt_l')}</span>
+                      <span className="cf-val" style={{ fontFamily: 'var(--mono)', fontSize: '15px' }}>{purchaseAmount.toLocaleString()} RAB</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="1"
+                      max="10000"
+                      step="1"
+                      value={purchaseAmount}
+                      onChange={(e) => setPurchaseAmount(parseInt(e.target.value))}
+                      style={{ marginTop: '8px' }}
+                    />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'var(--off3)', marginTop: '4px' }}>
+                      <span>1 RAB</span>
+                      <span>5,000 RAB</span>
+                      <span>10,000 RAB</span>
+                    </div>
+                  </div>
+
+                  <div className="calc-result" style={{ background: 'rgba(255,255,255,0.02)', borderColor: 'var(--line2)' }}>
+                    <div className="cr-rows" style={{ gap: '12px' }}>
+                      <div className="cr-row">
+                        <span className="cr-l">Base Price (1 RAB = $0.01988)</span>
+                        <span className="cr-v" style={{ color: 'var(--off)' }}>${(purchaseAmount * BASE_PRICE).toFixed(3)} USD</span>
+                      </div>
+                      <div className="cr-row">
+                        <span className="cr-l">Premium Rate</span>
+                        <span className="cr-v" style={{ color: 'var(--goldl)', fontWeight: 600 }}>{getPurchaseRate(purchaseAmount).toFixed(4)}%</span>
+                      </div>
+                      <div className="cr-row">
+                        <span className="cr-l">Premium Amount</span>
+                        <span className="cr-v" style={{ color: 'var(--goldl)' }}>${((purchaseAmount * BASE_PRICE) * (getPurchaseRate(purchaseAmount) / 100)).toFixed(3)} USD</span>
+                      </div>
+                      <div className="cr-div"></div>
+                      <div className="cr-row" style={{ fontSize: '15px' }}>
+                        <span className="cr-l" style={{ fontWeight: 600, color: 'var(--off)' }}>{t('calc_pur_out_1')}</span>
+                        <span className="cr-v" style={{ color: 'var(--teal)', fontWeight: 700, fontSize: '16px' }}>${getPurchaseUsd(purchaseAmount).toFixed(2)} USD</span>
+                      </div>
+                    </div>
+
+                    <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '.5px solid var(--line)', textAlign: 'center' }}>
+                      {getPurchaseUsd(purchaseAmount) < 10.00 ? (
+                        <div style={{ background: 'var(--redd)', border: '.5px solid rgba(224,82,82,.3)', padding: '10px', borderRadius: '8px', color: 'var(--red)', fontSize: '12px', lineHeight: '1.5' }}>
+                          ⚠️ <strong>{t('calc_pur_stripe_warn_title')}</strong><br />
+                          {t('calc_pur_stripe_warn_desc')}
+                        </div>
+                      ) : (
+                        <div style={{ background: 'var(--teald)', border: '.5px solid rgba(14,194,142,.3)', padding: '10px', borderRadius: '8px', color: 'var(--teal)', fontSize: '12px', lineHeight: '1.5' }}>
+                          ✅ <strong>{t('calc_pur_stripe_ok_title')}</strong><br />
+                          {t('calc_pur_stripe_ok_desc')}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div style={{ marginTop: '16px', fontSize: '11px', color: 'var(--off3)', lineHeight: '1.6', background: 'rgba(255,255,255,0.01)', padding: '12px', borderRadius: '8px', border: '.5px solid var(--line)' }}>
+                    ℹ️ <strong>{t('calc_pur_formula_title')}</strong><br />
+                    {t('calc_pur_formula_desc')}
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Reward details */}
@@ -624,36 +758,36 @@ export default function LandingPage() {
                   <span className="rd-icon">📤</span>
                   <span className="rd-rab" style={{color: 'var(--teal)'}}>+10~30 RAB</span>
                 </div>
-                <div className="rd-title">업로드 보상</div>
-                <p className="rd-desc">케이스 업로드 후 AI 품질 검수를 통과하면 48시간 후 보상이 확정됩니다. 기본 10 RAB에 품질 점수에 따라 최대 20 RAB 보너스가 추가됩니다.</p>
-                <div className="rd-tags"><span className="rd-tag">48h 검수 후 확정</span><span className="rd-tag">월 10건 상한</span><span className="rd-tag">신규 회원 50% 적용</span></div>
+                <div className="rd-title">{t('rd_t1')}</div>
+                <p className="rd-desc">{t('rd_d1')}</p>
+                <div className="rd-tags"><span className="rd-tag">{t('rd_t1_tag1')}</span><span className="rd-tag">{t('rd_t1_tag2')}</span><span className="rd-tag">{t('rd_t1_tag3')}</span></div>
               </div>
               <div className="rd-card rv d2">
                 <div className="rd-header">
                   <span className="rd-icon">▶️</span>
-                  <span className="rd-rab" style={{color: 'var(--teal)'}}>가격 자율 설정</span>
+                  <span className="rd-rab" style={{color: 'var(--teal)'}}>Pricing by Uploader</span>
                 </div>
-                <div className="rd-title">시청료 자동 배분</div>
-                <p className="rd-desc">다른 회원이 내 케이스를 시청하면 내가 설정한 가격에서 플랫폼 수수료를 제외한 금액이 즉시 내 계정에 적립됩니다. 케이스가 쌓일수록 패시브 인컴이 늘어납니다.</p>
-                <div className="rd-tags"><span className="rd-tag">즉시 적립</span><span className="rd-tag">수익 분배</span><span className="rd-tag">본인 케이스 제외</span></div>
+                <div className="rd-title">{t('rd_t2')}</div>
+                <p className="rd-desc">{t('rd_d2')}</p>
+                <div className="rd-tags"><span className="rd-tag">{t('rd_t2_tag1')}</span><span className="rd-tag">{t('rd_t2_tag2')}</span><span className="rd-tag">{t('rd_t2_tag3')}</span></div>
               </div>
               <div className="rd-card rv d3">
                 <div className="rd-header">
                   <span className="rd-icon">❤️</span>
-                  <span className="rd-rab" style={{color: 'var(--teal)'}}>+1 RAB / 좋아요</span>
+                  <span className="rd-rab" style={{color: 'var(--teal)'}}>+1 RAB / Like</span>
                 </div>
-                <div className="rd-title">좋아요 수신 보상</div>
-                <p className="rd-desc">케이스에 좋아요를 받을 때마다 1 RAB이 즉시 적립됩니다. 고품질 케이스일수록 더 많은 좋아요를 받아 추가 수익이 발생합니다.</p>
-                <div className="rd-tags"><span className="rd-tag">즉시 적립</span><span className="rd-tag">자기 케이스 자기 좋아요 제외</span></div>
+                <div className="rd-title">{t('rd_t3')}</div>
+                <p className="rd-desc">{t('rd_d3')}</p>
+                <div className="rd-tags"><span className="rd-tag">{t('rd_t3_tag1')}</span><span className="rd-tag">{t('rd_t3_tag2')}</span></div>
               </div>
               <div className="rd-card rv d4">
                 <div className="rd-header">
                   <span className="rd-icon">🏅</span>
-                  <span className="rd-rab" style={{color: 'var(--goldl)'}}>최대 +20 RAB</span>
+                  <span className="rd-rab" style={{color: 'var(--goldl)'}}>Max +20 RAB</span>
                 </div>
-                <div className="rd-title">품질 보너스</div>
-                <p className="rd-desc">48시간 후 시청 완료율과 좋아요율을 반영한 최종 품질 점수가 산정됩니다. 점수 구간에 따라 Gold(+20), Silver(+14), Bronze(+6) 보너스가 추가 지급됩니다.</p>
-                <div className="rd-tags"><span className="rd-tag">48h 후 지급</span><span className="rd-tag">완료율 반영</span><span className="rd-tag">누적 적립</span></div>
+                <div className="rd-title">{t('rd_t4')}</div>
+                <p className="rd-desc">{t('rd_d4')}</p>
+                <div className="rd-tags"><span className="rd-tag">{t('rd_t4_tag1')}</span><span className="rd-tag">{t('rd_t4_tag2')}</span><span className="rd-tag">{t('rd_t4_tag3')}</span></div>
               </div>
             </div>
           </div>
@@ -665,56 +799,56 @@ export default function LandingPage() {
       {/* QUALITY TIERS */}
       <section id="tiers">
         <div className="si">
-          <p className="sk rv">품질 등급</p>
-          <h2 className="rv d1">케이스 품질에 따라<br/><em>보상이 달라집니다</em></h2>
-          <p className="sdesc rv d2">AI 검수 점수(50점)와 48시간 커뮤니티 반응(50점)을 합산해 등급이 결정됩니다.</p>
+          <p className="sk rv">{t('tier_eyebrow')}</p>
+          <h2 className="rv d1" dangerouslySetInnerHTML={{ __html: t.raw('tier_title') }}></h2>
+          <p className="sdesc rv d2">{t('tier_desc')}</p>
           <div className="tiers-grid">
             <div className="tier-card t-gold rv d1">
               <span className="tier-emoji">🥇</span>
-              <div className="tier-name">Gold</div>
-              <div className="tier-score">85점 이상</div>
+              <div className="tier-name">{t('tier_g')}</div>
+              <div className="tier-score">{t('tier_g_s')}</div>
               <div className="tier-rab"><span className="big">+30</span><span className="unit">RAB</span></div>
               <div className="tier-req">
-                <div className="tier-req-item">시청 완료율 80% 이상</div>
-                <div className="tier-req-item">좋아요율 15% 이상</div>
-                <div className="tier-req-item">AI 검수 만점 수준</div>
-                <div className="tier-req-item">신고 0건</div>
+                <div className="tier-req-item">{t('tier_g_r1')}</div>
+                <div className="tier-req-item">{t('tier_g_r2')}</div>
+                <div className="tier-req-item">{t('tier_g_r3')}</div>
+                <div className="tier-req-item">{t('tier_g_r4')}</div>
               </div>
             </div>
             <div className="tier-card t-silver rv d2">
               <span className="tier-emoji">🥈</span>
-              <div className="tier-name">Silver</div>
-              <div className="tier-score">70~84점</div>
+              <div className="tier-name">{t('tier_s')}</div>
+              <div className="tier-score">{t('tier_s_s')}</div>
               <div className="tier-rab"><span className="big">+24</span><span className="unit">RAB</span></div>
               <div className="tier-req">
-                <div className="tier-req-item">시청 완료율 65% 이상</div>
-                <div className="tier-req-item">좋아요율 8% 이상</div>
-                <div className="tier-req-item">AI 검수 양호</div>
-                <div className="tier-req-item">신고 0~1건</div>
+                <div className="tier-req-item">{t('tier_s_r1')}</div>
+                <div className="tier-req-item">{t('tier_s_r2')}</div>
+                <div className="tier-req-item">{t('tier_s_r3')}</div>
+                <div className="tier-req-item">{t('tier_s_r4')}</div>
               </div>
             </div>
             <div className="tier-card t-bronze rv d3">
               <span className="tier-emoji">🥉</span>
-              <div className="tier-name">Bronze</div>
-              <div className="tier-score">50~69점</div>
+              <div className="tier-name">{t('tier_b')}</div>
+              <div className="tier-score">{t('tier_b_s')}</div>
               <div className="tier-rab"><span className="big">+16</span><span className="unit">RAB</span></div>
               <div className="tier-req">
-                <div className="tier-req-item">시청 완료율 40% 이상</div>
-                <div className="tier-req-item">AI 검수 기본 통과</div>
-                <div className="tier-req-item">신고 1건 이하</div>
-                <div className="tier-req-item">2분 이상 영상</div>
+                <div className="tier-req-item">{t('tier_b_r1')}</div>
+                <div className="tier-req-item">{t('tier_b_r2')}</div>
+                <div className="tier-req-item">{t('tier_b_r3')}</div>
+                <div className="tier-req-item">{t('tier_b_r4')}</div>
               </div>
             </div>
             <div className="tier-card t-none rv d4">
               <span className="tier-emoji">📋</span>
-              <div className="tier-name">기본</div>
-              <div className="tier-score">검수 통과</div>
+              <div className="tier-name">{t('tier_n')}</div>
+              <div className="tier-score">{t('tier_n_s')}</div>
               <div className="tier-rab"><span className="big">+10</span><span className="unit">RAB</span></div>
               <div className="tier-req">
-                <div className="tier-req-item">AI 검수 통과</div>
-                <div className="tier-req-item">치과 콘텐츠 확인</div>
-                <div className="tier-req-item">얼굴 노출 없음</div>
-                <div className="tier-req-item">중복 영상 아님</div>
+                <div className="tier-req-item">{t('tier_n_r1')}</div>
+                <div className="tier-req-item">{t('tier_n_r2')}</div>
+                <div className="tier-req-item">{t('tier_n_r3')}</div>
+                <div className="tier-req-item">{t('tier_n_r4')}</div>
               </div>
             </div>
           </div>
@@ -726,46 +860,46 @@ export default function LandingPage() {
       {/* UPLOAD POLICY */}
       <section id="policy" className="policy-bg">
         <div className="si">
-          <p className="sk rv">업로드 정책</p>
-          <h2 className="rv d1">올려도 되는 것<br/><em>올리면 안 되는 것</em></h2>
+          <p className="sk rv">{t('pol_eyebrow')}</p>
+          <h2 className="rv d1" dangerouslySetInnerHTML={{ __html: t.raw('pol_title') }}></h2>
           <div className="policy-grid">
             <div className="pol-card rv d1">
               <div className="pol-icon" style={{background: 'var(--teald)'}}>✅</div>
-              <div className="pol-title">권장 콘텐츠</div>
-              <p className="pol-desc">전문성 있는 치과 케이스 영상. 배우고 공유할 수 있는 내용이면 됩니다.</p>
+              <div className="pol-title">{t('pol_c1_t')}</div>
+              <p className="pol-desc">{t('pol_c1_d')}</p>
               <div className="pol-rules">
-                <div className="pol-rule"><span className="pr-ok">✓</span>임플란트 식립 과정 및 결과</div>
-                <div className="pol-rule"><span className="pr-ok">✓</span>복잡 발치 케이스 술식 영상</div>
-                <div className="pol-rule"><span className="pr-ok">✓</span>보철물 제작 및 세팅 과정</div>
-                <div className="pol-rule"><span className="pr-ok">✓</span>치주 수술 전·후 비교</div>
-                <div className="pol-rule"><span className="pr-ok">✓</span>교정 케이스 경과 관찰 기록</div>
-                <div className="pol-rule"><span className="pr-ok">✓</span>구강 내 X-ray 해석 및 진단</div>
+                <div className="pol-rule"><span className="pr-ok">✓</span>{t('pol_c1_r1')}</div>
+                <div className="pol-rule"><span className="pr-ok">✓</span>{t('pol_c1_r2')}</div>
+                <div className="pol-rule"><span className="pr-ok">✓</span>{t('pol_c1_r3')}</div>
+                <div className="pol-rule"><span className="pr-ok">✓</span>{t('pol_c1_r4')}</div>
+                <div className="pol-rule"><span className="pr-ok">✓</span>{t('pol_c1_r5')}</div>
+                <div className="pol-rule"><span className="pr-ok">✓</span>{t('pol_c1_r6')}</div>
               </div>
             </div>
             <div className="pol-card rv d2">
               <div className="pol-icon" style={{background: 'var(--redd)'}}>🚫</div>
-              <div className="pol-title">금지 콘텐츠</div>
-              <p className="pol-desc">환자 프라이버시와 플랫폼 신뢰를 해치는 콘텐츠는 즉시 비공개 처리됩니다.</p>
+              <div className="pol-title">{t('pol_c2_t')}</div>
+              <p className="pol-desc">{t('pol_c2_d')}</p>
               <div className="pol-rules">
-                <div className="pol-rule"><span className="pr-no">✗</span>환자 얼굴·이름 노출 영상</div>
-                <div className="pol-rule"><span className="pr-no">✗</span>치과와 무관한 일반 콘텐츠</div>
-                <div className="pol-rule"><span className="pr-no">✗</span>2분 미만의 짧은 클립</div>
-                <div className="pol-rule"><span className="pr-no">✗</span>동일 영상 중복 업로드</div>
-                <div className="pol-rule"><span className="pr-no">✗</span>정지 화면 또는 흑백 영상</div>
-                <div className="pol-rule"><span className="pr-no">✗</span>허위·과장된 케이스 설명</div>
+                <div className="pol-rule"><span className="pr-no">✗</span>{t('pol_c2_r1')}</div>
+                <div className="pol-rule"><span className="pr-no">✗</span>{t('pol_c2_r2')}</div>
+                <div className="pol-rule"><span className="pr-no">✗</span>{t('pol_c2_r3')}</div>
+                <div className="pol-rule"><span className="pr-no">✗</span>{t('pol_c2_r4')}</div>
+                <div className="pol-rule"><span className="pr-no">✗</span>{t('pol_c2_r5')}</div>
+                <div className="pol-rule"><span className="pr-no">✗</span>{t('pol_c2_r6')}</div>
               </div>
             </div>
             <div className="pol-card rv d3">
               <div className="pol-icon" style={{background: 'var(--goldd)'}}>⚠️</div>
-              <div className="pol-title">보상 정책</div>
-              <p className="pol-desc">공정한 보상 시스템을 위한 제한 사항입니다. 어뷰징 방지 장치가 내장되어 있습니다.</p>
+              <div className="pol-title">{t('pol_c3_t')}</div>
+              <p className="pol-desc">{t('pol_c3_d')}</p>
               <div className="pol-rules">
-                <div className="pol-rule"><span style={{color: 'var(--gold)'}}>·</span>월 업로드 보상 상한: 10건</div>
-                <div className="pol-rule"><span style={{color: 'var(--gold)'}}>·</span>보상 지급: 검수 후 48시간 대기</div>
-                <div className="pol-rule"><span style={{color: 'var(--gold)'}}>·</span>신규 3개월: 보상 50% 적용</div>
-                <div className="pol-rule"><span style={{color: 'var(--gold)'}}>·</span>불량 판정: 보상 취소 + 패널티</div>
-                <div className="pol-rule"><span style={{color: 'var(--gold)'}}>·</span>신고 3회 이상: 자동 비공개</div>
-                <div className="pol-rule"><span style={{color: 'var(--gold)'}}>·</span>허위 신고자: RAB 차감</div>
+                <div className="pol-rule"><span style={{color: 'var(--gold)'}}>·</span>{t('pol_c3_r1')}</div>
+                <div className="pol-rule"><span style={{color: 'var(--gold)'}}>·</span>{t('pol_c3_r2')}</div>
+                <div className="pol-rule"><span style={{color: 'var(--gold)'}}>·</span>{t('pol_c3_r3')}</div>
+                <div className="pol-rule"><span style={{color: 'var(--gold)'}}>·</span>{t('pol_c3_r4')}</div>
+                <div className="pol-rule"><span style={{color: 'var(--gold)'}}>·</span>{t('pol_c3_r5')}</div>
+                <div className="pol-rule"><span style={{color: 'var(--gold)'}}>·</span>{t('pol_c3_r6')}</div>
               </div>
             </div>
           </div>
@@ -777,41 +911,41 @@ export default function LandingPage() {
       {/* AI PIPELINE */}
       <section id="ai">
         <div className="si">
-          <p className="sk rv">AI 품질 파이프라인</p>
-          <h2 className="rv d1">업로드 후<br/><em>자동 검수</em> 과정</h2>
-          <p className="sdesc rv d2">Google Cloud Functions가 트리거되어 영상을 자동 분석합니다. 사람의 개입 없이 48시간 내 검수 완료.</p>
+          <p className="sk rv">{t('ai_eyebrow')}</p>
+          <h2 className="rv d1" dangerouslySetInnerHTML={{ __html: t.raw('ai_title') }}></h2>
+          <p className="sdesc rv d2">{t('ai_desc')}</p>
           <div className="pipe-wrap">
             <div className="pipe-line"></div>
             <div className="pipe-grid">
               <div className="pipe-node rv d1">
                 <div className="pn-dot pass">📁</div>
-                <div className="pn-title">Storage 업로드</div>
-                <div className="pn-desc">Firebase Storage에 영상 저장</div>
-                <span className="pn-badge pb-pass">트리거</span>
+                <div className="pn-title">{t('ai_p1_t')}</div>
+                <div className="pn-desc">{t('ai_p1_d')}</div>
+                <span className="pn-badge pb-pass">{t('ai_p1_b')}</span>
               </div>
               <div className="pipe-node rv d2">
                 <div className="pn-dot pass">⏱</div>
-                <div className="pn-title">길이 / 해시</div>
-                <div className="pn-desc">ffprobe로 길이 추출, MD5 중복 감지</div>
-                <span className="pn-badge pb-pass">자동</span>
+                <div className="pn-title">{t('ai_p2_t')}</div>
+                <div className="pn-desc">{t('ai_p2_d')}</div>
+                <span className="pn-badge pb-pass">{t('ai_p2_b')}</span>
               </div>
               <div className="pipe-node rv d3">
                 <div className="pn-dot warn">🤖</div>
-                <div className="pn-title">Video Intelligence</div>
-                <div className="pn-desc">치과 콘텐츠 레이블 감지</div>
-                <span className="pn-badge pb-warn">AI 분석</span>
+                <div className="pn-title">{t('ai_p3_t')}</div>
+                <div className="pn-desc">{t('ai_p3_d')}</div>
+                <span className="pn-badge pb-warn">{t('ai_p3_b')}</span>
               </div>
               <div className="pipe-node rv d4">
                 <div className="pn-dot fail">🙈</div>
-                <div className="pn-title">Vision API</div>
-                <div className="pn-desc">얼굴 감지 — 노출 시 즉시 차단</div>
-                <span className="pn-badge pb-fail">Privacy</span>
+                <div className="pn-title">{t('ai_p4_t')}</div>
+                <div className="pn-desc">{t('ai_p4_d')}</div>
+                <span className="pn-badge pb-fail">{t('ai_p4_b')}</span>
               </div>
               <div className="pipe-node rv d5">
                 <div className="pn-dot pass">🏅</div>
-                <div className="pn-title">등급 + 보상</div>
-                <div className="pn-desc">점수 산정 후 RAB 자동 지급</div>
-                <span className="pn-badge pb-pass">확정</span>
+                <div className="pn-title">{t('ai_p5_t')}</div>
+                <div className="pn-desc">{t('ai_p5_d')}</div>
+                <span className="pn-badge pb-pass">{t('ai_p5_b')}</span>
               </div>
             </div>
           </div>
@@ -823,16 +957,16 @@ export default function LandingPage() {
       {/* FAQ */}
       <section id="faq">
         <div className="si">
-          <p className="sk rv">자주 묻는 질문</p>
-          <h2 className="rv d1">업로드에 대해<br/><em>궁금한 것들</em></h2>
+          <p className="sk rv">{t('faq_eyebrow')}</p>
+          <h2 className="rv d1" dangerouslySetInnerHTML={{ __html: t.raw('faq_title') }}></h2>
           <div className="faq-wrap rv d2">
             {[
-              { q: "영상 업로드 후 언제 RAB를 받을 수 있나요?", a: "업로드 즉시 pending 상태로 RAB가 예약됩니다. AI 품질 검수가 완료되고 48시간이 경과하면 자동으로 확정 지급됩니다. 포인트 내역 페이지에서 대기 중인 RAB를 확인할 수 있습니다." },
-              { q: "AI 검수에서 실패하면 어떻게 되나요?", a: "검수 실패 시 케이스는 자동으로 비공개 처리됩니다. 업로드 보상은 지급되지 않으며, 반복 위반 시 패널티가 적용될 수 있습니다. 실패 이유는 알림으로 상세히 안내됩니다. 수정 후 재업로드가 가능합니다." },
-              { q: "환자 프라이버시는 어떻게 보호하나요?", a: "Google Vision API가 자동으로 얼굴을 감지하여 환자 얼굴이 포함된 영상은 업로드 단계에서 차단합니다. 또한 모든 케이스는 기본적으로 '회원 전용' 공개로 설정되어 치과 면허 인증 회원만 시청 가능합니다. 원하시면 '비공개' 설정도 가능합니다." },
-              { q: "월 업로드 건수에 제한이 있나요?", a: "RAB 보상은 월 10건까지 지급됩니다. 10건 초과 업로드는 피드에 공개되지만 보상은 다음 달로 이월됩니다. 이는 어뷰징 방지와 토큰 공급량 조절을 위한 정책입니다. 추후 구독 등급에 따라 상한이 확대될 예정입니다." },
-              { q: "RAB 토큰은 어떻게 사용하나요?", a: "현재 RAB는 업로더가 설정한 가격에 따라 케이스 시청에 사용할 수 있으며, 현금 결제로 충전이 가능합니다. 다운로드, 홍보 부스트 등 다양한 기능에도 활용될 예정입니다. 향후 현금 환전 기능 및 블록체인 기반 실거래 토큰 전환이 계획되어 있습니다." },
-              { q: "가입하려면 무엇이 필요한가요?", a: "치과 면허 번호, 이메일, 병원명, 지역 정보로 가입할 수 있습니다. 치과 면허를 보유한 개원의만 가입 가능하며, 인증 완료 즉시 50 RAB 가입 보너스가 지급됩니다. 별도 결제 없이 무료로 시작하실 수 있습니다." }
+              { q: t('faq_q1'), a: t('faq_a1') },
+              { q: t('faq_q2'), a: t('faq_a2') },
+              { q: t('faq_q3'), a: t('faq_a3') },
+              { q: t('faq_q4'), a: t('faq_a4') },
+              { q: t('faq_q5'), a: t('faq_a5') },
+              { q: t('faq_q6'), a: t('faq_a6') }
             ].map((faq, idx) => (
               <div key={idx} className={`faq-item ${openFaq === idx ? 'open' : ''}`}>
                 <div className="faq-q" onClick={() => toggleFaq(idx)}>
@@ -852,17 +986,17 @@ export default function LandingPage() {
       <section className="cta-sec">
         <div className="cta-glow"></div>
         <div className="cta-inner">
-          <p className="sk rv" style={{justifyContent: 'center'}}>내 케이스로 수익을 시작하세요</p>
-          <h2 className="rv">가입 즉시 <em>50 RAB</em><br/>가격은 <em>내가 결정</em></h2>
-          <p className="sdesc rv d2" style={{textAlign: 'center', margin: '0 auto 40px'}}>무료 가입 후 첫 케이스를 올리고 가격을 설정하세요.<br/>시청될 때마다 수익이 자동으로 쌓입니다.</p>
+          <p className="sk rv" style={{justifyContent: 'center'}}>{t('cta_eyebrow')}</p>
+          <h2 className="rv" dangerouslySetInnerHTML={{ __html: t.raw('cta_title') }}></h2>
+          <p className="sdesc rv d2" style={{textAlign: 'center', margin: '0 auto 40px'}} dangerouslySetInnerHTML={{ __html: t.raw('cta_desc') }}></p>
           <div className="cta-btns rv d3">
             <Link href="/auth/register" className="btn-cta">
-              무료 가입 후 수익 시작하기
+              {t('cta_btn1')}
               <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </Link>
-            <Link href="/auth/login" className="btn-cta2">이미 회원이신가요?</Link>
+            <Link href="/auth/login" className="btn-cta2">{t('cta_btn2')}</Link>
           </div>
-          <p className="cta-note rv d4">면허 번호로 인증 · 영구 무료 · 가격 자율 설정 · <a href="#">개인정보처리방침</a></p>
+          <p className="cta-note rv d4" dangerouslySetInnerHTML={{ __html: t.raw('cta_note') }}></p>
         </div>
       </section>
 
@@ -871,24 +1005,24 @@ export default function LandingPage() {
         <div className="foot-inner">
           <div>
             <div className="flogo"><span className="flogo-dot"></span>RabTube</div>
-            <p className="fdesc">치과 개원의를 위한 전문 케이스 영상 커뮤니티. 지식을 공유하고 함께 성장합니다.</p>
+            <p className="fdesc">{t('foot_desc')}</p>
           </div>
           <div>
-            <div className="fcol-t">플랫폼</div>
-            <ul className="flinks"><li><a href="#">케이스 피드</a></li><li><a href="#">업로드</a></li><li><a href="#">내 케이스</a></li><li><a href="#">포인트 내역</a></li></ul>
+            <div className="fcol-t">{t('foot_c1_t')}</div>
+            <ul className="flinks"><li><a href="#">{t('foot_c1_l1')}</a></li><li><a href="#">{t('foot_c1_l2')}</a></li><li><a href="#">{t('foot_c1_l3')}</a></li><li><a href="#">{t('foot_c1_l4')}</a></li></ul>
           </div>
           <div>
-            <div className="fcol-t">RAB 토큰</div>
-            <ul className="flinks"><li><a href="#">토큰 정책</a></li><li><a href="#">보상 구조</a></li><li><a href="#">로드맵</a></li><li><a href="#">시뮬레이터</a></li></ul>
+            <div className="fcol-t">{t('foot_c2_t')}</div>
+            <ul className="flinks"><li><a href="#">{t('foot_c2_l1')}</a></li><li><a href="#">{t('foot_c2_l2')}</a></li><li><a href="#">{t('foot_c2_l3')}</a></li><li><a href="#">{t('foot_c2_l4')}</a></li></ul>
           </div>
           <div>
-            <div className="fcol-t">회사</div>
-            <ul className="flinks"><li><a href="#">소개</a></li><li><a href="#">이용약관</a></li><li><a href="#">개인정보처리방침</a></li><li><a href="#">문의하기</a></li></ul>
+            <div className="fcol-t">{t('foot_c3_t')}</div>
+            <ul className="flinks"><li><a href="#">{t('foot_c3_l1')}</a></li><li><a href="#">{t('foot_c3_l2')}</a></li><li><a href="#">{t('foot_c3_l3')}</a></li><li><a href="#">{t('foot_c3_l4')}</a></li></ul>
           </div>
         </div>
         <div className="foot-bot">
-          <div className="fcopy">© 2025 RabTube. All rights reserved.</div>
-          <div className="frab">RAB TOKEN · UPLOAD PLATFORM</div>
+          <div className="fcopy">{t('foot_copy')}</div>
+          <div className="frab">{t('foot_rab')}</div>
         </div>
       </footer>
     </div>

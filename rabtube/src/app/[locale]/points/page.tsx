@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { ChevronLeft, TrendingUp, TrendingDown, Clock, CreditCard, X } from 'lucide-react';
 import Header from '@/components/Header';
@@ -11,21 +12,6 @@ import { useAuth } from '@/lib/AuthContext';
 import { RAB_POLICY } from '@/types';
 import type { PointTxType } from '@/types';
 
-const TX_LABELS: Record<PointTxType, string> = {
-  SIGNUP_BONUS:         '회원가입 보너스',
-  UPLOAD_REWARD:        '케이스 업로드 보상',
-  UPLOAD_QUALITY_BONUS: '품질 보너스',
-  LIKE_RECEIVED:        '좋아요 수신',
-  VIEW_SHARE:           '시청료 수익',
-  VIEW_SPEND:           '케이스 시청',
-  DOWNLOAD_SPEND:       '케이스 다운로드',
-  BOOST_SPEND:          '피드 부스트',
-  ADMIN_GRANT:          '관리자 지급',
-  ADMIN_DEDUCT:         '관리자 차감',
-  REPORT_REWARD:        '신고 기여 보상',
-  PENALTY_DEDUCT:       '불량 케이스 패널티',
-  RAB_PURCHASE:         'RAB 충전',
-};
 
 const EARN_TYPES: PointTxType[] = [
   'SIGNUP_BONUS', 'UPLOAD_REWARD', 'UPLOAD_QUALITY_BONUS',
@@ -33,6 +19,7 @@ const EARN_TYPES: PointTxType[] = [
 ];
 
 function PointsPageContent() {
+  const t = useTranslations('Points');
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -47,11 +34,11 @@ function PointsPageContent() {
   useEffect(() => {
     const purchase = searchParams.get('purchase');
     if (purchase === 'success') {
-      setToast({ message: 'RAB 충전 결제가 성공적으로 완료되었습니다!', type: 'success' });
+      setToast({ message: t('toast_success'), type: 'success' });
       refresh();
       router.replace('/points');
     } else if (purchase === 'canceled') {
-      setToast({ message: '결제가 취소되었습니다.', type: 'error' });
+      setToast({ message: t('toast_cancel'), type: 'error' });
       router.replace('/points');
     }
   }, [searchParams, router, refresh]);
@@ -76,14 +63,14 @@ function PointsPageContent() {
       <Header />
       <main className="max-w-2xl mx-auto px-6 py-8">
         <Link href="/" className="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-600 mb-6 transition-colors">
-          <ChevronLeft size={14} />피드로 돌아가기
+          <ChevronLeft size={14} />{t('back_to_feed')}
         </Link>
 
         {/* Balance Cards */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="card p-5">
             <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-2">
-              확정 잔액
+              {t('confirmed_balance')}
             </p>
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-medium text-slate-800">
@@ -96,13 +83,13 @@ function PointsPageContent() {
                 onClick={() => setShowPurchase(true)}
                 className="w-full bg-slate-800 text-white flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-medium hover:bg-slate-700 transition-colors"
               >
-                <CreditCard size={14} /> 충전하기
+                <CreditCard size={14} /> {t('btn_charge')}
               </button>
             </div>
           </div>
           <div className="card p-5">
             <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-2">
-              대기 중 (48h)
+              {t('pending_balance')}
             </p>
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-medium text-slate-500">
@@ -110,13 +97,13 @@ function PointsPageContent() {
               </span>
               <span className="text-sm font-bold text-slate-400">RAB</span>
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">업로드 보상 검수 대기</p>
+            <p className="text-[11px] text-slate-400 mt-1">{t('pending_desc')}</p>
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="bg-teal-50 border border-teal-100 rounded-xl p-4">
-            <p className="text-[11px] font-medium text-teal-600 uppercase tracking-wide mb-1">누적 획득</p>
+            <p className="text-[11px] font-medium text-teal-600 uppercase tracking-wide mb-1">{t('total_earned')}</p>
             <div className="flex items-baseline gap-1">
               <span className="text-xl font-medium text-teal-700">
                 +{(balance?.totalEarned ?? 0).toLocaleString()}
@@ -125,7 +112,7 @@ function PointsPageContent() {
             </div>
           </div>
           <div className="bg-red-50 border border-red-100 rounded-xl p-4">
-            <p className="text-[11px] font-medium text-red-500 uppercase tracking-wide mb-1">누적 소비</p>
+            <p className="text-[11px] font-medium text-red-500 uppercase tracking-wide mb-1">{t('total_spent')}</p>
             <div className="flex items-baseline gap-1">
               <span className="text-xl font-medium text-red-600">
                 -{(balance?.totalSpent ?? 0).toLocaleString()}
@@ -137,15 +124,15 @@ function PointsPageContent() {
 
         {/* Policy Info */}
         <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 mb-6">
-          <p className="text-[11px] font-semibold text-amber-700 uppercase tracking-wide mb-2">RAB 정책 안내</p>
+          <p className="text-[11px] font-semibold text-amber-700 uppercase tracking-wide mb-2">{t('policy_title')}</p>
           <div className="grid grid-cols-2 gap-x-4 gap-y-1">
             {[
-              ['회원가입 보너스', `+${RAB_POLICY.SIGNUP_BONUS} RAB`],
-              ['케이스 업로드', `+${RAB_POLICY.UPLOAD_BASE}~${RAB_POLICY.UPLOAD_BASE + RAB_POLICY.UPLOAD_QUALITY_MAX} RAB`],
-              ['좋아요 수신', `+${RAB_POLICY.LIKE_REWARD} RAB`],
-              ['케이스 시청', `업로더 설정 가격에 따라 차감`],
-              ['시청료 배분', `플랫폼 수수료 제외 후 업로더 지급`],
-              ['업로드 보상 대기', `${RAB_POLICY.UPLOAD_PENDING_HOURS}시간`],
+              [t('pol_signup'), `+${RAB_POLICY.SIGNUP_BONUS} RAB`],
+              [t('pol_upload'), `+${RAB_POLICY.UPLOAD_BASE}~${RAB_POLICY.UPLOAD_BASE + RAB_POLICY.UPLOAD_QUALITY_MAX} RAB`],
+              [t('pol_like'), `+${RAB_POLICY.LIKE_REWARD} RAB`],
+              [t('pol_view'), t('pol_view_desc')],
+              [t('pol_share'), t('pol_share_desc')],
+              [t('pol_pending'), t('pol_pending_desc', { hours: RAB_POLICY.UPLOAD_PENDING_HOURS })],
             ].map(([k, v]) => (
               <div key={k} className="flex justify-between text-xs py-0.5">
                 <span className="text-amber-700">{k}</span>
@@ -158,8 +145,8 @@ function PointsPageContent() {
         {/* Transaction History */}
         <div className="card overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-            <h2 className="text-sm font-medium text-slate-700">거래 내역</h2>
-            <span className="text-xs text-slate-400">{transactions.length}건</span>
+            <h2 className="text-sm font-medium text-slate-700">{t('history_title')}</h2>
+            <span className="text-xs text-slate-400">{t('history_count', { count: transactions.length })}</span>
           </div>
 
           {loading ? (
@@ -168,8 +155,8 @@ function PointsPageContent() {
             </div>
           ) : transactions.length === 0 ? (
             <div className="flex flex-col items-center py-14 text-slate-400">
-              <p className="text-sm">아직 거래 내역이 없습니다</p>
-              <p className="text-xs mt-1">케이스를 업로드하면 RAB를 획득할 수 있습니다</p>
+              <p className="text-sm">아직 {t('history_title')}이 없습니다</p>
+              <p className="text-xs mt-1">{t('empty_desc')}</p>
             </div>
           ) : (
             <div>
@@ -195,11 +182,11 @@ function PointsPageContent() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-medium text-slate-700 truncate">
-                        {TX_LABELS[tx.type]}
+                        {t(`tx_${tx.type}` as any)}
                       </p>
                       {tx.status === 'pending' && (
                         <span className="text-[9px] font-semibold bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded uppercase">
-                          대기
+                          {t('status_pending')}
                         </span>
                       )}
                     </div>
@@ -221,7 +208,7 @@ function PointsPageContent() {
                       {tx.amount > 0 ? '+' : ''}{tx.amount} RAB
                     </p>
                     <p className="text-[11px] text-slate-300">
-                      잔액 {tx.balanceAfter.toLocaleString()}
+                      {t('balance_after', { amount: tx.balanceAfter.toLocaleString() })}
                     </p>
                   </div>
                 </div>
@@ -252,7 +239,7 @@ function PointsPageContent() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-xs font-semibold text-slate-800 leading-tight truncate">{toast.message}</p>
-            <p className="text-[10px] text-slate-400 mt-0.5 leading-normal">실시간으로 포인트가 연동되었습니다</p>
+            <p className="text-[10px] text-slate-400 mt-0.5 leading-normal">{t('toast_sync')}</p>
           </div>
           <button onClick={() => setToast(null)} className="text-slate-400 hover:text-slate-600 transition-colors ml-auto p-1 rounded-full hover:bg-slate-50">
             <X size={14} />

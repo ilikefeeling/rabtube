@@ -1,4 +1,10 @@
 /** @type {import('next').NextConfig} */
+const createNextIntlPlugin = require('next-intl/plugin');
+
+const withNextIntl = createNextIntlPlugin(
+  './src/i18n.ts'
+);
+
 const nextConfig = {
   images: {
     remotePatterns: [
@@ -8,17 +14,13 @@ const nextConfig = {
       },
     ],
   },
-  // firebase-admin은 서버 전용이므로 번들 제외
   experimental: {
     serverComponentsExternalPackages: ['firebase-admin'],
   },
-  // 프로덕션 성능: source map 비활성화
   productionBrowserSourceMaps: false,
-  // 빌드 시 lint 경고만 (에러 중단 방지)
   eslint: {
     ignoreDuringBuilds: false,
   },
-  // 파워 헤더
   async headers() {
     return [
       {
@@ -33,4 +35,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+module.exports = withNextIntl(nextConfig);

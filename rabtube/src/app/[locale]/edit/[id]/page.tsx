@@ -7,7 +7,8 @@ import { Upload, CheckCircle, AlertCircle, ChevronLeft, ChevronDown, ChevronUp, 
 import Link from 'next/link';
 import Header from '@/components/Header';
 import { useAuth } from '@/lib/AuthContext';
-import { uploadCaseVideo, getCustomMaterials } from '@/lib/firebaseService';
+import { getCaseById, updateCaseVideo, getCustomMaterials } from '@/lib/firebaseService';
+import { generateVideoThumbnails, dataURItoBlob, drawTextOnImage } from '@/lib/videoUtils';
 import { DIAGNOSIS_OPTIONS, TECHNIQUE_OPTIONS, MATERIAL_PRESETS } from '@/lib/clinicalPresets';
 import { SYSTEMIC_CONDITIONS } from '@/types';
 import type { CaseCategory, Difficulty, Visibility, UploadProgress, BoneClassification, PatientAgeRange, SystemicCondition, ClinicalMetadata } from '@/types';
@@ -16,14 +17,27 @@ const CATEGORIES: CaseCategory[] = ['임플란트', '보철', '치주', '교정'
 const BONE_CLASSES: BoneClassification[] = ['Class I', 'Class II', 'Class III', 'Class IV', '해당없음'];
 const PATIENT_AGES: PatientAgeRange[] = ['10대', '20대', '30대', '40대', '50대', '60대', '70대이상'];
 
-export default function UploadPage() {
+export default function EditPage({ params }: { params: { id: string } }) {
+  const [loadingInitial, setLoadingInitial] = useState(true);
+  const [oldVideoUrl, setOldVideoUrl] = useState<string | null>(null);
   const { user, profile } = useAuth();
   const router = useRouter();
 
   const [file, setFile] = useState<File | null>(null);
   const [progress, setProgress] = useState<UploadProgress>({ phase: 'idle', percent: 0 });
 
+  const [thumbnails, setThumbnails] = useState<string[]>([]);
+  const [selectedThumbnailIndex, setSelectedThumbnailIndex] = useState<number>(-1);
+  const [customThumbnail, setCustomThumbnail] = useState<File | null>(null);
+  const [isGeneratingThumbnails, setIsGeneratingThumbnails] = useState(false);
+  const [existingThumbnailUrl, setExistingThumbnailUrl] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [title, setTitle] = useState('');
+  const [thumbnailText, setThumbnailText] = useState('');
+  const [thumbnailTextSize, setThumbnailTextSize] = useState<'medium' | 'large' | 'xlarge'>('large');
+  const [thumbnailTextColor, setThumbnailTextColor] = useState<string>('#FFFFFF');
+  const [thumbnailBgColor, setThumbnailBgColor] = useState<string>('rgba(15, 23, 42, 0.85)');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState<CaseCategory | ''>('');
   const [toothNumber, setToothNumber] = useState('');
@@ -58,10 +72,72 @@ export default function UploadPage() {
   // 팝업 면책동의 State
   const [isPolicyModalOpen, setIsPolicyModalOpen] = useState(false);
 
+  useEffect(() => {
+    if (!params.id) return;
+    getCaseById(params.id).then(c => {
+      if(c) {
+        setTitle(c.title);
+        setDescription(c.description || "");
+        setCategory(c.category);
+        setToothNumber(c.toothNumber);
+        setTags(c.tags?.join(", ") || "");
+        setDifficulty(c.difficulty);
+        setVisibility(c.visibility);
+        setPrice(c.price || 0);
+        setOldVideoUrl(c.videoUrl);
+        if (c.thumbnailUrl) {
+          setExistingThumbnailUrl(c.thumbnailUrl);
+        }
+        if (c.clinical) {
+          setDiagnosis(c.clinical.diagnosis || []);
+          setTechnique(c.clinical.technique || []);
+          setSelectedMaterials(c.clinical.materials || []);
+          setBoneClassification(c.clinical.boneClassification || "");
+          setPatientAge(c.clinical.patientAge || "");
+          setPatientGender(c.clinical.patientGender || "");
+          setSystemicConditions((c.clinical.systemicConditions || []) as SystemicCondition[]);
+          setIsClinicalOpen(true);
+        }
+      }
+      setLoadingInitial(false);
+    }).catch(console.error);
+  }, [params.id]);
+
   // 재료 목록 불러오기
   useEffect(() => {
     getCustomMaterials().then(list => setCustomMaterialsList(list)).catch(console.error);
   }, []);
+
+  // 영상 파일 변경 시 썸네일 추출 (새 파일 선택 시만 자동 작동)
+  useEffect(() => {
+    if (file) {
+      setIsGeneratingThumbnails(true);
+      generateVideoThumbnails(file).then(urls => {
+        setThumbnails(urls);
+        setIsGeneratingThumbnails(false);
+        setSelectedThumbnailIndex(0);
+        setCustomThumbnail(null);
+      });
+    } else {
+      setThumbnails([]);
+      setCustomThumbnail(null);
+      setSelectedThumbnailIndex(-1); // 기존 썸네일 유지
+    }
+  }, [file]);
+
+  // 기존 영상에서 수동으로 썸네일 추출
+  const handleExtractFromExisting = () => {
+    if (!oldVideoUrl || isGeneratingThumbnails) return;
+    setIsGeneratingThumbnails(true);
+    generateVideoThumbnails(oldVideoUrl).then(urls => {
+      setThumbnails(urls);
+      setIsGeneratingThumbnails(false);
+      setSelectedThumbnailIndex(-1); // 기본 선택은 기존 썸네일 유지
+      setCustomThumbnail(null);
+    }).catch(() => {
+      setIsGeneratingThumbnails(false);
+    });
+  };
 
   // 치아 선택 토글
   const toggleTooth = (t: string) => {
@@ -104,13 +180,66 @@ export default function UploadPage() {
   });
 
   const handleSubmit = async () => {
-    if (!file || !title || !category || !user || !profile || !consentAgreed) return;
+    if (!user) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+    if (!title.trim()) {
+      alert('케이스 제목을 입력해 주세요.');
+      return;
+    }
+    if (!category) {
+      alert('케이스 카테고리를 선택해 주세요.');
+      return;
+    }
+    if (!consentAgreed) {
+      alert('임상 케이스 업로드 정책 및 면책 동의에 동의해 주세요.');
+      return;
+    }
     if (price < 0 || price > 10000) {
       alert('열람 가격은 0 RAB에서 10,000 RAB 사이여야 합니다.');
       return;
     }
 
+    setIsSubmitting(true);
     setProgress({ phase: 'uploading', percent: 0 });
+
+    let thumbnailFile: Blob | File | null = null;
+    
+    try {
+      const overlayOptions = {
+        textSize: thumbnailTextSize,
+        textColor: thumbnailTextColor,
+        bgColor: thumbnailBgColor
+      };
+
+      if (selectedThumbnailIndex === 3 && customThumbnail) {
+        if (thumbnailText.trim()) {
+          const customUrl = URL.createObjectURL(customThumbnail);
+          const mergedDataUri = await drawTextOnImage(customUrl, thumbnailText, overlayOptions);
+          URL.revokeObjectURL(customUrl);
+          thumbnailFile = dataURItoBlob(mergedDataUri);
+        } else {
+          thumbnailFile = customThumbnail;
+        }
+      } else if (selectedThumbnailIndex >= 0 && thumbnails[selectedThumbnailIndex]) {
+        let sourceImage = thumbnails[selectedThumbnailIndex];
+        if (thumbnailText.trim()) {
+          sourceImage = await drawTextOnImage(sourceImage, thumbnailText, overlayOptions);
+        }
+        thumbnailFile = dataURItoBlob(sourceImage);
+      } else if (selectedThumbnailIndex === -1 && existingThumbnailUrl && thumbnailText.trim()) {
+        const mergedDataUri = await drawTextOnImage(existingThumbnailUrl, thumbnailText, overlayOptions);
+        thumbnailFile = dataURItoBlob(mergedDataUri);
+      }
+    } catch (err) {
+      console.warn("Failed to overlay subtitle on thumbnail, fallback to original", err);
+      if (selectedThumbnailIndex === 3 && customThumbnail) {
+        thumbnailFile = customThumbnail;
+      } else if (selectedThumbnailIndex >= 0 && thumbnails[selectedThumbnailIndex]) {
+        thumbnailFile = dataURItoBlob(thumbnails[selectedThumbnailIndex]);
+      }
+    }
 
     try {
       const clinical: any = {
@@ -125,8 +254,8 @@ export default function UploadPage() {
 
       const hasClinicalData = diagnosis.length > 0 || technique.length > 0 || selectedMaterials.length > 0 || boneClassification || patientAge || patientGender || systemicConditions.length > 0;
 
-      await uploadCaseVideo(
-        file,
+      await updateCaseVideo(
+        params.id,
         user.uid,
         {
           title,
@@ -140,22 +269,30 @@ export default function UploadPage() {
           clinical: hasClinicalData ? clinical : undefined,
           consentAgreed,
         },
-        profile,
+        file,
+        file ? oldVideoUrl : null,
+        thumbnailFile,
         (p) => setProgress(p)
       );
 
       setTimeout(() => router.push('/my'), 1500);
     } catch (e: any) {
       setProgress({ phase: 'error', percent: 0, error: e.message });
+      setIsSubmitting(false);
     }
   };
 
-  const isUploading = progress.phase === 'uploading' || progress.phase === 'processing';
+  const isUploading = progress.phase === 'uploading' || progress.phase === 'processing' || isSubmitting;
   const isDone = progress.phase === 'done';
   const isError = progress.phase === 'error';
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {loadingInitial && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80">
+          <div className="w-8 h-8 border-4 border-teal-500/30 border-t-teal-500 rounded-full animate-spin" />
+        </div>
+      )}
       <Header />
 
       <main className="max-w-2xl mx-auto px-6 py-8">
@@ -165,11 +302,11 @@ export default function UploadPage() {
         </Link>
 
         <div className="card p-6">
-          <h1 className="text-lg font-medium text-slate-800 mb-1">케이스 영상 업로드</h1>
+          <h1 className="text-lg font-medium text-slate-800 mb-1">케이스 영상 수정</h1>
           <p className="text-xs text-slate-400 mb-6">치료 케이스를 동료 원장님들과 공유해 주세요</p>
 
           {/* Dropzone */}
-          {!file ? (
+          {(!file && !oldVideoUrl) ? (
             <div
               {...getRootProps()}
               className={`border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-all mb-6 ${
@@ -194,11 +331,11 @@ export default function UploadPage() {
                   <Upload size={18} className="text-teal-600" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-700 truncate">{file.name}</p>
-                  <p className="text-xs text-slate-400">{(file.size / 1024 / 1024).toFixed(1)} MB</p>
+                  <p className="text-sm font-medium text-slate-700 truncate">{file ? file.name : "기존 영상 유지"}</p>
+                  <p className="text-xs text-slate-400">{file ? (file.size / 1024 / 1024).toFixed(1) + " MB" : "(변경 시 새 파일 선택)"}</p>
                 </div>
                 {!isUploading && !isDone && (
-                  <button onClick={() => setFile(null)} className="text-xs text-slate-400 hover:text-slate-600">변경</button>
+                  <button onClick={() => { setFile(null); setOldVideoUrl(null); }} className="text-xs text-slate-400 hover:text-slate-600">변경</button>
                 )}
               </div>
 
@@ -220,6 +357,237 @@ export default function UploadPage() {
                   </div>
                 </div>
               )}
+
+              {/* Thumbnail Selection */}
+              <div className="mt-4 border-t border-slate-100 pt-4">
+                <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wide block mb-2">
+                  썸네일 선택
+                </label>
+                {isGeneratingThumbnails ? (
+                  <div className="flex items-center gap-2 text-sm text-slate-400">
+                    <div className="w-4 h-4 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
+                    썸네일 추출 중...
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                      {!file && existingThumbnailUrl && (
+                        <div 
+                          className={`relative w-32 h-20 shrink-0 rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${selectedThumbnailIndex === -1 ? 'border-teal-500 shadow-md' : 'border-transparent'}`}
+                          onClick={() => setSelectedThumbnailIndex(-1)}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={existingThumbnailUrl} alt="Existing Thumbnail" className="w-full h-full object-cover" />
+                          {selectedThumbnailIndex === -1 && (
+                            <div className="absolute top-1 right-1 bg-teal-500 rounded-full p-0.5">
+                              <CheckCircle size={14} className="text-white" />
+                            </div>
+                          )}
+                          <div className="absolute bottom-0 inset-x-0 bg-black/50 text-[9px] text-white text-center py-0.5 z-10">
+                            기존 썸네일
+                          </div>
+                          {thumbnailText.trim() && (
+                            <div 
+                              className="absolute bottom-1 inset-x-1 rounded px-1.5 py-0.5 text-center truncate pointer-events-none z-20"
+                              style={
+                                thumbnailBgColor === 'none'
+                                  ? { background: 'none', filter: 'drop-shadow(0 1.5px 1.5px rgba(0,0,0,0.9))' }
+                                  : { background: thumbnailBgColor }
+                              }
+                            >
+                              <span 
+                                style={{ color: thumbnailTextColor }}
+                                className={`font-bold leading-none ${
+                                  thumbnailTextSize === 'medium'
+                                    ? 'text-[8px]'
+                                    : thumbnailTextSize === 'large'
+                                    ? 'text-[10px]'
+                                    : 'text-[12px]'
+                                }`}
+                              >
+                                {thumbnailText}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      
+                      {!file && oldVideoUrl && thumbnails.length === 0 && (
+                        <button 
+                          type="button"
+                          onClick={handleExtractFromExisting}
+                          className="relative w-32 h-20 shrink-0 rounded-lg overflow-hidden border-2 border-dashed border-slate-300 hover:border-teal-500 bg-white hover:bg-slate-50 flex flex-col items-center justify-center transition-all group"
+                        >
+                          <div className="w-6 h-6 bg-teal-50 rounded-full flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
+                            <svg className="w-3.5 h-3.5 text-teal-600 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                          <span className="text-[10px] font-semibold text-slate-500 group-hover:text-teal-600">프레임 추출</span>
+                        </button>
+                      )}
+                      
+                      {thumbnails.map((url, i) => (
+                        <div 
+                          key={i} 
+                          className={`relative w-32 h-20 shrink-0 rounded-lg overflow-hidden cursor-pointer border-2 transition-all ${selectedThumbnailIndex === i ? 'border-teal-500 shadow-md' : 'border-transparent'}`}
+                          onClick={() => setSelectedThumbnailIndex(i)}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={url} alt={`Thumbnail ${i+1}`} className="w-full h-full object-cover" />
+                          {selectedThumbnailIndex === i && (
+                            <div className="absolute top-1 right-1 bg-teal-500 rounded-full p-0.5">
+                              <CheckCircle size={14} className="text-white" />
+                            </div>
+                          )}
+                          {thumbnailText.trim() && (
+                            <div 
+                              className="absolute bottom-1 inset-x-1 rounded px-1.5 py-0.5 text-center truncate pointer-events-none z-20"
+                              style={
+                                thumbnailBgColor === 'none'
+                                  ? { background: 'none', filter: 'drop-shadow(0 1.5px 1.5px rgba(0,0,0,0.9))' }
+                                  : { background: thumbnailBgColor }
+                              }
+                            >
+                              <span 
+                                style={{ color: thumbnailTextColor }}
+                                className={`font-bold leading-none ${
+                                  thumbnailTextSize === 'medium'
+                                    ? 'text-[8px]'
+                                    : thumbnailTextSize === 'large'
+                                    ? 'text-[10px]'
+                                    : 'text-[12px]'
+                                }`}
+                              >
+                                {thumbnailText}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                      
+                      <label className={`relative w-32 h-20 shrink-0 rounded-lg overflow-hidden cursor-pointer border-2 border-dashed flex flex-col items-center justify-center transition-all hover:bg-slate-50 ${selectedThumbnailIndex === 3 ? 'border-teal-500 bg-teal-50 shadow-md' : 'border-slate-300'}`}>
+                        <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                          if (e.target.files && e.target.files[0]) {
+                            setCustomThumbnail(e.target.files[0]);
+                            setSelectedThumbnailIndex(3);
+                          }
+                        }} disabled={isUploading || isDone} />
+                        {customThumbnail ? (
+                          <>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={URL.createObjectURL(customThumbnail)} alt="Custom" className="absolute inset-0 w-full h-full object-cover opacity-60" />
+                            <div className="absolute z-10 flex flex-col items-center drop-shadow-md">
+                              <CheckCircle size={16} className="text-teal-600 mb-1" fill="white" />
+                              <span className="text-[10px] font-medium text-slate-800 bg-white/80 px-1.5 rounded">직접 업로드됨</span>
+                            </div>
+                            {thumbnailText.trim() && (
+                              <div 
+                                className="absolute bottom-1 inset-x-1 rounded px-1.5 py-0.5 text-center truncate pointer-events-none z-20"
+                                style={
+                                  thumbnailBgColor === 'none'
+                                    ? { background: 'none', filter: 'drop-shadow(0 1.5px 1.5px rgba(0,0,0,0.9))' }
+                                    : { background: thumbnailBgColor }
+                                }
+                              >
+                                <span 
+                                  style={{ color: thumbnailTextColor }}
+                                  className={`font-bold leading-none ${
+                                    thumbnailTextSize === 'medium'
+                                      ? 'text-[8px]'
+                                      : thumbnailTextSize === 'large'
+                                      ? 'text-[10px]'
+                                      : 'text-[12px]'
+                                  }`}
+                                >
+                                  {thumbnailText}
+                                </span>
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <div className="w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center mb-1">
+                              <Upload size={12} className="text-slate-500" />
+                            </div>
+                            <span className="text-[10px] font-medium text-slate-500">이미지 업로드</span>
+                          </>
+                        )}
+                      </label>
+                    </div>
+                    
+                    <div className="mt-3 space-y-2">
+                      <label className="text-[10px] font-medium text-slate-500 block">
+                        썸네일 자막 (선택)
+                      </label>
+                      <input
+                        type="text"
+                        maxLength={18}
+                        className="input-field py-1 text-xs"
+                        placeholder="썸네일 하단에 합성할 짧은 문구를 입력하세요 (최대 18자)"
+                        value={thumbnailText}
+                        onChange={e => setThumbnailText(e.target.value)}
+                        disabled={isUploading || isDone}
+                      />
+                      
+                      {thumbnailText.trim() && (
+                        <div className="grid grid-cols-3 gap-3 bg-slate-50 p-2.5 rounded-xl border border-slate-200/60 mt-2 animate-in fade-in slide-in-from-top-1 duration-200">
+                          {/* 글자 크기 */}
+                          <div>
+                            <label className="text-[9px] font-medium text-slate-400 block mb-1">글자 크기</label>
+                            <select
+                              value={thumbnailTextSize}
+                              onChange={e => setThumbnailTextSize(e.target.value as any)}
+                              className="select-field py-0.5 px-1.5 text-[10px] h-7 bg-white border border-slate-200 rounded-lg w-full"
+                              disabled={isUploading || isDone}
+                            >
+                              <option value="medium">중간 (기본)</option>
+                              <option value="large">크게</option>
+                              <option value="xlarge">매우 크게</option>
+                            </select>
+                          </div>
+
+                          {/* 글자 색상 */}
+                          <div>
+                            <label className="text-[9px] font-medium text-slate-400 block mb-1">글자 색상</label>
+                            <div className="flex gap-1.5 h-7 items-center justify-center bg-white px-2 rounded-lg border border-slate-200 w-full">
+                              {[
+                                { name: '흰색', value: '#FFFFFF', bg: 'bg-white border border-slate-300' },
+                                { name: '노랑', value: '#FFEB3B', bg: 'bg-yellow-300' },
+                                { name: '검정', value: '#000000', bg: 'bg-black' }
+                              ].map(c => (
+                                <button
+                                  key={c.value}
+                                  type="button"
+                                  onClick={() => setThumbnailTextColor(c.value)}
+                                  className={`w-4 h-4 rounded-full transition-transform ${c.bg} ${thumbnailTextColor === c.value ? 'scale-125 ring-2 ring-teal-500' : 'hover:scale-110'}`}
+                                  title={c.name}
+                                />
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* 배경 상자 */}
+                          <div>
+                            <label className="text-[9px] font-medium text-slate-400 block mb-1">배경 상자</label>
+                            <select
+                              value={thumbnailBgColor}
+                              onChange={e => setThumbnailBgColor(e.target.value)}
+                              className="select-field py-0.5 px-1.5 text-[10px] h-7 bg-white border border-slate-200 rounded-lg w-full"
+                              disabled={isUploading || isDone}
+                            >
+                              <option value="rgba(15, 23, 42, 0.85)">어두운 반투명</option>
+                              <option value="rgba(220, 38, 38, 0.85)">붉은 반투명</option>
+                              <option value="rgba(30, 64, 175, 0.85)">푸른 반투명</option>
+                              <option value="none">배경 없음 (외곽선)</option>
+                            </select>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           )}
 
@@ -572,10 +940,10 @@ export default function UploadPage() {
             <Link href="/" className="btn-secondary flex-1 text-center">취소</Link>
             <button
               onClick={handleSubmit}
-              disabled={!file || !title || !category || !consentAgreed || isUploading || isDone}
+              disabled={(!file && !oldVideoUrl) || !title || !category || !consentAgreed || isUploading || isDone}
               className="btn-primary flex-1"
             >
-              {isDone ? '✓ 업로드 완료' : isUploading ? `${progress.percent}% 업로드 중...` : '업로드 시작'}
+              {isDone ? '✓ 업로드 완료' : isUploading ? `${progress.percent}% 업로드 중...` : '수정 시작'}
             </button>
           </div>
         </div>

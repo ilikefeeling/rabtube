@@ -1,10 +1,10 @@
 import {
-  collection, doc, addDoc, updateDoc, getDoc, getDocs, deleteDoc,
+  collection, doc, addDoc, updateDoc, getDoc, getDocs, deleteDoc, setDoc,
   query, where, orderBy, limit, increment,
   arrayUnion, arrayRemove, serverTimestamp, Timestamp,
 } from 'firebase/firestore';
 import {
-  ref, uploadBytesResumable, getDownloadURL, deleteObject,
+  ref, uploadBytesResumable, getDownloadURL, deleteObject, uploadBytes
 } from 'firebase/storage';
 import { db, storage } from './firebase';
 import { awardUploadReward, awardLikeReward } from './pointService';
@@ -18,32 +18,41 @@ export const COLLECTIONS = {
 
 /* ─────────────── USER ─────────────── */
 
+export async function checkDuplicatePhoneNumber(phoneNumber: string): Promise<boolean> {
+  const cleanPhone = phoneNumber.replace(/[^0-9]/g, '');
+  if (!cleanPhone) return false;
+  const snap = await getDoc(doc(db, 'phone_numbers', cleanPhone));
+  return snap.exists();
+}
+
 export async function createUserProfile(
   uid: string,
   data: Omit<UserProfile, 'uid' | 'createdAt' | 'status' | 'role'>
 ) {
-  await doc(db, COLLECTIONS.USERS, uid);
   const ref = doc(db, COLLECTIONS.USERS, uid);
   const isTargetAdmin = data.email === 'ilikefeeling@gmail.com';
   const role = isTargetAdmin ? 'admin' : 'user';
+  const status = isTargetAdmin ? 'approved' : 'pending'; // 일반 원장님은 가입 시 대기(pending) 상태
 
-  await updateDoc(ref, {
+  const profileData = {
     ...data,
     uid,
-    status: 'approved', // MVP: 자동 승인 (추후 관리자 승인으로 전환)
-    role: role,
+    status,
+    role,
     createdAt: serverTimestamp(),
-  }).catch(async () => {
-    // doc이 없으면 setDoc으로 생성
-    const { setDoc } = await import('firebase/firestore');
-    await setDoc(ref, {
-      ...data,
-      uid,
-      status: 'approved',
-      role: role,
-      createdAt: serverTimestamp(),
-    });
+  };
+
+  await updateDoc(ref, profileData).catch(async () => {
+    await setDoc(ref, profileData);
   });
+
+  // 휴대폰 번호 중복 가입 방지 컬렉션 등록
+  if (data.phoneNumber) {
+    const cleanPhone = data.phoneNumber.replace(/[^0-9]/g, '');
+    if (cleanPhone) {
+      await setDoc(doc(db, 'phone_numbers', cleanPhone), { uid });
+    }
+  }
 }
 
 export async function getUserProfile(uid: string): Promise<UserProfile | null> {
@@ -154,6 +163,7 @@ export function uploadCaseVideo(
   userId: string,
   metadata: Omit<CaseVideo, 'id' | 'userId' | 'userProfile' | 'videoUrl' | 'thumbnailUrl' | 'duration' | 'views' | 'likes' | 'createdAt' | 'updatedAt'>,
   userProfile: UserProfile,
+  thumbnailFile: File | Blob | null,
   onProgress: (p: UploadProgress) => void
 ): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -184,6 +194,14 @@ export function uploadCaseVideo(
         onProgress({ phase: 'processing', percent: 100 });
         const videoUrl = await getDownloadURL(task.snapshot.ref);
 
+        let thumbnailUrl = '';
+        if (thumbnailFile) {
+          const thumbExt = thumbnailFile instanceof File ? thumbnailFile.name.split('.').pop()?.toLowerCase() || 'jpg' : 'jpg';
+          const thumbRef = ref(storage, `thumbnails/${userId}/${Date.now()}_thumb.${thumbExt}`);
+          await uploadBytes(thumbRef, thumbnailFile, { contentType: thumbnailFile.type || 'image/jpeg' });
+          thumbnailUrl = await getDownloadURL(thumbRef);
+        }
+
         const docData: any = {
           userId,
           userProfile: {
@@ -193,7 +211,7 @@ export function uploadCaseVideo(
           },
           ...metadata,
           videoUrl,
-          thumbnailUrl: '',
+          thumbnailUrl,
           duration: 0,
           views: 0,
           likes: [],
@@ -214,6 +232,16 @@ export function uploadCaseVideo(
           : new Date();
         awardUploadReward(userId, docRef.id, userCreatedAt).catch(console.error);
 
+        // 업로드 일회성 수수료 과금 (RAB)
+        import('./billingService').then(({ calculateUploadFeeRab }) => {
+          const uploadFee = calculateUploadFeeRab(metadata.price || 0);
+          if (uploadFee > 0) {
+            import('./pointService').then(({ processUploadFee }) => {
+              processUploadFee(userId, docRef.id, metadata.title, uploadFee).catch(console.error);
+            });
+          }
+        });
+
         onProgress({ phase: 'done', percent: 100 });
         resolve(docRef.id);
       }
@@ -227,6 +255,7 @@ export function updateCaseVideo(
   metadata: Partial<Omit<CaseVideo, 'id' | 'userId' | 'userProfile' | 'videoUrl' | 'thumbnailUrl' | 'duration' | 'views' | 'likes' | 'createdAt' | 'updatedAt'>>,
   file: File | null,
   oldVideoUrl: string | null,
+  thumbnailFile: File | Blob | null,
   onProgress: (p: UploadProgress) => void
 ): Promise<void> {
   return new Promise(async (resolve, reject) => {
@@ -261,6 +290,12 @@ export function updateCaseVideo(
             }
             
             const docData: any = { ...metadata, videoUrl, updatedAt: serverTimestamp() };
+            if (thumbnailFile) {
+              const thumbExt = thumbnailFile instanceof File ? thumbnailFile.name.split('.').pop()?.toLowerCase() || 'jpg' : 'jpg';
+              const thumbRef = ref(storage, `thumbnails/${userId}/${Date.now()}_thumb.${thumbExt}`);
+              await uploadBytes(thumbRef, thumbnailFile, { contentType: thumbnailFile.type || 'image/jpeg' });
+              docData.thumbnailUrl = await getDownloadURL(thumbRef);
+            }
             if (docData.clinical === undefined) delete docData.clinical;
             
             await updateDoc(doc(db, COLLECTIONS.CASES, caseId), docData);
@@ -271,6 +306,12 @@ export function updateCaseVideo(
       } else {
         onProgress({ phase: 'processing', percent: 50 });
         const docData: any = { ...metadata, updatedAt: serverTimestamp() };
+        if (thumbnailFile) {
+          const thumbExt = thumbnailFile instanceof File ? thumbnailFile.name.split('.').pop()?.toLowerCase() || 'jpg' : 'jpg';
+          const thumbRef = ref(storage, `thumbnails/${userId}/${Date.now()}_thumb.${thumbExt}`);
+          await uploadBytes(thumbRef, thumbnailFile, { contentType: thumbnailFile.type || 'image/jpeg' });
+          docData.thumbnailUrl = await getDownloadURL(thumbRef);
+        }
         if (docData.clinical === undefined) delete docData.clinical;
         await updateDoc(doc(db, COLLECTIONS.CASES, caseId), docData);
         onProgress({ phase: 'done', percent: 100 });

@@ -7,6 +7,14 @@ service cloud.firestore {
       allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
       allow create: if request.auth != null && request.auth.uid == userId;
       allow update: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow delete: if request.auth != null && isAdmin();
+    }
+
+    // ── Phone Numbers (중복 가입 방지 고유값 보장) ────
+    match /phone_numbers/{phoneNumber} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && isAdmin();
     }
 
     // ── Cases ──────────────────────────────────────

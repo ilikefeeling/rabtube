@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import { Eye, Heart, Play } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { ko } from 'date-fns/locale';
+import { ko, enUS } from 'date-fns/locale';
 import Image from 'next/image';
+import { useLocale, useTranslations } from 'next-intl';
 import type { CaseVideo } from '@/types';
 
 const CAT_STYLES: Record<string, string> = {
@@ -28,6 +29,8 @@ interface Props {
 
 export default function VideoCard({ video, onClick }: Props) {
   const [hovered, setHovered] = useState(false);
+  const locale = useLocale();
+  const t = useTranslations('VideoCard');
   const catStyle = CAT_STYLES[video.category] ?? 'bg-slate-50 text-slate-600 border-slate-100';
   const bgColor = BG_COLORS[video.id.charCodeAt(0) % BG_COLORS.length];
   const likeCount = video.likes?.length ?? 0;
@@ -40,15 +43,15 @@ export default function VideoCard({ video, onClick }: Props) {
 
   return (
     <div
-      className="card cursor-pointer hover:-translate-y-0.5 hover:shadow-md transition-all duration-150"
+      className="flex flex-col cursor-pointer group"
       onClick={() => onClick(video)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       {/* Thumbnail */}
-      <div className="relative aspect-video" style={{ background: bgColor }}>
+      <div className="relative aspect-video rounded-xl overflow-hidden" style={{ background: bgColor }}>
         {video.thumbnailUrl ? (
-          <Image src={video.thumbnailUrl} alt={video.title} fill className="object-cover opacity-90" sizes="(max-width:768px) 50vw, 20vw" />
+          <Image src={video.thumbnailUrl} alt={video.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 25vw" />
         ) : null}
 
         {/* Play overlay */}
@@ -72,28 +75,34 @@ export default function VideoCard({ video, onClick }: Props) {
       </div>
 
       {/* Body */}
-      <div className="p-3">
-        <p className="text-sm font-medium text-slate-800 leading-snug line-clamp-2 mb-2">
-          {video.title}
-        </p>
-        <div className="flex items-center gap-2 text-xs text-slate-400">
-          {/* Avatar */}
-          <div className="w-5 h-5 rounded-full bg-slate-700 text-blue-300 text-[9px] font-semibold flex items-center justify-center shrink-0">
-            {video.userProfile.name.slice(0, 1)}
-          </div>
-          <span className="text-slate-500">{video.userProfile.name} 원장</span>
-          <span className="text-slate-200">·</span>
-          <span className="bg-slate-50 border border-slate-100 px-1.5 py-0.5 rounded text-[10px] text-slate-500 font-medium">
-            {video.toothNumber}
-          </span>
-          <div className="ml-auto flex items-center gap-2.5">
-            <span className="flex items-center gap-1"><Eye size={11} />{video.views}</span>
-            <span className="flex items-center gap-1"><Heart size={11} />{likeCount}</span>
+      <div className="flex gap-3 mt-3 items-start px-1">
+        {/* Avatar */}
+        <div className="w-9 h-9 rounded-full bg-teal-600 text-white text-xs font-semibold flex items-center justify-center shrink-0 mt-0.5">
+          {video.userProfile.name.slice(0, 1)}
+        </div>
+        
+        {/* Text Info */}
+        <div className="flex flex-col overflow-hidden w-full">
+          <h3 className="text-sm font-semibold text-slate-900 leading-snug line-clamp-2 mb-1 group-hover:text-teal-700 transition-colors" title={video.title}>
+            {video.title}
+          </h3>
+          <div className="text-xs text-slate-500 flex flex-col gap-0.5">
+            <span className="font-medium hover:text-slate-800 transition-colors truncate">
+              {t('doctor', { name: video.userProfile.name })}
+            </span>
+            <div className="flex items-center gap-1.5 truncate">
+              <span>{t('views', { count: video.views })}</span>
+              <span className="text-[10px]">•</span>
+              <span>{formatDistanceToNow(video.createdAt instanceof Date ? video.createdAt : new Date(), { addSuffix: true, locale: locale === 'en' ? enUS : ko })}</span>
+            </div>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded text-[10px] font-medium inline-block truncate max-w-[120px]">
+                {video.toothNumber}
+              </span>
+              <span className="flex items-center gap-1 text-[11px] ml-auto"><Heart size={11} className={likeCount > 0 ? 'text-red-400' : 'text-slate-400'} /> {likeCount}</span>
+            </div>
           </div>
         </div>
-        <p className="text-[10px] text-slate-300 mt-1.5">
-          {formatDistanceToNow(video.createdAt instanceof Date ? video.createdAt : new Date(), { addSuffix: true, locale: ko })}
-        </p>
       </div>
     </div>
   );

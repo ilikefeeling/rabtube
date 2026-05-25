@@ -11,27 +11,58 @@ import { AlertCircle, CheckCircle } from 'lucide-react';
 export default function RegisterPage() {
   const router = useRouter();
   const [form, setForm] = useState({
-    name: '', email: '', password: '', hospital: '', region: '', licenseNumber: '',
+    name: '', email: '', phoneNumber: '', password: '', hospital: '', region: '', licenseNumber: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const update = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-    setForm(f => ({ ...f, [k]: e.target.value }));
+  const formatPhoneNumber = (value: string) => {
+    const clean = value.replace(/[^0-9]/g, '');
+    if (clean.length < 4) return clean;
+    if (clean.length < 7) return `${clean.slice(0, 3)}-${clean.slice(3)}`;
+    if (clean.length < 11) return `${clean.slice(0, 3)}-${clean.slice(3, 6)}-${clean.slice(6)}`;
+    return `${clean.slice(0, 3)}-${clean.slice(3, 7)}-${clean.slice(7, 11)}`;
+  };
+
+  const update = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    let val = e.target.value;
+    if (k === 'phoneNumber') {
+      val = formatPhoneNumber(val);
+    }
+    setForm(f => ({ ...f, [k]: val }));
+  };
 
   const handleRegister = async () => {
-    const { name, email, password, hospital, region, licenseNumber } = form;
-    if (!name || !email || !password || !hospital || !region || !licenseNumber) {
+    const { name, email, phoneNumber, password, hospital, region, licenseNumber } = form;
+    if (!name || !email || !phoneNumber || !password || !hospital || !region || !licenseNumber) {
       setError('모든 항목을 입력해 주세요');
       return;
     }
     if (password.length < 6) { setError('비밀번호는 6자 이상이어야 합니다'); return; }
 
+    const phoneRegex = /^01[0-9]-[0-9]{3,4}-[0-9]{4}$/;
+    if (!phoneRegex.test(phoneNumber)) {
+      setError('올바른 휴대폰 번호 형식을 입력해 주세요 (예: 010-1234-5678)');
+      return;
+    }
+
     setLoading(true);
     setError('');
     try {
+      // 1. 휴대폰 번호 중복 가입 체크
+      const { checkDuplicatePhoneNumber } = await import('@/lib/firebaseService');
+      const isDuplicate = await checkDuplicatePhoneNumber(phoneNumber);
+      if (isDuplicate) {
+        setError('이미 가입된 휴대폰 번호입니다');
+        setLoading(false);
+        return;
+      }
+
+      // 2. Auth 계정 및 프로필 생성
       const cred = await createUserWithEmailAndPassword(auth, email, password);
-      await createUserProfile(cred.user.uid, { name, email, hospital, region, licenseNumber });
+      await createUserProfile(cred.user.uid, { name, email, phoneNumber, hospital, region, licenseNumber });
+      
+      alert('회원가입 신청이 완료되었습니다. 관리자 승인 후 서비스 이용이 가능합니다.');
       router.push('/');
     } catch (e: any) {
       const msg: Record<string, string> = {
@@ -63,6 +94,7 @@ export default function RegisterPage() {
             {[
               { label: '이름 (성명)', key: 'name', placeholder: '홍길동', type: 'text' },
               { label: '이메일', key: 'email', placeholder: 'doctor@example.com', type: 'email' },
+              { label: '휴대폰 번호', key: 'phoneNumber', placeholder: '010-1234-5678', type: 'tel' },
               { label: '비밀번호', key: 'password', placeholder: '6자 이상', type: 'password' },
               { label: '병원명', key: 'hospital', placeholder: '예) 연세스마일치과', type: 'text' },
               { label: '치과 면허 번호', key: 'licenseNumber', placeholder: '예) 제12345호', type: 'text' },
