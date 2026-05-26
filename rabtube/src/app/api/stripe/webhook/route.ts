@@ -51,11 +51,15 @@ export async function POST(req: NextRequest) {
           );
         } else if (meta.type === 'rab_purchase') {
           // RAB 즉시 지급
+          const rabAmount = parseInt(meta.rabAmount || '0');
+          const krwAmount = parseInt(meta.krwAmount || '0');
+          const usdAmount = parseFloat(meta.usdAmount || '0');
           await grantRabFromPurchase(
             meta.userId,
-            parseInt(meta.rabAmount),
-            parseInt(meta.krwAmount),
-            session.id
+            rabAmount,
+            krwAmount,
+            session.id,
+            usdAmount
           );
         }
         break;
@@ -139,7 +143,8 @@ async function grantRabFromPurchase(
   userId:    string,
   rabAmount: number,
   krwAmount: number,
-  sessionId: string
+  sessionId: string,
+  usdAmount?: number
 ) {
   // 잔액 업데이트
   const balRef  = adminDb.collection('rab_balances').doc(userId);
@@ -155,14 +160,18 @@ async function grantRabFromPurchase(
     updatedAt:      new Date(),
   });
 
+  const priceDesc = usdAmount && usdAmount > 0 
+    ? `$${usdAmount.toFixed(2)} USD` 
+    : `₩${(krwAmount || 0).toLocaleString()}원`;
+
   // 트랜잭션 기록
   await adminDb.collection('rab_transactions').add({
     userId,
-    type:          'ADMIN_GRANT',
+    type:          'RAB_PURCHASE',
     amount:        rabAmount,
     balanceAfter:  (cur.balance ?? 0) + rabAmount,
     status:        'confirmed',
-    description:   `RAB 구매: ₩${krwAmount.toLocaleString()} → +${rabAmount} RAB`,
+    description:   `RAB 구매: ${priceDesc} → +${rabAmount} RAB`,
     relatedCaseId: null,
     confirmedAt:   null,
     createdAt:     new Date(),
@@ -173,10 +182,10 @@ async function grantRabFromPurchase(
     userId,
     type:            'rab_purchase',
     status:          'succeeded',
-    amountKrw:       krwAmount,
+    amountKrw:       krwAmount > 0 ? krwAmount : Math.round((usdAmount || 0) * 1400),
     amountRab:       rabAmount,
     stripePaymentId: sessionId,
-    description:     `RAB ${rabAmount}개 구매`,
+    description:     `RAB ${rabAmount}개 구매 (${priceDesc})`,
     createdAt:       new Date(),
   });
 }

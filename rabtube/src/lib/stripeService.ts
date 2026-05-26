@@ -44,18 +44,18 @@ export async function createCheckoutSession(
 }
 
 /* ─────────────────────────────────────
-   RAB 직접 구매 (₩ → RAB)
+   RAB 직접 구매 ($0.01988 / RAB)
 ───────────────────────────────────── */
 
 export async function createRabPurchaseSession(
   userId:    string,
-  krwAmount: number,   // 1000, 5000, 10000, 50000
+  rabAmount: number,
   email:     string
 ): Promise<string> {
   const res = await fetch('/api/stripe/rab-purchase', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ userId, krwAmount, email }),
+    body: JSON.stringify({ userId, rabAmount, email }),
   });
   if (!res.ok) throw new Error('RAB 구매 세션 생성 실패');
   const { url } = await res.json();

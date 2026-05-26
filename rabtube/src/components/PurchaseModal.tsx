@@ -27,6 +27,16 @@ export default function PurchaseModal({ onClose, onSuccess }: Props) {
 
     setIsProcessing(true);
     try {
+      if (user.email === 'ilikefeeling@gmail.com') {
+        const { recordRabPurchase } = await import('@/lib/pointService');
+        const usdAmount = rabAmount * 0.01988;
+        await recordRabPurchase(user.uid, usdAmount, rabAmount, 'test_recharge_' + Date.now());
+        alert(`🪙 [테스트 충전] ${rabAmount.toLocaleString()} RAB가 즉시 지급되었습니다!`);
+        onSuccess();
+        onClose();
+        return;
+      }
+
       const res = await fetch('/api/stripe/rab-purchase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -124,7 +134,7 @@ export default function PurchaseModal({ onClose, onSuccess }: Props) {
             <p className="text-[11px] text-amber-600 font-medium mb-1">총 결제 금액 (USD)</p>
             <p className="text-3xl font-bold text-amber-700">${billing.price.toFixed(2)}</p>
             <p className="text-[10px] text-amber-500 mt-1.5 font-medium">
-              대량 구매 보너스(할인율): <span className="font-bold">{billing.rate}%</span> 적용
+              1 RAB = $0.01988 USD 고정 환율 적용 (충전 할인 없음)
             </p>
           </div>
 

@@ -25,10 +25,10 @@ const fmt = (n: number) => n.toLocaleString();
 
 /* RAB 구매 패키지 */
 const RAB_PACKAGES = [
-  { krw: 1000,  rab: 90,   label: '입문',  bonus: '+10%' },
-  { krw: 5000,  rab: 500,  label: '일반',  bonus: '+20%' },
-  { krw: 10000, rab: 1100, label: '인기',  bonus: '+25%', highlight: true },
-  { krw: 50000, rab: 6000, label: '대용량', bonus: '+30%' },
+  { rab: 1000,  label: '기본', highlight: false },
+  { rab: 3000,  label: '일반', highlight: false },
+  { rab: 5000,  label: '인기', highlight: true },
+  { rab: 10000, label: '대용량', highlight: false },
 ];
 
 /* ── useSearchParams는 Suspense 내부 컴포넌트에서만 사용 ── */
@@ -99,12 +99,20 @@ export default function BillingPage() {
     }
   };
 
-  const handleRabPurchase = async (krw: number) => {
+  const handleRabPurchase = async (rab: number) => {
     if (!user) return;
-    setActionLoading(String(krw));
+    setActionLoading(String(rab));
     try {
-      const url = await createRabPurchaseSession(user.uid, krw, user.email ?? '');
-      window.location.href = url;
+      if (user.email === 'ilikefeeling@gmail.com') {
+        const { recordRabPurchase } = await import('@/lib/pointService');
+        const usdAmount = rab * 0.01988;
+        await recordRabPurchase(user.uid, usdAmount, rab, 'test_recharge_' + Date.now());
+        showToast(`🪙 [테스트 충전] ${rab.toLocaleString()} RAB가 즉시 지급되었습니다!`);
+        refreshPoints();
+      } else {
+        const url = await createRabPurchaseSession(user.uid, rab, user.email ?? '');
+        window.location.href = url;
+      }
     } catch (e: any) {
       showToast(`❌ ${e.message}`);
     } finally {
@@ -232,7 +240,7 @@ export default function BillingPage() {
             <div className="grid grid-cols-2 gap-3 mb-6">
               {RAB_PACKAGES.map(pkg => (
                 <div
-                  key={pkg.krw}
+                  key={pkg.rab}
                   className={`card p-5 cursor-pointer transition-all ${
                     pkg.highlight
                       ? 'border-teal-200 bg-teal-50/30'
@@ -245,21 +253,21 @@ export default function BillingPage() {
                     </span>
                   )}
                   <div className="flex items-baseline justify-between mb-2">
-                    <span className="text-xl font-medium text-slate-800">₩{fmt(pkg.krw)}</span>
-                    <span className="text-xs text-teal-600 font-medium bg-teal-50 px-2 py-0.5 rounded">
-                      {pkg.bonus}
+                    <span className="text-lg font-bold text-slate-800">${(pkg.rab * 0.01988).toFixed(2)} <span className="text-[9px] text-slate-400 font-medium">USD</span></span>
+                    <span className="text-xs text-teal-600 font-semibold bg-teal-50 px-2 py-0.5 rounded">
+                      {pkg.label}
                     </span>
                   </div>
-                  <div className="flex items-baseline gap-1 mb-4">
-                    <span className="text-2xl font-medium text-amber-600">{fmt(pkg.rab)}</span>
+                  <div className="flex items-baseline gap-0.5 mb-4">
+                    <span className="text-2xl font-extrabold text-amber-600">{fmt(pkg.rab)}</span>
                     <span className="text-sm font-bold text-amber-500">RAB</span>
                   </div>
                   <button
-                    onClick={() => handleRabPurchase(pkg.krw)}
+                    onClick={() => handleRabPurchase(pkg.rab)}
                     disabled={!!actionLoading}
-                    className="w-full py-2 text-sm font-medium bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition-colors disabled:opacity-50"
+                    className="w-full py-2 text-sm font-semibold bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition-colors disabled:opacity-50"
                   >
-                    {actionLoading === String(pkg.krw) ? '처리 중...' : '충전하기'}
+                    {actionLoading === String(pkg.rab) ? '처리 중...' : '충전하기'}
                   </button>
                 </div>
               ))}

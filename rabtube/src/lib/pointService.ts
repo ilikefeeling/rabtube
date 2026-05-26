@@ -518,14 +518,17 @@ export async function recordRabPurchase(
     // types/index.ts의 PointTxType에 'RAB_PURCHASE'가 없으니 'SIGNUP_BONUS'처럼 취급.
     // 잠시 후 types/index.ts를 한 번 더 업데이트 해야 할 수 있습니다. 
     // 일단은 에러 우회를 위해 강제 캐스팅
+    const isUsd = amountKrw < 1000;
+    const priceDesc = isUsd ? `$${amountKrw.toFixed(2)} USD` : `₩${amountKrw.toLocaleString()}원`;
+
     const txRef = doc(collection(db, COL.TRANSACTIONS));
     tx.set(txRef, {
       userId,
-      type: 'RAB_PURCHASE' as PointTxType, // 강제 캐스팅
+      type: 'RAB_PURCHASE' as PointTxType,
       amount: amountRab,
       balanceAfter: newBalance,
       status: 'confirmed',
-      description: `현금 결제 충전 (${amountKrw.toLocaleString()}원)`,
+      description: `현금 결제 충전 (${priceDesc})`,
       createdAt: serverTimestamp(),
     });
 
@@ -535,10 +538,10 @@ export async function recordRabPurchase(
       userId,
       type: 'rab_purchase',
       status: 'succeeded',
-      amountKrw,
+      amountKrw: isUsd ? Math.round(amountKrw * 1400) : amountKrw,
       amountRab,
       stripePaymentId,
-      description: `${amountRab} RAB 구매`,
+      description: `${amountRab} RAB 구매 (${priceDesc})`,
       createdAt: serverTimestamp(),
     });
   });
