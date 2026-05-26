@@ -15,9 +15,9 @@ export default function LandingPage() {
   const [uploads, setUploads] = useState(4);
   const [quality, setQuality] = useState(75);
   const [views, setViews] = useState(20);
-  const [spend, setSpend] = useState(10);
+  const [spend, setSpend] = useState(0);
   const [calcTab, setCalcTab] = useState<'revenue' | 'purchase'>('revenue');
-  const [purchaseAmount, setPurchaseAmount] = useState<number>(3000);
+  const [purchaseAmount, setPurchaseAmount] = useState(1500);
 
   // Upload Demo State
   const [uploadState, setUploadState] = useState<'idle' | 'uploading' | 'done'>('idle');
@@ -26,25 +26,45 @@ export default function LandingPage() {
   const [uploadDiff, setUploadDiff] = useState('중급');
   const [uploadProgress, setUploadProgress] = useState(0);
   const [titleError, setTitleError] = useState(false);
-  const [demoPrice, setDemoPrice] = useState(5);
+  const [demoPrice, setDemoPrice] = useState(100);
 
   // Continuous Billing Logic
   const BASE_PRICE = 0.01988;
-  const getPurchaseRate = (x: number) => {
-    if (x <= 1) return 30;
-    return 30 + 20 * (x - 1) / 9999;
+  const getUploadFeeRate = (priceRab: number): number => {
+    if (priceRab <= 0) return 0;
+    let rate = 0;
+    if (priceRab >= 1 && priceRab <= 10) {
+      rate = 2 + ((priceRab - 1) * (5 - 2)) / (10 - 1);
+    } else if (priceRab > 10 && priceRab <= 50) {
+      rate = 5 + ((priceRab - 10) * (10 - 5)) / (50 - 10);
+    } else if (priceRab > 50 && priceRab <= 100) {
+      rate = 10 + ((priceRab - 50) * (15 - 10)) / (100 - 50);
+    } else if (priceRab > 100 && priceRab <= 500) {
+      rate = 15 + ((priceRab - 100) * (20 - 15)) / (500 - 100);
+    } else if (priceRab > 500 && priceRab <= 600) {
+      rate = 20 + ((priceRab - 500) * (26 - 20)) / (600 - 500);
+    } else if (priceRab > 600 && priceRab <= 700) {
+      rate = 26 + ((priceRab - 600) * (28 - 26)) / (700 - 600);
+    } else if (priceRab > 700 && priceRab <= 800) {
+      rate = 28 + ((priceRab - 700) * (30 - 28)) / (800 - 700);
+    } else if (priceRab > 800 && priceRab <= 900) {
+      rate = 30 + ((priceRab - 800) * (32 - 30)) / (900 - 800);
+    } else if (priceRab > 900 && priceRab <= 1000) {
+      rate = 32 + ((priceRab - 900) * (34 - 32)) / (1000 - 900);
+    } else if (priceRab > 1000 && priceRab <= 10000) {
+      rate = 34 + ((priceRab - 1000) * (38 - 34)) / (10000 - 1000);
+    }
+    return Math.round(rate * 100) / 100;
   };
-  const getPurchaseUsd = (x: number) => {
-    const rate = getPurchaseRate(x);
-    return x * BASE_PRICE * (1 + rate / 100);
-  };
-  const getUploadFeeRab = (price: number) => {
-    const rate = getPurchaseRate(price);
-    return price * rate / 100;
+
+  const getUploadFeeRab = (priceRab: number): number => {
+    if (priceRab <= 0) return 0;
+    const rate = getUploadFeeRate(priceRab);
+    return Math.max(1, Math.round(priceRab * (rate / 100)));
   };
 
   // Calculator Logic
-  const [casePrice, setCasePrice] = useState(5);
+  const [casePrice, setCasePrice] = useState(100);
   const baseBonus = Math.floor((quality / 100) * 20);
   const uploadEarn = uploads * (10 + baseBonus);
   const viewEarn = Math.round(uploads * views * casePrice * 0.7);
@@ -568,8 +588,8 @@ export default function LandingPage() {
                 <div className="field">
                   <label>{t('uc_price_label')}</label>
                   <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
-                    <input type="range" min="1" max="100" value={demoPrice} onChange={(e) => setDemoPrice(parseInt(e.target.value))} style={{flex: 1}} />
-                    <span style={{color: 'var(--teal)', fontWeight: 600, fontFamily: 'var(--mono)', fontSize: '14px', minWidth: '65px'}}>{demoPrice} RAB</span>
+                    <input type="range" min="0" max="10000" step="10" value={demoPrice} onChange={(e) => setDemoPrice(parseInt(e.target.value))} style={{flex: 1}} />
+                    <span style={{color: 'var(--teal)', fontWeight: 600, fontFamily: 'var(--mono)', fontSize: '14px', minWidth: '65px'}}>{demoPrice.toLocaleString()} RAB</span>
                   </div>
                   <div style={{fontSize: '10px', color: 'var(--off3)', marginTop: '4px'}}>{t('uc_price_sub')}</div>
                 </div>
@@ -578,10 +598,10 @@ export default function LandingPage() {
                   <div className="rp-rows">
                     <div className="rp-row"><span className="rp-label">{t('uc_rp_ul_reward')}</span><span className="rp-val">+10 RAB</span></div>
                     <div className="rp-row"><span className="rp-label">{t('uc_rp_bonus')}</span><span className="rp-val" id="qualBonus">+{demoBonus} RAB</span></div>
-                    <div className="rp-row"><span className="rp-label" style={{color: 'var(--red)'}}>{t('uc_rp_fee')} ({getPurchaseRate(demoPrice).toFixed(3)}%)</span><span className="rp-val" style={{color: 'var(--red)'}}>-{getUploadFeeRab(demoPrice).toFixed(3)} RAB</span></div>
-                    <div className="rp-row"><span className="rp-label" style={{color: 'var(--teal)'}}>{t('uc_rp_monthly')} (20x × {demoPrice} RAB)</span><span className="rp-val" style={{color: 'var(--teal)'}}>+{Math.round(20 * demoPrice * 0.7)} RAB</span></div>
+                    <div className="rp-row"><span className="rp-label" style={{color: 'var(--red)'}}>{t('uc_rp_fee')} ({getUploadFeeRate(demoPrice).toFixed(2)}%)</span><span className="rp-val" style={{color: 'var(--red)'}}>-{getUploadFeeRab(demoPrice).toLocaleString()} RAB</span></div>
+                    <div className="rp-row"><span className="rp-label" style={{color: 'var(--teal)'}}>{t('uc_rp_monthly')} (20x × {demoPrice} RAB)</span><span className="rp-val" style={{color: 'var(--teal)'}}>+{Math.round(20 * demoPrice * 0.7).toLocaleString()} RAB</span></div>
                     <div className="rp-divider"></div>
-                    <div className="rp-row"><span className="rp-label" style={{fontWeight: 600, color: 'var(--off)'}}>{t('uc_rp_net')}</span><span className="rp-total" id="totalBonus">{(10 + demoBonus - getUploadFeeRab(demoPrice) + 20 * demoPrice * 0.7).toFixed(1)} RAB</span></div>
+                    <div className="rp-row"><span className="rp-label" style={{fontWeight: 600, color: 'var(--off)'}}>{t('uc_rp_net')}</span><span className="rp-total" id="totalBonus">{(10 + demoBonus - getUploadFeeRab(demoPrice) + 20 * demoPrice * 0.7).toLocaleString(undefined, {maximumFractionDigits: 1})} RAB</span></div>
                   </div>
                 </div>
               </div>
@@ -684,21 +704,41 @@ export default function LandingPage() {
                     <input type="range" min="0" max="100" value={views} onChange={(e) => setViews(parseInt(e.target.value))} />
                   </div>
                   <div className="calc-field">
-                    <div className="cf-label">{t('calc_rev_p_l')} <span className="cf-val">{casePrice} RAB</span></div>
-                    <input type="range" min="1" max="100" value={casePrice} onChange={(e) => setCasePrice(parseInt(e.target.value))} />
+                    <div className="cf-label">{t('calc_rev_p_l')} <span className="cf-val">{casePrice.toLocaleString()} RAB</span></div>
+                    <input type="range" min="0" max="10000" step="10" value={casePrice} onChange={(e) => setCasePrice(parseInt(e.target.value))} />
                   </div>
 
                   <div className="calc-result">
                     <div className="cr-rows">
-                      <div className="cr-row"><span className="cr-l">{t('calc_rev_out_2')}</span><span className="cr-v cr-earn">+{uploadEarn} RAB</span></div>
-                      <div className="cr-row"><span className="cr-l">{t('uc_rp_fee')}</span><span className="cr-v cr-spend">-{ (uploads * getUploadFeeRab(casePrice)).toFixed(2) } RAB</span></div>
-                      <div className="cr-row"><span className="cr-l">{t('calc_rev_out_3')}</span><span className="cr-v cr-earn">+{viewEarn} RAB</span></div>
+                      <div className="cr-row">
+                        <span className="cr-l">{t('calc_rev_out_2')}</span>
+                        <span className="cr-v cr-earn">+{uploadEarn.toLocaleString()} RAB</span>
+                      </div>
+                      <div className="cr-row">
+                        <span className="cr-l">{t('uc_rp_fee')}</span>
+                        <span className="cr-v cr-spend">-{Math.round(uploads * getUploadFeeRab(casePrice)).toLocaleString()} RAB</span>
+                      </div>
+                      <div className="cr-row">
+                        <span className="cr-l">{t('calc_rev_out_3')}</span>
+                        <span className="cr-v cr-earn">+{viewEarn.toLocaleString()} RAB</span>
+                      </div>
                       <div className="cr-div"></div>
-                      <div className="cr-row"><span className="cr-l" style={{fontWeight: 500}}>{t('calc_rev_out_1')}</span><span className={`cr-v cr-net ${netRab - (uploads * getUploadFeeRab(casePrice)) >= 0 ? 'pos' : 'neg'}`}>{netRab - (uploads * getUploadFeeRab(casePrice)) >= 0 ? '+' : ''}{(netRab - (uploads * getUploadFeeRab(casePrice))).toFixed(1)} RAB</span></div>
+                      <div className="cr-row">
+                        <span className="cr-l" style={{fontWeight: 500}}>{t('calc_rev_out_1')}</span>
+                        <span className={`cr-v cr-net ${netRab - (uploads * getUploadFeeRab(casePrice)) >= 0 ? 'pos' : 'neg'}`}>
+                          {netRab - (uploads * getUploadFeeRab(casePrice)) >= 0 ? '+' : ''}
+                          {Math.round(netRab - (uploads * getUploadFeeRab(casePrice))).toLocaleString()} RAB
+                        </span>
+                      </div>
                     </div>
                     <div className="cr-monthly">
                       <div className="crm-label">Total RAB</div>
-                      <div><span className="crm-val">{Math.max(0, Math.round(netRab - (uploads * getUploadFeeRab(casePrice))))}</span><span className="crm-unit">RAB</span></div>
+                      <div>
+                        <span className="crm-val">
+                          {Math.max(0, Math.round(netRab - (uploads * getUploadFeeRab(casePrice)))).toLocaleString()}
+                        </span>
+                        <span className="crm-unit">RAB</span>
+                      </div>
                     </div>
                   </div>
                 </>
@@ -734,23 +774,15 @@ export default function LandingPage() {
                         <span className="cr-l">Base Price (1 RAB = $0.01988)</span>
                         <span className="cr-v" style={{ color: 'var(--off)' }}>${(purchaseAmount * BASE_PRICE).toFixed(3)} USD</span>
                       </div>
-                      <div className="cr-row">
-                        <span className="cr-l">Premium Rate</span>
-                        <span className="cr-v" style={{ color: 'var(--goldl)', fontWeight: 600 }}>{getPurchaseRate(purchaseAmount).toFixed(4)}%</span>
-                      </div>
-                      <div className="cr-row">
-                        <span className="cr-l">Premium Amount</span>
-                        <span className="cr-v" style={{ color: 'var(--goldl)' }}>${((purchaseAmount * BASE_PRICE) * (getPurchaseRate(purchaseAmount) / 100)).toFixed(3)} USD</span>
-                      </div>
                       <div className="cr-div"></div>
                       <div className="cr-row" style={{ fontSize: '15px' }}>
                         <span className="cr-l" style={{ fontWeight: 600, color: 'var(--off)' }}>{t('calc_pur_out_1')}</span>
-                        <span className="cr-v" style={{ color: 'var(--teal)', fontWeight: 700, fontSize: '16px' }}>${getPurchaseUsd(purchaseAmount).toFixed(2)} USD</span>
+                        <span className="cr-v" style={{ color: 'var(--teal)', fontWeight: 700, fontSize: '16px' }}>${(purchaseAmount * BASE_PRICE).toFixed(2)} USD</span>
                       </div>
                     </div>
 
                     <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '.5px solid var(--line)', textAlign: 'center' }}>
-                      {getPurchaseUsd(purchaseAmount) < 10.00 ? (
+                      {(purchaseAmount * BASE_PRICE) < 10.00 ? (
                         <div style={{ background: 'var(--redd)', border: '.5px solid rgba(224,82,82,.3)', padding: '10px', borderRadius: '8px', color: 'var(--red)', fontSize: '12px', lineHeight: '1.5' }}>
                           ⚠️ <strong>{t('calc_pur_stripe_warn_title')}</strong><br />
                           {t('calc_pur_stripe_warn_desc')}
@@ -762,11 +794,6 @@ export default function LandingPage() {
                         </div>
                       )}
                     </div>
-                  </div>
-
-                  <div style={{ marginTop: '16px', fontSize: '11px', color: 'var(--off3)', lineHeight: '1.6', background: 'rgba(255,255,255,0.01)', padding: '12px', borderRadius: '8px', border: '.5px solid var(--line)' }}>
-                    ℹ️ <strong>{t('calc_pur_formula_title')}</strong><br />
-                    {t('calc_pur_formula_desc')}
                   </div>
                 </>
               )}

@@ -26,7 +26,7 @@ export function calculateBilling(rabAmount: number) {
     rate = 34 + ((validatedRab - 1000) * (38 - 34)) / (10000 - 1000);
   }
 
-  const rawPrice = validatedRab * BASE_PRICE_PER_RAB * (rate / 100);
+  const rawPrice = validatedRab * BASE_PRICE_PER_RAB;
   const finalPrice = Math.round(rawPrice * 100) / 100;
 
   return {

@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
             currency: 'usd',
             product_data: {
               name: `RabTube RAB 토큰 ${billing.rab.toLocaleString()}개`,
-              description: `할인율 ${billing.rate}% 적용 ($${billing.price})`,
+              description: `RAB 토큰 ${billing.rab.toLocaleString()}개 구매 ($${billing.price} USD)`,
               images: [`${process.env.NEXT_PUBLIC_APP_URL}/rab-token.png`],
             },
             unit_amount: unitAmountCents,
