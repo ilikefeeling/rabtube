@@ -6,7 +6,7 @@
     "search_ph": "Search",
     "points": "Points History",
     "my_cases": "My Cases",
-    "billing": "Billing",
+    "billing": "RAB Top-up",
     "logout": "Logout",
     "doctor": "Dr. {name}"
   },
@@ -95,10 +95,10 @@
   "Sidebar": {
     "feed": "Feed",
     "my_cases": "My Cases",
-    "billing": "Billing & Cashout",
-    "about": "About RabTube",
-    "admin_home": "Admin Home",
-    "admin_cashout": "Process Cashout"
+    "billing": "RAB Top-up",
+    "marketplace": "Marketplace",
+    "about": "About",
+    "admin_home": "Admin Home"
   },
   "HomePage": {
     "cat_all": "All",

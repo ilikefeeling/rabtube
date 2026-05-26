@@ -147,7 +147,14 @@ export type PointTxType =
   | 'REPORT_REWARD'       // 신고 보상
   | 'PENALTY_DEDUCT'      // 불량 업로드 패널티
   | 'RAB_PURCHASE'        // 현금 결제 충전
-  | 'UPLOAD_FEE_SPEND';   // 업로드 1회성 과금 (수수료)
+  | 'UPLOAD_FEE_SPEND'    // 업로드 1회성 과금 (수수료)
+  | 'BOUNTY_ESCROW'       // 바운티 에스크로 동결
+  | 'BOUNTY_RELEASE'      // 바운티 정산 (제안자 수령)
+  | 'BOUNTY_REFUND'       // 바운티 환급 (만료/취소)
+  | 'BOUNTY_FEE'          // 바운티 플랫폼 수수료
+  | 'BOUNTY_BURN'         // 바운티 소각분
+  | 'SHOP_PURCHASE'       // 쇼핑몰 구매 (RAB 지불)
+  | 'SHOP_REVENUE';       // 쇼핑몰 판매 수익 (공급사)
 
 export type PointTxStatus = 'pending' | 'confirmed' | 'cancelled';
 
@@ -206,27 +213,13 @@ export interface Subscription {
 export interface PaymentRecord {
   id:               string;
   userId:           string;
-  type:             'subscription' | 'rab_purchase' | 'rab_cashout';
+  type:             'subscription' | 'rab_purchase';
   status:           PaymentStatus;
   amountKrw:        number;   // 원화 금액
-  amountRab:        number;   // RAB 금액 (환전 시)
+  amountRab:        number;   // RAB 금액
   stripePaymentId?: string;
   description:      string;
   createdAt:        Date;
-}
-
-export interface RabCashoutRequest {
-  id:         string;
-  userId:     string;
-  rabAmount:  number;   // 신청 RAB
-  krwAmount:  number;   // 환전 원화
-  status:     'pending' | 'processing' | 'completed' | 'rejected';
-  bankName:   string;
-  accountNo:  string;
-  accountHolder: string;
-  rejectedReason?: string;
-  createdAt:  Date;
-  processedAt?: Date;
 }
 
 export const SUBSCRIPTION_PLANS = {
@@ -256,10 +249,46 @@ export const SUBSCRIPTION_PLANS = {
 } as const;
 
 export const RAB_EXCHANGE = {
-  krwPerRab:       10,     // 1 RAB = 10원 (Phase 2 기준)
-  minCashoutRab:   1000,   // 최소 환전 1,000 RAB
-  cashoutFeeRate:  0.05,   // 환전 수수료 5%
+  krwPerRab:       10,     // 1 RAB = 10원 (참고 기준)
   rabPerKrw1000:   90,     // ₩1,000 → 90 RAB (10% 보너스)
+} as const;
+
+/* ── 치과 B2B 마켓플레이스 ── */
+
+export type DentalCategory =
+  | '임플란트_부속' | '레진_수복재료' | '인상재_석고' | '근관치료재료'
+  | '교정재료' | '예방치과재료' | '소독_위생용품' | '진료실_소모품'
+  | '수술용품' | '보철재료' | '디지털장비_부속' | '병원_운영용품' | '기타';
+
+export type RequestStatus =
+  | 'DRAFT' | 'OPEN' | 'IN_REVIEW' | 'ACCEPTED'
+  | 'COMPLETED' | 'EXPIRED' | 'CANCELLED';
+
+export type ProposerType = 'supplier' | 'user';
+
+export const DENTAL_CATEGORIES: { id: DentalCategory; label: string }[] = [
+  { id: '임플란트_부속', label: '임플란트 부속' },
+  { id: '레진_수복재료', label: '레진·수복재료' },
+  { id: '인상재_석고', label: '인상재·석고' },
+  { id: '근관치료재료', label: '근관치료재료' },
+  { id: '교정재료', label: '교정재료' },
+  { id: '예방치과재료', label: '예방치과재료' },
+  { id: '소독_위생용품', label: '소독·위생용품' },
+  { id: '진료실_소모품', label: '진료실 소모품' },
+  { id: '수술용품', label: '수술용품' },
+  { id: '보철재료', label: '보철재료' },
+  { id: '디지털장비_부속', label: '디지털장비 부속' },
+  { id: '병원_운영용품', label: '병원 운영용품' },
+  { id: '기타', label: '기타' },
+];
+
+export const BOUNTY_LIMITS = {
+  MIN_RAB: 100,
+  MAX_RAB: 10000,
+  PLATFORM_FEE_RATE: 0.15,   // 바운티 플랫폼 수수료 15%
+  BURN_RATE: 0.05,            // 소각 5%
+  NET_RATE: 0.80,             // 제안자 수령 80%
+  CANCEL_FEE_RATE: 0.10,      // 취소 수수료 10%
 } as const;
 
 // RAB 포인트 정책 상수

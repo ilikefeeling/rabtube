@@ -15,13 +15,12 @@ import type {
   Subscription, PaymentRecord,
   SubscriptionTier, SubscriptionStatus,
 } from '@/types';
-import { SUBSCRIPTION_PLANS, RAB_EXCHANGE } from '@/types';
+import { SUBSCRIPTION_PLANS } from '@/types';
 import { creditBalanceAdmin } from './pointService';
 
 const COL = {
   SUBSCRIPTIONS: 'subscriptions',
   PAYMENTS:      'payments',
-  CASHOUTS:      'rab_cashouts',
 } as const;
 
 /* ─────────────────────────────────────
@@ -128,66 +127,7 @@ export async function cancelSubscription(userId: string): Promise<void> {
   });
 }
 
-/* ─────────────────────────────────────
-   RAB 환전 신청 (Phase 2)
-───────────────────────────────────── */
 
-export async function requestRabCashout(input: {
-  userId:        string;
-  rabAmount:     number;
-  bankName:      string;
-  accountNo:     string;
-  accountHolder: string;
-}): Promise<string> {
-  const { userId, rabAmount, bankName, accountNo, accountHolder } = input;
-
-  if (rabAmount < RAB_EXCHANGE.minCashoutRab) {
-    throw new Error(`최소 환전 금액은 ${RAB_EXCHANGE.minCashoutRab} RAB입니다`);
-  }
-
-  // 잔액 확인
-  const balSnap = await getDoc(doc(db, 'rab_balances', userId));
-  if (!balSnap.exists() || (balSnap.data().balance ?? 0) < rabAmount) {
-    throw new Error('RAB 잔액이 부족합니다');
-  }
-
-  const fee      = Math.floor(rabAmount * RAB_EXCHANGE.cashoutFeeRate);
-  const netRab   = rabAmount - fee;
-  const krwAmount = netRab * RAB_EXCHANGE.krwPerRab;
-
-  const ref = await addDoc(collection(db, COL.CASHOUTS), {
-    userId,
-    rabAmount,
-    fee,
-    netRab,
-    krwAmount,
-    bankName,
-    accountNo,
-    accountHolder,
-    status: 'pending',
-    createdAt: serverTimestamp(),
-  });
-
-  return ref.id;
-}
-
-export async function getCashoutHistory(userId: string) {
-  const q = query(
-    collection(db, COL.CASHOUTS),
-    where('userId', '==', userId),
-    orderBy('createdAt', 'desc'),
-    limit(20)
-  );
-  const snap = await getDocs(q);
-  return snap.docs.map(d => ({
-    ...d.data(),
-    id: d.id,
-    createdAt: (d.data().createdAt as Timestamp)?.toDate() ?? new Date(),
-    processedAt: d.data().processedAt
-      ? (d.data().processedAt as Timestamp).toDate()
-      : undefined,
-  }));
-}
 
 /* ─────────────────────────────────────
    RAB 구독 결제 (현금 대신 RAB로 구독)

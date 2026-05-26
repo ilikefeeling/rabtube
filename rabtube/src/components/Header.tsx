@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { Upload, Bookmark, LogOut, Settings, CreditCard, ArrowDownToLine, Search, Menu } from 'lucide-react';
+import { Upload, Bookmark, LogOut, Settings, CreditCard, ShoppingBag, Search, Menu } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import RabBadge from '@/components/RabBadge';
 import MobileDrawer from '@/components/MobileDrawer';
@@ -141,13 +141,20 @@ export default function Header() {
                   >
                     <Bookmark size={14} /> {t('my_cases')}
                   </Link>
+                  <Link 
+                    href="/marketplace" 
+                    onClick={() => setIsOpen(false)}
+                    className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50 rounded-lg"
+                  >
+                    <ShoppingBag size={14} /> 마켓플레이스
+                  </Link>
                   {profile?.role === 'admin' && (
                     <Link 
                       href="/billing" 
                       onClick={() => setIsOpen(false)}
                       className="w-full flex items-center gap-2 px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-50 rounded-lg"
                     >
-                      <CreditCard size={14} />{t('billing')}
+                      <CreditCard size={14} />RAB 충전
                     </Link>
                   )}
                   <button

@@ -36,16 +36,27 @@ const TX_LABELS: Record<PointTxType, string> = {
   PENALTY_DEDUCT:       '패널티',
   RAB_PURCHASE:         'RAB 충전',
   UPLOAD_FEE_SPEND:     '업로드 수수료',
+  BOUNTY_ESCROW:        '바운티 에스크로',
+  BOUNTY_RELEASE:       '바운티 정산',
+  BOUNTY_REFUND:        '바운티 환급',
+  BOUNTY_FEE:           '바운티 수수료',
+  BOUNTY_BURN:          '바운티 소각',
+  SHOP_PURCHASE:        '쇼핑몰 구매',
+  SHOP_REVENUE:         '쇼핑몰 수익',
 };
 
 const TX_COLOR: Record<string, string> = {
   SIGNUP_BONUS: 'text-teal-600', UPLOAD_REWARD: 'text-teal-600',
   UPLOAD_QUALITY_BONUS: 'text-teal-600', LIKE_RECEIVED: 'text-teal-600',
   VIEW_SHARE: 'text-teal-600', ADMIN_GRANT: 'text-blue-600',
-  REPORT_REWARD: 'text-teal-600',
+  REPORT_REWARD: 'text-teal-600', RAB_PURCHASE: 'text-teal-600',
+  BOUNTY_RELEASE: 'text-teal-600', BOUNTY_REFUND: 'text-teal-600',
+  SHOP_REVENUE: 'text-teal-600',
   VIEW_SPEND: 'text-red-500', DOWNLOAD_SPEND: 'text-red-500',
   BOOST_SPEND: 'text-red-500', ADMIN_DEDUCT: 'text-red-500',
   PENALTY_DEDUCT: 'text-red-500', UPLOAD_FEE_SPEND: 'text-red-500',
+  BOUNTY_ESCROW: 'text-amber-600', BOUNTY_FEE: 'text-red-500',
+  BOUNTY_BURN: 'text-red-500', SHOP_PURCHASE: 'text-red-500',
 };
 
 const fmt = (n: number) => n >= 1e6 ? `${(n/1e6).toFixed(1)}M` : n >= 1e3 ? `${(n/1e3).toFixed(1)}K` : String(Math.round(n ?? 0));

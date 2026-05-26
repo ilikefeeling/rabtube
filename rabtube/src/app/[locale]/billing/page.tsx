@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
   ChevronLeft, CheckCircle, AlertCircle, CreditCard,
-  Coins, ArrowDownToLine, Zap, Crown, Building2,
+  Coins, Zap, Crown, Building2, ShoppingBag,
 } from 'lucide-react';
 import Header from '@/components/Header';
 import { useAuth } from '@/lib/AuthContext';
@@ -15,10 +15,8 @@ import {
   createRabPurchaseSession,
   getSubscription,
   cancelSubscription,
-  getCashoutHistory,
 } from '@/lib/stripeService';
-import { requestRabCashout } from '@/lib/stripeService';
-import { SUBSCRIPTION_PLANS, RAB_EXCHANGE } from '@/types';
+import { SUBSCRIPTION_PLANS } from '@/types';
 import type { Subscription } from '@/types';
 
 const fmt = (n: number) => n.toLocaleString();
@@ -51,17 +49,9 @@ export default function BillingPage() {
   const { balance, refresh: refreshPoints } = usePoints();
 
   const [subscription, setSubscription] = useState<Subscription | null>(null);
-  const [tab, setTab]                   = useState<'rab' | 'cashout'>('rab');
   const [loading, setLoading]           = useState(true);
   const [actionLoading, setActionLoading] = useState('');
   const [toast, setToast]               = useState('');
-
-  // 캐시아웃 폼
-  const [cashoutAmount, setCashoutAmount] = useState('');
-  const [bankName, setBankName]           = useState('');
-  const [accountNo, setAccountNo]         = useState('');
-  const [accountHolder, setAccountHolder] = useState('');
-  const [cashoutHistory, setCashoutHistory] = useState<any[]>([]);
 
   useEffect(() => {
     if (!authLoading && !user) router.push('/auth/login');
@@ -69,12 +59,8 @@ export default function BillingPage() {
 
   useEffect(() => {
     if (!user) return;
-    Promise.all([
-      getSubscription(user.uid),
-      getCashoutHistory(user.uid),
-    ]).then(([sub, hist]) => {
+    getSubscription(user.uid).then((sub) => {
       setSubscription(sub);
-      setCashoutHistory(hist);
       setLoading(false);
     });
   }, [user]);
@@ -134,44 +120,9 @@ export default function BillingPage() {
     }
   };
 
-  const handleCashout = async () => {
-    if (!user) return;
-    const amt = parseInt(cashoutAmount);
-    if (!amt || !bankName || !accountNo || !accountHolder) {
-      showToast('❌ 모든 항목을 입력해 주세요');
-      return;
-    }
-    setActionLoading('cashout');
-    try {
-      const res = await fetch('/api/payments/cashout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: user.uid,
-          rabAmount: amt,
-          bankName, accountNo, accountHolder,
-        }),
-      });
-      if (!res.ok) {
-        const { error } = await res.json();
-        throw new Error(error);
-      }
-      showToast('✅ 환전 신청이 완료되었습니다. 3~5 영업일 내 입금됩니다.');
-      setCashoutAmount('');
-      refreshPoints();
-      // 히스토리 새로고침
-      getCashoutHistory(user.uid).then(setCashoutHistory);
-    } catch (e: any) {
-      showToast(`❌ ${e.message}`);
-    } finally {
-      setActionLoading('');
-    }
-  };
+
 
   const currentTier = subscription?.status === 'active' ? subscription.tier : 'free';
-  const cashoutAmt  = parseInt(cashoutAmount) || 0;
-  const cashoutFee  = Math.floor(cashoutAmt * RAB_EXCHANGE.cashoutFeeRate);
-  const cashoutKrw  = (cashoutAmt - cashoutFee) * RAB_EXCHANGE.krwPerRab;
 
   if (authLoading || loading) return (
     <div className="flex items-center justify-center min-h-screen bg-slate-50">
@@ -204,8 +155,8 @@ export default function BillingPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-lg font-medium text-slate-800">충전 & 환전</h1>
-            <p className="text-xs text-slate-400 mt-0.5">Rab 충전 · 현금 환전</p>
+            <h1 className="text-lg font-medium text-slate-800">RAB 충전</h1>
+            <p className="text-xs text-slate-400 mt-0.5">Rab 충전 · 마켓플레이스</p>
           </div>
           <div className="bg-amber-50 border border-amber-100 rounded-xl px-4 py-2.5 text-right">
             <p className="text-[10px] text-amber-600 font-medium uppercase tracking-wide">내 RAB 잔액</p>
@@ -213,28 +164,25 @@ export default function BillingPage() {
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="flex gap-2 mb-6 border-b border-slate-200">
-          {[
-            { id: 'rab',          label: 'Rab 충전',  icon: <Coins size={14} /> },
-            { id: 'cashout',      label: 'RAB 환전',  icon: <ArrowDownToLine size={14} /> },
-          ].map(t => (
-            <button
-              key={t.id}
-              onClick={() => setTab(t.id as any)}
-              className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${
-                tab === t.id
-                  ? 'border-teal-500 text-teal-600'
-                  : 'border-transparent text-slate-500 hover:text-slate-700'
-              }`}
-            >
-              {t.icon}{t.label}
-            </button>
-          ))}
-        </div>
+        {/* Marketplace CTA */}
+        <Link
+          href="/marketplace"
+          className="flex items-center gap-3 p-4 mb-6 bg-gradient-to-r from-teal-50 to-emerald-50 border border-teal-100 rounded-xl hover:from-teal-100 hover:to-emerald-100 transition-all group"
+        >
+          <div className="w-10 h-10 bg-teal-600 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+            <ShoppingBag size={20} className="text-white" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-teal-800">치과 용품 마켓플레이스</p>
+            <p className="text-xs text-teal-600 mt-0.5">RAB로 치과 재료·소모품을 구매하거나, 필요한 상품을 요청하세요</p>
+          </div>
+          <ChevronLeft size={16} className="text-teal-400 rotate-180" />
+        </Link>
+
+
 
         {/* ── RAB PURCHASE ── */}
-        {tab === 'rab' && (
+        <div>
           <div>
             <p className="text-sm text-slate-500 mb-5">Rab을 충전하여 케이스 시청, 다운로드, 홍보 부스트에 사용하세요.</p>
             <div className="grid grid-cols-2 gap-3 mb-6">
@@ -278,117 +226,9 @@ export default function BillingPage() {
               <p>• 충전한 Rab는 환불되지 않습니다</p>
             </div>
           </div>
-        )}
+        </div>
 
-        {/* ── RAB CASHOUT ── */}
-        {tab === 'cashout' && (
-          <div className="space-y-5">
-            {/* Phase 2 notice */}
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
-              <AlertCircle size={16} className="text-amber-600 shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm font-medium text-amber-800">Phase 2 기능 — 현재 베타 운영 중</p>
-                <p className="text-xs text-amber-600 mt-0.5">RAB 환전은 최소 {fmt(RAB_EXCHANGE.minCashoutRab)} RAB부터 가능합니다. 수수료 {RAB_EXCHANGE.cashoutFeeRate * 100}% 적용 후 영업일 기준 3~5일 내 입금됩니다.</p>
-              </div>
-            </div>
 
-            {/* Exchange info */}
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { label: '환전 비율', val: `1 RAB = ₩${RAB_EXCHANGE.krwPerRab}` },
-                { label: '최소 환전', val: `${fmt(RAB_EXCHANGE.minCashoutRab)} RAB` },
-                { label: '수수료',   val: `${RAB_EXCHANGE.cashoutFeeRate * 100}%` },
-              ].map(r => (
-                <div key={r.label} className="card p-4 text-center">
-                  <p className="text-[10px] text-slate-400 uppercase tracking-wide mb-1">{r.label}</p>
-                  <p className="text-sm font-medium text-slate-700">{r.val}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Cashout form */}
-            <div className="card p-5">
-              <h3 className="text-sm font-medium text-slate-700 mb-4">환전 신청</h3>
-              <div className="space-y-3">
-                <div>
-                  <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wide block mb-1.5">환전할 RAB 수량</label>
-                  <input
-                    className="input-field"
-                    type="number"
-                    placeholder={`최소 ${fmt(RAB_EXCHANGE.minCashoutRab)} RAB`}
-                    value={cashoutAmount}
-                    onChange={e => setCashoutAmount(e.target.value)}
-                  />
-                  {cashoutAmt >= RAB_EXCHANGE.minCashoutRab && (
-                    <div className="mt-2 text-xs text-slate-500 bg-slate-50 rounded-lg px-3 py-2 space-y-0.5">
-                      <div className="flex justify-between">
-                        <span>신청 RAB</span><span>{fmt(cashoutAmt)} RAB</span>
-                      </div>
-                      <div className="flex justify-between text-red-400">
-                        <span>수수료 ({RAB_EXCHANGE.cashoutFeeRate * 100}%)</span>
-                        <span>-{fmt(cashoutFee)} RAB</span>
-                      </div>
-                      <div className="flex justify-between font-medium text-teal-600 pt-1 border-t border-slate-100">
-                        <span>입금 예정</span>
-                        <span>₩{fmt(cashoutKrw)}</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wide block mb-1.5">은행명</label>
-                    <input className="input-field" placeholder="예) 국민은행" value={bankName} onChange={e => setBankName(e.target.value)} />
-                  </div>
-                  <div>
-                    <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wide block mb-1.5">계좌번호</label>
-                    <input className="input-field" placeholder="- 없이 입력" value={accountNo} onChange={e => setAccountNo(e.target.value)} />
-                  </div>
-                </div>
-                <div>
-                  <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wide block mb-1.5">예금주</label>
-                  <input className="input-field" placeholder="예금주 이름" value={accountHolder} onChange={e => setAccountHolder(e.target.value)} />
-                </div>
-                <button
-                  onClick={handleCashout}
-                  disabled={!!actionLoading || cashoutAmt < RAB_EXCHANGE.minCashoutRab}
-                  className="btn-primary w-full"
-                >
-                  {actionLoading === 'cashout' ? '처리 중...' : `₩${fmt(cashoutKrw)} 환전 신청`}
-                </button>
-              </div>
-            </div>
-
-            {/* Cashout history */}
-            {cashoutHistory.length > 0 && (
-              <div className="card overflow-hidden">
-                <div className="px-4 py-3 border-b border-slate-50">
-                  <h3 className="text-sm font-medium text-slate-700">환전 내역</h3>
-                </div>
-                {cashoutHistory.map((r: any) => (
-                  <div key={r.id} className="flex items-center gap-3 px-4 py-3 border-b border-slate-50 last:border-0">
-                    <div className={`w-2 h-2 rounded-full shrink-0 ${
-                      r.status === 'completed' ? 'bg-teal-500' :
-                      r.status === 'rejected'  ? 'bg-red-400' :
-                      'bg-amber-400'
-                    }`} />
-                    <div className="flex-1">
-                      <p className="text-xs font-medium text-slate-700">{fmt(r.rabAmount)} RAB → ₩{fmt(r.krwAmount)}</p>
-                      <p className="text-[10px] text-slate-400">{r.bankName} {r.accountNo?.slice(-4).padStart(r.accountNo.length, '*')}</p>
-                    </div>
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded uppercase ${
-                      r.status === 'completed' ? 'bg-teal-50 text-teal-700' :
-                      r.status === 'rejected'  ? 'bg-red-50 text-red-600' :
-                      'bg-amber-50 text-amber-600'
-                    }`}>
-                      {r.status === 'completed' ? '완료' : r.status === 'rejected' ? '거절' : '처리 중'}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
       </main>
     </div>
   );

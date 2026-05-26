@@ -6,7 +6,7 @@
     "search_ph": "검색",
     "points": "포인트 내역",
     "my_cases": "내 케이스 관리",
-    "billing": "충전 & 환전",
+    "billing": "RAB 충전",
     "logout": "로그아웃",
     "doctor": "{name} 원장"
   },
@@ -95,10 +95,10 @@
   "Sidebar": {
     "feed": "피드",
     "my_cases": "내 케이스",
-    "billing": "충전 & 환전",
+    "billing": "RAB 충전",
+    "marketplace": "마켓플레이스",
     "about": "서비스 소개",
-    "admin_home": "관리자 홈",
-    "admin_cashout": "환전 처리"
+    "admin_home": "관리자 홈"
   },
   "HomePage": {
     "cat_all": "전체",
