@@ -165,22 +165,22 @@ export default function LandingPage() {
         .landing-page-upload-root .hero-grid { position: absolute; inset: 0; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 56px 56px; mask-image: radial-gradient(ellipse 60% 80% at 70% 40%, black, transparent 70%); pointer-events: none; }
         .landing-page-upload-root .hero-wrap { max-width: 1200px; margin: 0 auto; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: center; position: relative; z-index: 1; }
 
-        .landing-page-upload-root .eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 3.5px; text-transform: uppercase; color: var(--teal); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; opacity: 0; animation: up .7s var(--ease) .05s forwards; }
+        .landing-page-upload-root .eyebrow { font-size: 13px; font-weight: 600; letter-spacing: 3.5px; text-transform: uppercase; color: var(--teal); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; opacity: 0; animation: up .7s var(--ease) .05s forwards; }
         .landing-page-upload-root .eyebrow::before { content: ''; width: 22px; height: 1px; background: var(--teal); }
         .landing-page-upload-root h1 { font-family: var(--serif); font-size: clamp(48px, 5.5vw, 76px); font-weight: 600; line-height: 1.04; letter-spacing: -.5px; margin-bottom: 26px; opacity: 0; animation: up .8s var(--ease) .18s forwards; }
         .landing-page-upload-root h1 em { font-style: italic; color: var(--teal); }
-        .landing-page-upload-root .hero-sub { font-size: 16px; line-height: 1.8; color: var(--off2); font-weight: 300; max-width: 460px; margin-bottom: 40px; opacity: 0; animation: up .8s var(--ease) .32s forwards; }
+        .landing-page-upload-root .hero-sub { font-size: 19px; line-height: 1.8; color: var(--off2); font-weight: 300; max-width: 550px; margin-bottom: 40px; opacity: 0; animation: up .8s var(--ease) .32s forwards; }
         .landing-page-upload-root .hero-sub strong { color: var(--goldl); font-weight: 500; }
         .landing-page-upload-root .hero-cta { display: flex; align-items: center; gap: 12px; opacity: 0; animation: up .8s var(--ease) .44s forwards; }
-        .landing-page-upload-root .btn-hero { display: inline-flex; align-items: center; gap: 8px; background: var(--teal); color: var(--ink); font-size: 15px; font-weight: 600; padding: 14px 30px; border-radius: 8px; text-decoration: none; transition: all .2s; }
+        .landing-page-upload-root .btn-hero { display: inline-flex; align-items: center; gap: 8px; background: var(--teal); color: var(--ink); font-size: 17px; font-weight: 600; padding: 14px 30px; border-radius: 8px; text-decoration: none; transition: all .2s; }
         .landing-page-upload-root .btn-hero:hover { background: var(--teal2); box-shadow: 0 6px 32px var(--tealg); transform: translateY(-2px); }
         .landing-page-upload-root .btn-hero svg { transition: transform .2s; }
         .landing-page-upload-root .btn-hero:hover svg { transform: translateX(3px); }
-        .landing-page-upload-root .btn-learn { font-size: 14px; color: var(--off3); text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color .2s; }
+        .landing-page-upload-root .btn-learn { font-size: 16px; color: var(--off3); text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color .2s; }
         .landing-page-upload-root .btn-learn:hover { color: var(--off); }
         
         .landing-page-upload-root .reward-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 36px; opacity: 0; animation: up .8s var(--ease) .56s forwards; }
-        .landing-page-upload-root .rpill { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; padding: 6px 12px; border-radius: 20px; border: .5px solid; letter-spacing: .3px; }
+        .landing-page-upload-root .rpill { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 500; padding: 7px 14px; border-radius: 20px; border: .5px solid; letter-spacing: .3px; }
         .landing-page-upload-root .rpill-g { background: var(--teald); border-color: rgba(14,194,142,.3); color: var(--teal); }
         .landing-page-upload-root .rpill-y { background: var(--goldd); border-color: rgba(200,168,74,.3); color: var(--goldl); }
         .landing-page-upload-root .rpill-s { background: rgba(255,255,255,.04); border-color: var(--line2); color: var(--off3); }
@@ -190,99 +190,99 @@ export default function LandingPage() {
         .landing-page-upload-root .uc-dots { display: flex; gap: 6px; }
         .landing-page-upload-root .ucd { width: 9px; height: 9px; border-radius: 50%; }
         .landing-page-upload-root .ucdr { background: #e05252; } .landing-page-upload-root .ucdy { background: #d4920c; } .landing-page-upload-root .ucdg { background: var(--teal); }
-        .landing-page-upload-root .uc-title { font-size: 11px; color: var(--off3); letter-spacing: .5px; }
+        .landing-page-upload-root .uc-title { font-size: 13px; color: var(--off3); letter-spacing: .5px; }
         .landing-page-upload-root .uc-body { padding: 20px; }
 
         .landing-page-upload-root .dropzone { border: 1.5px dashed rgba(14,194,142,.35); border-radius: 12px; padding: 28px 20px; text-align: center; cursor: pointer; position: relative; overflow: hidden; transition: all .3s; margin-bottom: 16px; background: rgba(14,194,142,.02); }
         .landing-page-upload-root .dropzone:hover { border-color: var(--teal); background: rgba(14,194,142,.05); }
         .landing-page-upload-root .dz-icon { font-size: 30px; margin-bottom: 8px; display: block; }
-        .landing-page-upload-root .dz-text { font-size: 13px; font-weight: 500; color: var(--off); margin-bottom: 3px; }
-        .landing-page-upload-root .dz-sub { font-size: 10px; color: var(--off3); }
-        .landing-page-upload-root .dz-btn { display: inline-block; margin-top: 10px; background: var(--teal); color: var(--ink); font-size: 11px; font-weight: 600; padding: 6px 16px; border-radius: 5px; }
+        .landing-page-upload-root .dz-text { font-size: 15px; font-weight: 500; color: var(--off); margin-bottom: 3px; }
+        .landing-page-upload-root .dz-sub { font-size: 12px; color: var(--off3); }
+        .landing-page-upload-root .dz-btn { display: inline-block; margin-top: 10px; background: var(--teal); color: var(--ink); font-size: 13px; font-weight: 600; padding: 6px 16px; border-radius: 5px; }
 
         .landing-page-upload-root .upload-progress { margin-bottom: 16px; }
         .landing-page-upload-root .up-file { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
         .landing-page-upload-root .up-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--teald); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
-        .landing-page-upload-root .up-name { font-size: 12px; font-weight: 500; color: var(--off); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
-        .landing-page-upload-root .up-size { font-size: 10px; color: var(--off3); }
+        .landing-page-upload-root .up-name { font-size: 14px; font-weight: 500; color: var(--off); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
+        .landing-page-upload-root .up-size { font-size: 12px; color: var(--off3); }
         .landing-page-upload-root .up-bar-wrap { height: 4px; background: rgba(255,255,255,.07); border-radius: 2px; overflow: hidden; margin-bottom: 6px; }
         .landing-page-upload-root .up-bar { height: 100%; background: linear-gradient(90deg, var(--teal), #0dd4a0); border-radius: 2px; transition: width .3s; }
-        .landing-page-upload-root .up-pct { font-size: 10px; color: var(--teal); text-align: right; }
+        .landing-page-upload-root .up-pct { font-size: 12px; color: var(--teal); text-align: right; }
 
         .landing-page-upload-root .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
         .landing-page-upload-root .field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
-        .landing-page-upload-root .field label { font-size: 9px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--off3); }
-        .landing-page-upload-root .field input, .landing-page-upload-root .field select { background: rgba(255,255,255,.04); border: .5px solid var(--line2); border-radius: 7px; padding: 8px 11px; font-size: 12px; font-family: var(--sans); color: var(--off); outline: none; width: 100%; transition: border .2s; -webkit-appearance: none; }
+        .landing-page-upload-root .field label { font-size: 11px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--off3); }
+        .landing-page-upload-root .field input, .landing-page-upload-root .field select { background: rgba(255,255,255,.04); border: .5px solid var(--line2); border-radius: 7px; padding: 8px 11px; font-size: 14px; font-family: var(--sans); color: var(--off); outline: none; width: 100%; transition: border .2s; -webkit-appearance: none; }
         .landing-page-upload-root .field input:focus, .landing-page-upload-root .field select:focus { border-color: var(--teal); }
         .landing-page-upload-root .field select option { background: var(--ink3); }
 
         .landing-page-upload-root .reward-preview { background: rgba(14,194,142,.05); border: .5px solid rgba(14,194,142,.2); border-radius: 10px; padding: 14px 16px; margin-top: 4px; }
-        .landing-page-upload-root .rp-title { font-size: 9px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--teal); margin-bottom: 10px; }
+        .landing-page-upload-root .rp-title { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--teal); margin-bottom: 10px; }
         .landing-page-upload-root .rp-rows { display: flex; flex-direction: column; gap: 6px; }
         .landing-page-upload-root .rp-row { display: flex; justify-content: space-between; align-items: center; }
-        .landing-page-upload-root .rp-label { font-size: 11px; color: var(--off2); }
-        .landing-page-upload-root .rp-val { font-family: var(--mono); font-size: 11px; color: var(--teal); font-weight: 500; }
+        .landing-page-upload-root .rp-label { font-size: 13px; color: var(--off2); }
+        .landing-page-upload-root .rp-val { font-family: var(--mono); font-size: 13px; color: var(--teal); font-weight: 500; }
         .landing-page-upload-root .rp-divider { width: 100%; height: .5px; background: rgba(14,194,142,.15); margin: 6px 0; }
-        .landing-page-upload-root .rp-total { font-size: 13px; font-weight: 600; color: var(--goldl); }
+        .landing-page-upload-root .rp-total { font-size: 15px; font-weight: 600; color: var(--goldl); }
         
-        .landing-page-upload-root .btn-upload { width: 100%; padding: 11px; background: var(--teal); color: var(--ink); border: none; border-radius: 8px; font-family: var(--sans); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all .2s; margin-top: 12px; }
+        .landing-page-upload-root .btn-upload { width: 100%; padding: 11px; background: var(--teal); color: var(--ink); border: none; border-radius: 8px; font-family: var(--sans); font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all .2s; margin-top: 12px; }
         .landing-page-upload-root .btn-upload:hover { background: var(--teal2); box-shadow: 0 4px 20px var(--tealg); }
 
         .landing-page-upload-root .done-state { text-align: center; padding: 24px 16px; }
         .landing-page-upload-root .done-icon { font-size: 40px; margin-bottom: 12px; display: block; }
-        .landing-page-upload-root .done-title { font-family: var(--serif); font-size: 20px; color: var(--off); font-weight: 600; margin-bottom: 6px; }
-        .landing-page-upload-root .done-sub { font-size: 12px; color: var(--off3); line-height: 1.6; }
-        .landing-page-upload-root .done-rab { margin-top: 14px; display: inline-flex; align-items: center; gap: 6px; background: var(--goldd); border: .5px solid rgba(200,168,74,.3); color: var(--goldl); padding: 7px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; }
+        .landing-page-upload-root .done-title { font-family: var(--serif); font-size: 22px; color: var(--off); font-weight: 600; margin-bottom: 6px; }
+        .landing-page-upload-root .done-sub { font-size: 14px; color: var(--off3); line-height: 1.6; }
+        .landing-page-upload-root .done-rab { margin-top: 14px; display: inline-flex; align-items: center; gap: 6px; background: var(--goldd); border: .5px solid rgba(200,168,74,.3); color: var(--goldl); padding: 7px 16px; border-radius: 6px; font-size: 15px; font-weight: 600; }
 
         .landing-page-upload-root section { padding: 110px 52px; position: relative; }
         .landing-page-upload-root .si { max-width: 1200px; margin: 0 auto; }
-        .landing-page-upload-root .sk { font-size: 10px; font-weight: 600; letter-spacing: 3.5px; text-transform: uppercase; color: var(--teal); margin-bottom: 14px; display: flex; align-items: center; gap: 9px; }
+        .landing-page-upload-root .sk { font-size: 13px; font-weight: 600; letter-spacing: 3.5px; text-transform: uppercase; color: var(--teal); margin-bottom: 14px; display: flex; align-items: center; gap: 9px; }
         .landing-page-upload-root .sk::before { content: ''; width: 20px; height: 1px; background: var(--teal); }
         .landing-page-upload-root h2 { font-family: var(--serif); font-size: clamp(38px, 4vw, 58px); font-weight: 600; line-height: 1.08; letter-spacing: -.4px; margin-bottom: 18px; }
         .landing-page-upload-root h2 em { font-style: italic; color: var(--teal); }
-        .landing-page-upload-root .sdesc { font-size: 15px; line-height: 1.85; color: var(--off2); max-width: 520px; font-weight: 300; }
+        .landing-page-upload-root .sdesc { font-size: 18px; line-height: 1.85; color: var(--off2); max-width: 600px; font-weight: 300; }
         .landing-page-upload-root .divider { width: 100%; height: .5px; background: var(--line); }
 
         .landing-page-upload-root .flow-wrap { margin-top: 70px; position: relative; }
         .landing-page-upload-root .flow-wrap::before { content: ''; position: absolute; top: 44px; left: calc(12.5% - 1px); right: calc(12.5% - 1px); height: .5px; background: linear-gradient(90deg, transparent, var(--teal), var(--teal), var(--teal), transparent); opacity: .3; pointer-events: none; }
-        .landing-page-upload-root .flow-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; }
-        .landing-page-upload-root .flow-step { background: var(--ink2); padding: 28px 22px 24px; border: .5px solid var(--line); transition: all .25s; cursor: default; position: relative; overflow: hidden; }
+        .landing-page-upload-root .flow-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        .landing-page-upload-root .flow-step { background: var(--ink2); padding: 32px 24px 28px; border: .5px solid var(--line); transition: all .25s; cursor: default; position: relative; overflow: hidden; }
         .landing-page-upload-root .flow-step:first-child { border-radius: 12px 0 0 12px; }
         .landing-page-upload-root .flow-step:last-child { border-radius: 0 12px 12px 0; }
         .landing-page-upload-root .flow-step:hover { background: var(--ink3); border-color: var(--line2); }
         .landing-page-upload-root .flow-step::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--teal), rgba(14,194,142,0)); opacity: 0; transition: opacity .3s; }
         .landing-page-upload-root .flow-step:hover::after { opacity: 1; }
-        .landing-page-upload-root .fs-num { font-family: var(--mono); font-size: 10px; color: var(--teal); letter-spacing: 2px; margin-bottom: 16px; display: block; }
-        .landing-page-upload-root .fs-icon { font-size: 24px; display: block; margin-bottom: 14px; }
-        .landing-page-upload-root .fs-title { font-size: 13px; font-weight: 500; color: var(--off); margin-bottom: 6px; line-height: 1.3; }
-        .landing-page-upload-root .fs-desc { font-size: 11px; color: var(--off3); line-height: 1.6; }
-        .landing-page-upload-root .fs-rab { margin-top: 12px; font-family: var(--mono); font-size: 11px; color: var(--teal); }
+        .landing-page-upload-root .fs-num { font-family: var(--mono); font-size: 13px; color: var(--teal); letter-spacing: 2px; margin-bottom: 16px; display: block; }
+        .landing-page-upload-root .fs-icon { font-size: 32px; display: block; margin-bottom: 14px; }
+        .landing-page-upload-root .fs-title { font-size: 17px; font-weight: 600; color: var(--off); margin-bottom: 8px; line-height: 1.3; }
+        .landing-page-upload-root .fs-desc { font-size: 14px; color: var(--off2); line-height: 1.6; }
+        .landing-page-upload-root .fs-rab { margin-top: 14px; font-family: var(--mono); font-size: 14px; color: var(--teal); }
 
         .landing-page-upload-root .calc-bg { background: var(--ink2); }
         .landing-page-upload-root .calc-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; margin-top: 70px; }
         .landing-page-upload-root .calc-panel { background: var(--ink); border-radius: 16px; border: .5px solid var(--line2); padding: 36px; position: sticky; top: 80px; }
-        .landing-page-upload-root .cp-title { font-family: var(--serif); font-size: 20px; font-weight: 600; color: var(--off); margin-bottom: 4px; }
-        .landing-page-upload-root .cp-sub { font-size: 12px; color: var(--off3); margin-bottom: 28px; }
+        .landing-page-upload-root .cp-title { font-family: var(--serif); font-size: 24px; font-weight: 600; color: var(--off); margin-bottom: 4px; }
+        .landing-page-upload-root .cp-sub { font-size: 14px; color: var(--off3); margin-bottom: 28px; }
         .landing-page-upload-root .calc-field { margin-bottom: 18px; }
-        .landing-page-upload-root .cf-label { font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--off3); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .landing-page-upload-root .cf-label { font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--off3); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
         .landing-page-upload-root .cf-val { font-family: var(--mono); color: var(--teal); font-weight: 500; }
         .landing-page-upload-root input[type=range] { width: 100%; accent-color: var(--teal); cursor: pointer; }
         .landing-page-upload-root .calc-result { margin-top: 28px; padding: 24px; background: rgba(14,194,142,.05); border-radius: 12px; border: .5px solid rgba(14,194,142,.2); }
         .landing-page-upload-root .cr-rows { display: flex; flex-direction: column; gap: 10px; }
         .landing-page-upload-root .cr-row { display: flex; justify-content: space-between; align-items: center; }
-        .landing-page-upload-root .cr-l { font-size: 13px; color: var(--off2); }
-        .landing-page-upload-root .cr-v { font-family: var(--mono); font-size: 13px; font-weight: 500; }
+        .landing-page-upload-root .cr-l { font-size: 15px; color: var(--off2); }
+        .landing-page-upload-root .cr-v { font-family: var(--mono); font-size: 15px; font-weight: 500; }
         .landing-page-upload-root .cr-earn { color: var(--teal); }
         .landing-page-upload-root .cr-spend { color: var(--red); }
         .landing-page-upload-root .cr-div { height: .5px; background: rgba(14,194,142,.15); margin: 6px 0; }
-        .landing-page-upload-root .cr-net { font-size: 16px; font-weight: 600; }
+        .landing-page-upload-root .cr-net { font-size: 18px; font-weight: 600; }
         .landing-page-upload-root .cr-net.pos { color: var(--teal); }
         .landing-page-upload-root .cr-net.neg { color: var(--red); }
         .landing-page-upload-root .cr-monthly { margin-top: 20px; padding-top: 20px; border-top: .5px solid var(--line); text-align: center; }
-        .landing-page-upload-root .crm-label { font-size: 11px; color: var(--off3); margin-bottom: 4px; }
-        .landing-page-upload-root .crm-val { font-family: var(--serif); font-size: 38px; font-weight: 700; color: var(--goldl); letter-spacing: -1px; }
-        .landing-page-upload-root .crm-unit { font-size: 13px; color: var(--gold); margin-left: 4px; }
-        .landing-page-upload-root .crm-note { font-size: 11px; color: var(--off3); margin-top: 4px; }
+        .landing-page-upload-root .crm-label { font-size: 13px; color: var(--off3); margin-bottom: 4px; }
+        .landing-page-upload-root .crm-val { font-family: var(--serif); font-size: 44px; font-weight: 700; color: var(--goldl); letter-spacing: -1px; }
+        .landing-page-upload-root .crm-unit { font-size: 15px; color: var(--gold); margin-left: 4px; }
+        .landing-page-upload-root .crm-note { font-size: 13px; color: var(--off3); margin-top: 4px; }
         
         .landing-page-upload-root .reward-details { display: flex; flex-direction: column; gap: 20px; }
         .landing-page-upload-root .rd-card { background: var(--ink); border-radius: 14px; border: .5px solid var(--line); padding: 28px 30px; transition: border-color .2s; }
@@ -290,10 +290,10 @@ export default function LandingPage() {
         .landing-page-upload-root .rd-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
         .landing-page-upload-root .rd-icon { font-size: 22px; }
         .landing-page-upload-root .rd-rab { font-family: var(--mono); font-size: 16px; font-weight: 500; }
-        .landing-page-upload-root .rd-title { font-family: var(--serif); font-size: 18px; font-weight: 600; color: var(--off); margin-bottom: 8px; }
-        .landing-page-upload-root .rd-desc { font-size: 13px; color: var(--off2); line-height: 1.7; font-weight: 300; }
+        .landing-page-upload-root .rd-title { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--off); margin-bottom: 8px; }
+        .landing-page-upload-root .rd-desc { font-size: 16px; color: var(--off2); line-height: 1.7; font-weight: 300; }
         .landing-page-upload-root .rd-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
-        .landing-page-upload-root .rd-tag { font-size: 10px; padding: 3px 9px; border-radius: 4px; border: .5px solid var(--line2); color: var(--off3); letter-spacing: .3px; }
+        .landing-page-upload-root .rd-tag { font-size: 12px; padding: 3px 9px; border-radius: 4px; border: .5px solid var(--line2); color: var(--off3); letter-spacing: .3px; }
 
         .landing-page-upload-root .tiers-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; margin-top: 70px; }
         .landing-page-upload-root .tier-card { padding: 36px 28px; border: .5px solid var(--line); transition: all .25s; position: relative; overflow: hidden; }
@@ -304,14 +304,14 @@ export default function LandingPage() {
         .landing-page-upload-root .tier-card.t-bronze { background: linear-gradient(160deg, #140e00, var(--ink2)); }
         .landing-page-upload-root .tier-card.t-none { background: var(--ink2); }
         .landing-page-upload-root .tier-card:hover { transform: translateY(-3px); box-shadow: 0 16px 48px rgba(0,0,0,.4); }
-        .landing-page-upload-root .tier-emoji { font-size: 32px; display: block; margin-bottom: 16px; }
-        .landing-page-upload-root .tier-name { font-family: var(--serif); font-size: 22px; font-weight: 600; margin-bottom: 6px; }
-        .landing-page-upload-root .tier-score { font-size: 11px; color: var(--off3); margin-bottom: 20px; letter-spacing: .5px; }
+        .landing-page-upload-root .tier-emoji { font-size: 38px; display: block; margin-bottom: 16px; }
+        .landing-page-upload-root .tier-name { font-family: var(--serif); font-size: 26px; font-weight: 600; margin-bottom: 6px; }
+        .landing-page-upload-root .tier-score { font-size: 13px; color: var(--off3); margin-bottom: 20px; letter-spacing: .5px; }
         .landing-page-upload-root .tier-rab { margin-bottom: 20px; }
-        .landing-page-upload-root .tier-rab .big { font-family: var(--serif); font-size: 44px; font-weight: 700; letter-spacing: -1px; line-height: 1; }
-        .landing-page-upload-root .tier-rab .unit { font-size: 14px; font-weight: 600; margin-left: 4px; }
+        .landing-page-upload-root .tier-rab .big { font-family: var(--serif); font-size: 48px; font-weight: 700; letter-spacing: -1px; line-height: 1; }
+        .landing-page-upload-root .tier-rab .unit { font-size: 16px; font-weight: 600; margin-left: 4px; }
         .landing-page-upload-root .tier-req { display: flex; flex-direction: column; gap: 7px; }
-        .landing-page-upload-root .tier-req-item { font-size: 11px; color: var(--off3); display: flex; align-items: flex-start; gap: 7px; line-height: 1.5; }
+        .landing-page-upload-root .tier-req-item { font-size: 13px; color: var(--off3); display: flex; align-items: flex-start; gap: 7px; line-height: 1.5; }
         .landing-page-upload-root .tier-req-item::before { content: '▸'; flex-shrink: 0; margin-top: 1px; }
         .landing-page-upload-root .t-gold .tier-name, .landing-page-upload-root .t-gold .big, .landing-page-upload-root .t-gold .unit { color: var(--goldl); }
         .landing-page-upload-root .t-gold .tier-req-item::before { color: var(--gold); }
@@ -327,26 +327,26 @@ export default function LandingPage() {
         .landing-page-upload-root .pol-card:hover { background: rgba(7,18,27,.7); }
         .landing-page-upload-root .pol-card:first-child { border-radius: 12px 0 0 12px; }
         .landing-page-upload-root .pol-card:last-child { border-radius: 0 12px 12px 0; }
-        .landing-page-upload-root .pol-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 22px; }
-        .landing-page-upload-root .pol-title { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--off); margin-bottom: 12px; }
-        .landing-page-upload-root .pol-desc { font-size: 13px; color: var(--off2); line-height: 1.75; font-weight: 300; margin-bottom: 20px; }
+        .landing-page-upload-root .pol-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 22px; }
+        .landing-page-upload-root .pol-title { font-family: var(--serif); font-size: 24px; font-weight: 600; color: var(--off); margin-bottom: 12px; }
+        .landing-page-upload-root .pol-desc { font-size: 15px; color: var(--off2); line-height: 1.75; font-weight: 300; margin-bottom: 20px; }
         .landing-page-upload-root .pol-rules { display: flex; flex-direction: column; gap: 8px; }
-        .landing-page-upload-root .pol-rule { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; color: var(--off3); line-height: 1.5; }
+        .landing-page-upload-root .pol-rule { display: flex; align-items: flex-start; gap: 8px; font-size: 14px; color: var(--off3); line-height: 1.5; }
         .landing-page-upload-root .pr-ok { color: var(--teal); } .landing-page-upload-root .pr-no { color: var(--red); }
 
         .landing-page-upload-root .pipe-wrap { margin-top: 70px; position: relative; }
         .landing-page-upload-root .pipe-line { position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent 2%, var(--teal) 5%, var(--teal) 95%, transparent 98%); opacity: .2; transform: translateY(-50%); pointer-events: none; z-index: 0; }
         .landing-page-upload-root .pipe-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; position: relative; z-index: 1; }
         .landing-page-upload-root .pipe-node { display: flex; flex-direction: column; align-items: center; text-align: center; }
-        .landing-page-upload-root .pn-dot { width: 52px; height: 52px; border-radius: 50%; border: .5px solid; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 14px; background: var(--ink2); position: relative; transition: all .3s; }
+        .landing-page-upload-root .pn-dot { width: 52px; height: 52px; border-radius: 50%; border: .5px solid; display: flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 14px; background: var(--ink2); position: relative; transition: all .3s; }
         .landing-page-upload-root .pn-dot.pass { border-color: rgba(14,194,142,.4); box-shadow: 0 0 20px rgba(14,194,142,.1); }
         .landing-page-upload-root .pn-dot.warn { border-color: rgba(212,146,12,.4); box-shadow: 0 0 20px rgba(212,146,12,.1); }
         .landing-page-upload-root .pn-dot.fail { border-color: rgba(224,82,82,.4); box-shadow: 0 0 20px rgba(224,82,82,.1); }
         .landing-page-upload-root .pn-dot::after { content: ''; position: absolute; right: -16px; top: 50%; transform: translateY(-50%); width: 14px; height: 1px; background: var(--off3); opacity: .3; }
         .landing-page-upload-root .pipe-node:last-child .pn-dot::after { display: none; }
-        .landing-page-upload-root .pn-title { font-size: 12px; font-weight: 500; color: var(--off); margin-bottom: 5px; }
-        .landing-page-upload-root .pn-desc { font-size: 10px; color: var(--off3); line-height: 1.5; }
-        .landing-page-upload-root .pn-badge { margin-top: 8px; font-size: 9px; font-weight: 600; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: .5px; }
+        .landing-page-upload-root .pn-title { font-size: 14px; font-weight: 500; color: var(--off); margin-bottom: 5px; }
+        .landing-page-upload-root .pn-desc { font-size: 12px; color: var(--off3); line-height: 1.5; }
+        .landing-page-upload-root .pn-badge { margin-top: 8px; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: .5px; }
         .landing-page-upload-root .pb-pass { background: var(--teald); color: var(--teal); }
         .landing-page-upload-root .pb-warn { background: rgba(212,146,12,.12); color: #d4920c; }
         .landing-page-upload-root .pb-fail { background: var(--redd); color: var(--red); }
@@ -355,9 +355,9 @@ export default function LandingPage() {
         .landing-page-upload-root .faq-item { border-bottom: .5px solid var(--line); overflow: hidden; }
         .landing-page-upload-root .faq-q { padding: 20px 0; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: color .2s; }
         .landing-page-upload-root .faq-q:hover { color: var(--teal); }
-        .landing-page-upload-root .faq-q-text { font-size: 15px; font-weight: 500; color: var(--off); }
+        .landing-page-upload-root .faq-q-text { font-size: 17px; font-weight: 500; color: var(--off); }
         .landing-page-upload-root .faq-arrow { width: 20px; height: 20px; border-radius: 50%; border: .5px solid var(--line2); display: flex; align-items: center; justify-content: center; color: var(--off3); font-size: 11px; transition: all .3s; flex-shrink: 0; }
-        .landing-page-upload-root .faq-a { font-size: 14px; color: var(--off2); line-height: 1.8; font-weight: 300; max-height: 0; overflow: hidden; transition: max-height .4s var(--ease), padding .4s; }
+        .landing-page-upload-root .faq-a { font-size: 15px; color: var(--off2); line-height: 1.8; font-weight: 300; max-height: 0; overflow: hidden; transition: max-height .4s var(--ease), padding .4s; }
         .landing-page-upload-root .faq-a.open { max-height: 200px; padding-bottom: 20px; }
         .landing-page-upload-root .faq-item.open .faq-arrow { transform: rotate(45deg); border-color: var(--teal); color: var(--teal); }
 
@@ -367,27 +367,27 @@ export default function LandingPage() {
         .landing-page-upload-root .cta-sec h2 { font-size: clamp(42px, 5vw, 68px); margin-bottom: 20px; }
         .landing-page-upload-root .cta-sec .sdesc { margin: 0 auto 40px; text-align: center; }
         .landing-page-upload-root .cta-btns { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
-        .landing-page-upload-root .btn-cta { display: inline-flex; align-items: center; gap: 8px; background: var(--teal); color: var(--ink); font-size: 15px; font-weight: 600; padding: 14px 30px; border-radius: 8px; text-decoration: none; transition: all .2s; }
+        .landing-page-upload-root .btn-cta { display: inline-flex; align-items: center; gap: 8px; background: var(--teal); color: var(--ink); font-size: 17px; font-weight: 600; padding: 14px 30px; border-radius: 8px; text-decoration: none; transition: all .2s; }
         .landing-page-upload-root .btn-cta:hover { background: var(--teal2); box-shadow: 0 6px 32px var(--tealg); transform: translateY(-2px); }
         .landing-page-upload-root .btn-cta svg { transition: transform .2s; }
         .landing-page-upload-root .btn-cta:hover svg { transform: translateX(3px); }
-        .landing-page-upload-root .btn-cta2 { display: inline-flex; align-items: center; gap: 8px; border: .5px solid var(--line2); color: var(--off2); font-size: 15px; padding: 13px 26px; border-radius: 8px; text-decoration: none; transition: all .2s; }
+        .landing-page-upload-root .btn-cta2 { display: inline-flex; align-items: center; gap: 8px; border: .5px solid var(--line2); color: var(--off2); font-size: 17px; padding: 13px 26px; border-radius: 8px; text-decoration: none; transition: all .2s; }
         .landing-page-upload-root .btn-cta2:hover { border-color: rgba(255,255,255,.25); color: var(--off); }
-        .landing-page-upload-root .cta-note { font-size: 12px; color: var(--off3); margin-top: 18px; }
+        .landing-page-upload-root .cta-note { font-size: 14px; color: var(--off3); margin-top: 18px; }
         .landing-page-upload-root .cta-note a { color: var(--teal); text-decoration: none; }
 
         .landing-page-upload-root footer { background: var(--ink); border-top: .5px solid var(--line); padding: 60px 52px 36px; }
         .landing-page-upload-root .foot-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 56px; margin-bottom: 56px; }
         .landing-page-upload-root .flogo { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--off); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
         .landing-page-upload-root .flogo-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); }
-        .landing-page-upload-root .fdesc { font-size: 13px; color: var(--off3); line-height: 1.7; font-weight: 300; max-width: 240px; }
-        .landing-page-upload-root .fcol-t { font-size: 9px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: var(--off3); margin-bottom: 18px; opacity: .6; }
+        .landing-page-upload-root .fdesc { font-size: 14px; color: var(--off3); line-height: 1.7; font-weight: 300; max-width: 240px; }
+        .landing-page-upload-root .fcol-t { font-size: 11px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: var(--off3); margin-bottom: 18px; opacity: .6; }
         .landing-page-upload-root .flinks { list-style: none; display: flex; flex-direction: column; gap: 9px; }
-        .landing-page-upload-root .flinks a { font-size: 13px; color: var(--off3); text-decoration: none; transition: color .2s; }
+        .landing-page-upload-root .flinks a { font-size: 14px; color: var(--off3); text-decoration: none; transition: color .2s; }
         .landing-page-upload-root .flinks a:hover { color: var(--off); }
         .landing-page-upload-root .foot-bot { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding-top: 28px; border-top: .5px solid var(--line); }
-        .landing-page-upload-root .fcopy { font-size: 12px; color: var(--off3); opacity: .5; }
-        .landing-page-upload-root .frab { font-family: var(--mono); font-size: 10px; color: var(--gold); opacity: .5; letter-spacing: 1px; }
+        .landing-page-upload-root .fcopy { font-size: 13px; color: var(--off3); opacity: .5; }
+        .landing-page-upload-root .frab { font-family: var(--mono); font-size: 11px; color: var(--gold); opacity: .5; letter-spacing: 1px; }
 
         .landing-page-upload-root .rv { opacity: 0; transform: translateY(22px); transition: opacity .75s var(--ease), transform .75s var(--ease); }
         .landing-page-upload-root .rvl { opacity: 0; transform: translateX(-22px); transition: opacity .75s var(--ease), transform .75s var(--ease); }
