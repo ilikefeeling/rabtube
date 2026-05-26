@@ -10,7 +10,6 @@ import {
 import Header from '@/components/Header';
 import { useAuth } from '@/lib/AuthContext';
 import { usePoints } from '@/hooks/usePoints';
-import { recordRabPurchase } from '@/lib/pointService';
 import {
   createCheckoutSession,
   createRabPurchaseSession,
@@ -104,16 +103,8 @@ export default function BillingPage() {
     if (!user) return;
     setActionLoading(String(krw));
     try {
-      if (user.email === 'ilikefeeling@gmail.com') {
-        const pkg = RAB_PACKAGES.find(p => p.krw === krw);
-        const rab = pkg ? pkg.rab : Math.round(krw / 10);
-        await recordRabPurchase(user.uid, krw, rab, 'test_recharge_' + Date.now());
-        showToast(`🪙 [테스트 충전] ${rab.toLocaleString()} RAB가 즉시 지급되었습니다!`);
-        refreshPoints();
-      } else {
-        const url = await createRabPurchaseSession(user.uid, krw, user.email ?? '');
-        window.location.href = url;
-      }
+      const url = await createRabPurchaseSession(user.uid, krw, user.email ?? '');
+      window.location.href = url;
     } catch (e: any) {
       showToast(`❌ ${e.message}`);
     } finally {

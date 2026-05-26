@@ -19,6 +19,7 @@ import type { CaseCategory, Difficulty, Visibility, UploadProgress, BoneClassifi
 const CATEGORIES: CaseCategory[] = ['임플란트', '보철', '치주', '교정', '보존', '소아', '구강외과'];
 const BONE_CLASSES: BoneClassification[] = ['Class I', 'Class II', 'Class III', 'Class IV', '해당없음'];
 const PATIENT_AGES: PatientAgeRange[] = ['10대', '20대', '30대', '40대', '50대', '60대', '70대이상'];
+const PRESET_TAGS = ['즉시식립', '골이식', 'GBR', '상악동거상', '발치후즉시', '전치부', '구치부', '지르코니아', '라미네이트', '레진', '인레이', '의치', '근관치료', '치은이식'];
 
 export default function UploadPage() {
   const t = useTranslations('Upload');
@@ -57,6 +58,16 @@ export default function UploadPage() {
   const [category, setCategory] = useState<CaseCategory | ''>('');
   const [toothNumber, setToothNumber] = useState('');
   const [tags, setTags] = useState('');
+  const handleTagClick = (tag: string) => {
+    const currentTags = tags.split(',').map(t => t.trim()).filter(Boolean);
+    let newTags: string[];
+    if (currentTags.includes(tag)) {
+      newTags = currentTags.filter(t => t !== tag);
+    } else {
+      newTags = [...currentTags, tag];
+    }
+    setTags(newTags.join(', '));
+  };
   const [difficulty, setDifficulty] = useState<Difficulty>('중급');
   const [visibility, setVisibility] = useState<Visibility>('회원전용');
   const [price, setPrice] = useState<number>(50); // 기본 가격을 50 RAB으로 {t('change')} (0 ~ 10,000 범위)
@@ -619,12 +630,32 @@ export default function UploadPage() {
                 {t('tag_label')}
               </label>
               <input
-                className="input-field"
+                className="input-field mb-2"
                 placeholder={t("tag_ph")}
                 value={tags}
                 onChange={e => setTags(e.target.value)}
                 disabled={isUploading || isDone}
               />
+              <div className="flex flex-wrap gap-1.5">
+                {PRESET_TAGS.map(tag => {
+                  const isSelected = tags.split(',').map(t => t.trim()).includes(tag);
+                  return (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => handleTagClick(tag)}
+                      disabled={isUploading || isDone}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all ${
+                        isSelected 
+                          ? 'bg-teal-500 border-teal-500 text-white shadow-sm scale-105' 
+                          : 'bg-white border-slate-200 text-slate-600 hover:border-teal-300 hover:bg-slate-50'
+                      }`}
+                    >
+                      {tag}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
