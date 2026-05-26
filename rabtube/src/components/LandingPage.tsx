@@ -16,8 +16,6 @@ export default function LandingPage() {
   const [quality, setQuality] = useState(75);
   const [views, setViews] = useState(20);
   const [spend, setSpend] = useState(0);
-  const [calcTab, setCalcTab] = useState<'revenue' | 'purchase'>('revenue');
-  const [purchaseAmount, setPurchaseAmount] = useState(1500);
 
   // Upload Demo State
   const [uploadState, setUploadState] = useState<'idle' | 'uploading' | 'done'>('idle');
@@ -649,154 +647,59 @@ export default function LandingPage() {
           <div className="calc-layout">
             {/* Calculator */}
             <div className="calc-panel rvl" style={{ width: '100%' }}>
-              <div style={{ display: 'flex', gap: '8px', borderBottom: '.5px solid var(--line)', marginBottom: '24px', paddingBottom: '12px' }}>
-                <button
-                  onClick={() => setCalcTab('revenue')}
-                  style={{
-                    flex: 1,
-                    background: calcTab === 'revenue' ? 'var(--teald)' : 'transparent',
-                    border: 'none',
-                    color: calcTab === 'revenue' ? 'var(--teal)' : 'var(--off3)',
-                    padding: '10px',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontWeight: 600,
-                    fontSize: '13px',
-                    transition: 'all .2s'
-                  }}
-                >
-                  📈 {t('calc_tab_rev')}
-                </button>
-                <button
-                  onClick={() => setCalcTab('purchase')}
-                  style={{
-                    flex: 1,
-                    background: calcTab === 'purchase' ? 'var(--teald)' : 'transparent',
-                    border: 'none',
-                    color: calcTab === 'purchase' ? 'var(--teal)' : 'var(--off3)',
-                    padding: '10px',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontWeight: 600,
-                    fontSize: '13px',
-                    transition: 'all .2s'
-                  }}
-                >
-                  🪙 {t('calc_tab_pur')}
-                </button>
+              <div className="cp-title">{t('calc_tab_rev')}</div>
+              <div className="cp-sub"></div>
+
+              <div className="calc-field">
+                <div className="cf-label">{t('calc_rev_u_l')} <span className="cf-val">{uploads}</span></div>
+                <input type="range" min="1" max="10" value={uploads} onChange={(e) => setUploads(parseInt(e.target.value))} />
+              </div>
+              <div className="calc-field">
+                <div className="cf-label">{t('calc_rev_q_l')} <span className="cf-val">{quality}%</span></div>
+                <input type="range" min="0" max="100" value={quality} onChange={(e) => setQuality(parseInt(e.target.value))} />
+              </div>
+              <div className="calc-field">
+                <div className="cf-label">{t('calc_rev_v_l')} <span className="cf-val">{views}</span></div>
+                <input type="range" min="0" max="100" value={views} onChange={(e) => setViews(parseInt(e.target.value))} />
+              </div>
+              <div className="calc-field">
+                <div className="cf-label">{t('calc_rev_p_l')} <span className="cf-val">{casePrice.toLocaleString()} RAB</span></div>
+                <input type="range" min="0" max="10000" step="10" value={casePrice} onChange={(e) => setCasePrice(parseInt(e.target.value))} />
               </div>
 
-              {calcTab === 'revenue' ? (
-                <>
-                  <div className="cp-title">{t('calc_tab_rev')}</div>
-                  <div className="cp-sub"></div>
-
-                  <div className="calc-field">
-                    <div className="cf-label">{t('calc_rev_u_l')} <span className="cf-val">{uploads}</span></div>
-                    <input type="range" min="1" max="10" value={uploads} onChange={(e) => setUploads(parseInt(e.target.value))} />
+              <div className="calc-result">
+                <div className="cr-rows">
+                  <div className="cr-row">
+                    <span className="cr-l">{t('calc_rev_out_2')}</span>
+                    <span className="cr-v cr-earn">+{uploadEarn.toLocaleString()} RAB</span>
                   </div>
-                  <div className="calc-field">
-                    <div className="cf-label">{t('calc_rev_q_l')} <span className="cf-val">{quality}%</span></div>
-                    <input type="range" min="0" max="100" value={quality} onChange={(e) => setQuality(parseInt(e.target.value))} />
+                  <div className="cr-row">
+                    <span className="cr-l">{t('uc_rp_fee')}</span>
+                    <span className="cr-v cr-spend">-{Math.round(uploads * getUploadFeeRab(casePrice)).toLocaleString()} RAB</span>
                   </div>
-                  <div className="calc-field">
-                    <div className="cf-label">{t('calc_rev_v_l')} <span className="cf-val">{views}</span></div>
-                    <input type="range" min="0" max="100" value={views} onChange={(e) => setViews(parseInt(e.target.value))} />
+                  <div className="cr-row">
+                    <span className="cr-l">{t('calc_rev_out_3')}</span>
+                    <span className="cr-v cr-earn">+{viewEarn.toLocaleString()} RAB</span>
                   </div>
-                  <div className="calc-field">
-                    <div className="cf-label">{t('calc_rev_p_l')} <span className="cf-val">{casePrice.toLocaleString()} RAB</span></div>
-                    <input type="range" min="0" max="10000" step="10" value={casePrice} onChange={(e) => setCasePrice(parseInt(e.target.value))} />
+                  <div className="cr-div"></div>
+                  <div className="cr-row">
+                    <span className="cr-l" style={{fontWeight: 500}}>{t('calc_rev_out_1')}</span>
+                    <span className={`cr-v cr-net ${netRab - (uploads * getUploadFeeRab(casePrice)) >= 0 ? 'pos' : 'neg'}`}>
+                      {netRab - (uploads * getUploadFeeRab(casePrice)) >= 0 ? '+' : ''}
+                      {Math.round(netRab - (uploads * getUploadFeeRab(casePrice))).toLocaleString()} RAB
+                    </span>
                   </div>
-
-                  <div className="calc-result">
-                    <div className="cr-rows">
-                      <div className="cr-row">
-                        <span className="cr-l">{t('calc_rev_out_2')}</span>
-                        <span className="cr-v cr-earn">+{uploadEarn.toLocaleString()} RAB</span>
-                      </div>
-                      <div className="cr-row">
-                        <span className="cr-l">{t('uc_rp_fee')}</span>
-                        <span className="cr-v cr-spend">-{Math.round(uploads * getUploadFeeRab(casePrice)).toLocaleString()} RAB</span>
-                      </div>
-                      <div className="cr-row">
-                        <span className="cr-l">{t('calc_rev_out_3')}</span>
-                        <span className="cr-v cr-earn">+{viewEarn.toLocaleString()} RAB</span>
-                      </div>
-                      <div className="cr-div"></div>
-                      <div className="cr-row">
-                        <span className="cr-l" style={{fontWeight: 500}}>{t('calc_rev_out_1')}</span>
-                        <span className={`cr-v cr-net ${netRab - (uploads * getUploadFeeRab(casePrice)) >= 0 ? 'pos' : 'neg'}`}>
-                          {netRab - (uploads * getUploadFeeRab(casePrice)) >= 0 ? '+' : ''}
-                          {Math.round(netRab - (uploads * getUploadFeeRab(casePrice))).toLocaleString()} RAB
-                        </span>
-                      </div>
-                    </div>
-                    <div className="cr-monthly">
-                      <div className="crm-label">Total RAB</div>
-                      <div>
-                        <span className="crm-val">
-                          {Math.max(0, Math.round(netRab - (uploads * getUploadFeeRab(casePrice)))).toLocaleString()}
-                        </span>
-                        <span className="crm-unit">RAB</span>
-                      </div>
-                    </div>
+                </div>
+                <div className="cr-monthly">
+                  <div className="crm-label">Total RAB</div>
+                  <div>
+                    <span className="crm-val">
+                      {Math.max(0, Math.round(netRab - (uploads * getUploadFeeRab(casePrice)))).toLocaleString()}
+                    </span>
+                    <span className="crm-unit">RAB</span>
                   </div>
-                </>
-              ) : (
-                <>
-                  <div className="cp-title">{t('calc_tab_pur')}</div>
-                  <div className="cp-sub"></div>
-
-                  <div className="calc-field" style={{ marginBottom: '24px' }}>
-                    <div className="cf-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span>{t('calc_pur_amt_l')}</span>
-                      <span className="cf-val" style={{ fontFamily: 'var(--mono)', fontSize: '15px' }}>{purchaseAmount.toLocaleString()} RAB</span>
-                    </div>
-                    <input
-                      type="range"
-                      min="1"
-                      max="10000"
-                      step="1"
-                      value={purchaseAmount}
-                      onChange={(e) => setPurchaseAmount(parseInt(e.target.value))}
-                      style={{ marginTop: '8px' }}
-                    />
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: 'var(--off3)', marginTop: '4px' }}>
-                      <span>1 RAB</span>
-                      <span>5,000 RAB</span>
-                      <span>10,000 RAB</span>
-                    </div>
-                  </div>
-
-                  <div className="calc-result" style={{ background: 'rgba(255,255,255,0.02)', borderColor: 'var(--line2)' }}>
-                    <div className="cr-rows" style={{ gap: '12px' }}>
-                      <div className="cr-row">
-                        <span className="cr-l">Base Price (1 RAB = $0.01988)</span>
-                        <span className="cr-v" style={{ color: 'var(--off)' }}>${(purchaseAmount * BASE_PRICE).toFixed(3)} USD</span>
-                      </div>
-                      <div className="cr-div"></div>
-                      <div className="cr-row" style={{ fontSize: '15px' }}>
-                        <span className="cr-l" style={{ fontWeight: 600, color: 'var(--off)' }}>{t('calc_pur_out_1')}</span>
-                        <span className="cr-v" style={{ color: 'var(--teal)', fontWeight: 700, fontSize: '16px' }}>${(purchaseAmount * BASE_PRICE).toFixed(2)} USD</span>
-                      </div>
-                    </div>
-
-                    <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '.5px solid var(--line)', textAlign: 'center' }}>
-                      {(purchaseAmount * BASE_PRICE) < 10.00 ? (
-                        <div style={{ background: 'var(--redd)', border: '.5px solid rgba(224,82,82,.3)', padding: '10px', borderRadius: '8px', color: 'var(--red)', fontSize: '12px', lineHeight: '1.5' }}>
-                          ⚠️ <strong>{t('calc_pur_stripe_warn_title')}</strong><br />
-                          {t('calc_pur_stripe_warn_desc')}
-                        </div>
-                      ) : (
-                        <div style={{ background: 'var(--teald)', border: '.5px solid rgba(14,194,142,.3)', padding: '10px', borderRadius: '8px', color: 'var(--teal)', fontSize: '12px', lineHeight: '1.5' }}>
-                          ✅ <strong>{t('calc_pur_stripe_ok_title')}</strong><br />
-                          {t('calc_pur_stripe_ok_desc')}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </>
-              )}
+                </div>
+              </div>
             </div>
 
             {/* Reward details */}
