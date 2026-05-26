@@ -118,6 +118,7 @@
     "views": "조회수 {count}회"
   },
   "Landing": {
+    "nav_feed": "피드로 이동",
     "nav_flow": "업로드 방법",
     "nav_rewards": "보상 계산기",
     "nav_tiers": "품질 등급",

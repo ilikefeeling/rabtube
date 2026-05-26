@@ -118,6 +118,7 @@
     "views": "{count} views"
   },
   "Landing": {
+    "nav_feed": "Go to Feed",
     "nav_flow": "How it Works",
     "nav_rewards": "Calculator",
     "nav_tiers": "Quality Tiers",

@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { useAuth } from '@/lib/AuthContext';
 
 export default function LandingPage() {
   const t = useTranslations('Landing');
+  const { user } = useAuth();
   const [navSolid, setNavSolid] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
@@ -410,18 +412,30 @@ export default function LandingPage() {
 
       {/* NAV */}
       <nav id="nav" className={navSolid ? 'solid' : ''}>
-        <a href="#" className="logo">
+        <Link href="/" className="logo">
           <span className="logo-dot"></span>RabTube
-        </a>
+        </Link>
         <div className="nav-links">
+          {user && (
+            <Link href="/" className="mr-2 text-teal-400 font-medium hover:text-teal-300 transition-colors">
+              {t('nav_feed')}
+            </Link>
+          )}
           <a href="#flow">{t('nav_flow')}</a>
           <a href="#rewards">{t('nav_rewards')}</a>
           <a href="#tiers">{t('nav_tiers')}</a>
           <a href="#faq">{t('nav_faq')}</a>
-          <Link href="/auth/register" className="btn-start">
-            {t('nav_cta')}
-            <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </Link>
+          {!user ? (
+            <Link href="/auth/register" className="btn-start">
+              {t('nav_cta')}
+              <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </Link>
+          ) : (
+            <Link href="/" className="btn-start">
+              {t('nav_feed')}
+              <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </Link>
+          )}
         </div>
       </nav>
 
@@ -440,13 +454,20 @@ export default function LandingPage() {
               <span dangerouslySetInnerHTML={{ __html: t.raw('hero_sub_3') }} />
             </p>
             <div className="hero-cta">
-              <Link href="/auth/register" className="btn-hero">
-                {t('btn_hero')}
-                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-              </Link>
+              {!user ? (
+                <Link href="/auth/register" className="btn-hero">
+                  {t('btn_hero')}
+                  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </Link>
+              ) : (
+                <Link href="/" className="btn-hero">
+                  {t('nav_feed')}
+                  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </Link>
+              )}
               <a href="#rewards" className="btn-learn">
                 {t('btn_learn')}
-                <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+                <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
               </a>
             </div>
             <div className="reward-row">
@@ -990,11 +1011,20 @@ export default function LandingPage() {
           <h2 className="rv" dangerouslySetInnerHTML={{ __html: t.raw('cta_title') }}></h2>
           <p className="sdesc rv d2" style={{textAlign: 'center', margin: '0 auto 40px'}} dangerouslySetInnerHTML={{ __html: t.raw('cta_desc') }}></p>
           <div className="cta-btns rv d3">
-            <Link href="/auth/register" className="btn-cta">
-              {t('cta_btn1')}
-              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </Link>
-            <Link href="/auth/login" className="btn-cta2">{t('cta_btn2')}</Link>
+            {!user ? (
+              <>
+                <Link href="/auth/register" className="btn-cta">
+                  {t('cta_btn1')}
+                  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </Link>
+                <Link href="/auth/login" className="btn-cta2">{t('cta_btn2')}</Link>
+              </>
+            ) : (
+              <Link href="/" className="btn-cta">
+                {t('nav_feed')}
+                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </Link>
+            )}
           </div>
           <p className="cta-note rv d4" dangerouslySetInnerHTML={{ __html: t.raw('cta_note') }}></p>
         </div>
