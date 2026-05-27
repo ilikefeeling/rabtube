@@ -41,7 +41,7 @@ function PointsPageContent() {
       setToast({ message: t('toast_cancel'), type: 'error' });
       router.replace('/points');
     }
-  }, [searchParams, router, refresh]);
+  }, [searchParams, router, refresh, t]);
 
   useEffect(() => {
     if (toast) {

@@ -260,11 +260,9 @@ export type DentalCategory =
   | '교정재료' | '예방치과재료' | '소독_위생용품' | '진료실_소모품'
   | '수술용품' | '보철재료' | '디지털장비_부속' | '병원_운영용품' | '기타';
 
-export type RequestStatus =
-  | 'DRAFT' | 'OPEN' | 'IN_REVIEW' | 'ACCEPTED'
-  | 'COMPLETED' | 'EXPIRED' | 'CANCELLED';
+export type RequestStatus = 'OPEN' | 'REVIEWING' | 'LISTED' | 'REJECTED';
 
-export type ProposerType = 'supplier' | 'user';
+export type OrderStatus = 'PENDING' | 'CONFIRMED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
 
 export const DENTAL_CATEGORIES: { id: DentalCategory; label: string }[] = [
   { id: '임플란트_부속', label: '임플란트 부속' },
@@ -282,14 +280,7 @@ export const DENTAL_CATEGORIES: { id: DentalCategory; label: string }[] = [
   { id: '기타', label: '기타' },
 ];
 
-export const BOUNTY_LIMITS = {
-  MIN_RAB: 100,
-  MAX_RAB: 10000,
-  PLATFORM_FEE_RATE: 0.15,   // 바운티 플랫폼 수수료 15%
-  BURN_RATE: 0.05,            // 소각 5%
-  NET_RATE: 0.80,             // 제안자 수령 80%
-  CANCEL_FEE_RATE: 0.10,      // 취소 수수료 10%
-} as const;
+
 
 // RAB 포인트 정책 상수
 export const RAB_POLICY = {
