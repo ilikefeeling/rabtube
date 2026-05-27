@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { X, Heart, Eye, AlertCircle } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/AuthContext';
 import { toggleLike, incrementViews } from '@/lib/firebaseService';
 import { processViewPayment } from '@/lib/pointService';
@@ -17,12 +18,25 @@ const CAT_STYLES: Record<string, string> = {
   구강외과:  'bg-red-50 text-red-700',
 };
 
+const CAT_KEYS: Record<string, string> = {
+  전체: 'cat_all',
+  임플란트: 'cat_implant',
+  보철: 'cat_prosthetics',
+  치주: 'cat_perio',
+  교정: 'cat_ortho',
+  보존: 'cat_cons',
+  소아: 'cat_pedo',
+  구강외과: 'cat_surgery'
+};
+
 interface Props {
   video: CaseVideo;
   onClose: () => void;
 }
 
 export default function VideoPlayer({ video, onClose }: Props) {
+  const t = useTranslations('VideoPlayer');
+  const tHome = useTranslations('HomePage');
   const { user } = useAuth();
   const [likes, setLikes] = useState<string[]>(video.likes ?? []);
   const liked = user ? likes.includes(user.uid) : false;
@@ -90,8 +104,8 @@ export default function VideoPlayer({ video, onClose }: Props) {
             {videoError ? (
               <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#0d2137] text-white p-6 text-center">
                 <AlertCircle size={32} className="text-red-400 mb-3" />
-                <p className="font-medium">영상을 불러올 수 없습니다</p>
-                <p className="text-sm text-slate-400 mt-1">삭제되었거나 접근할 수 없는 영상입니다</p>
+                <p className="font-medium">{t('err_load_title')}</p>
+                <p className="text-sm text-slate-400 mt-1">{t('err_load_desc')}</p>
               </div>
             ) : (
               <video
@@ -106,7 +120,7 @@ export default function VideoPlayer({ video, onClose }: Props) {
                 onCanPlay={() => setIsLoading(false)}
                 onError={() => {
                   setIsLoading(false);
-                  setVideoError("영상을 불러오거나 재생할 수 없습니다.");
+                  setVideoError(t('err_playback'));
                 }}
               />
             )}
@@ -122,7 +136,7 @@ export default function VideoPlayer({ video, onClose }: Props) {
           <div className="p-4">
           <div className="flex items-start gap-2 mb-3">
             <span className={`text-[10px] font-semibold px-2 py-1 rounded uppercase tracking-wide shrink-0 ${catStyle}`}>
-              {video.category}
+              {CAT_KEYS[video.category] ? tHome(CAT_KEYS[video.category]) : video.category}
             </span>
             <h2 className="text-[15px] font-medium text-slate-800 leading-snug">{video.title}</h2>
           </div>
@@ -138,7 +152,7 @@ export default function VideoPlayer({ video, onClose }: Props) {
               </span>
             ))}
             <span className="text-[11px] px-2 py-0.5 bg-slate-50 border border-slate-100 rounded text-slate-500">
-              난이도: {video.difficulty}
+              {t('diff')}: {video.difficulty}
             </span>
           </div>
 
@@ -152,25 +166,25 @@ export default function VideoPlayer({ video, onClose }: Props) {
           {/* Clinical Metadata */}
           {video.clinical && (
             <div className="mb-3 border-t border-slate-50 pt-3 text-[11px] text-slate-600">
-              <h3 className="font-semibold text-slate-700 mb-1.5">임상 정보</h3>
+              <h3 className="font-semibold text-slate-700 mb-1.5">{t('clinical_info')}</h3>
               <div className="grid grid-cols-2 gap-y-1.5 gap-x-4">
                 {video.clinical.diagnosis && video.clinical.diagnosis.length > 0 && (
-                  <div><span className="text-slate-400 mr-1">진단명:</span>{video.clinical.diagnosis.join(', ')}</div>
+                  <div><span className="text-slate-400 mr-1">{t('diag')}</span>{video.clinical.diagnosis.join(', ')}</div>
                 )}
                 {video.clinical.technique && video.clinical.technique.length > 0 && (
-                  <div><span className="text-slate-400 mr-1">시술/테크닉:</span>{video.clinical.technique.join(', ')}</div>
+                  <div><span className="text-slate-400 mr-1">{t('tech')}</span>{video.clinical.technique.join(', ')}</div>
                 )}
                 {video.clinical.materials && video.clinical.materials.length > 0 && (
-                  <div className="col-span-2"><span className="text-slate-400 mr-1">사용재료:</span>{video.clinical.materials.join(', ')}</div>
+                  <div className="col-span-2"><span className="text-slate-400 mr-1">{t('mat')}</span>{video.clinical.materials.join(', ')}</div>
                 )}
                 {video.clinical.boneClassification && (
-                  <div><span className="text-slate-400 mr-1">골분류:</span>{video.clinical.boneClassification}</div>
+                  <div><span className="text-slate-400 mr-1">{t('bone')}</span>{video.clinical.boneClassification}</div>
                 )}
                 {(video.clinical.patientAge || video.clinical.patientGender) && (
-                  <div><span className="text-slate-400 mr-1">환자:</span>{video.clinical.patientAge} {video.clinical.patientGender}</div>
+                  <div><span className="text-slate-400 mr-1">{t('pat')}</span>{video.clinical.patientAge} {video.clinical.patientGender}</div>
                 )}
                 {video.clinical.systemicConditions && video.clinical.systemicConditions.length > 0 && (
-                  <div className="col-span-2"><span className="text-slate-400 mr-1">전신질환:</span>{video.clinical.systemicConditions.join(', ')}</div>
+                  <div className="col-span-2"><span className="text-slate-400 mr-1">{t('sys')}</span>{video.clinical.systemicConditions.join(', ')}</div>
                 )}
               </div>
             </div>
@@ -182,7 +196,7 @@ export default function VideoPlayer({ video, onClose }: Props) {
               {video.userProfile.name.slice(0, 1)}
             </div>
             <div>
-              <p className="text-sm font-medium text-slate-800">{video.userProfile.name} 원장</p>
+              <p className="text-sm font-medium text-slate-800">{t('doctor', { name: video.userProfile.name })}</p>
               <p className="text-xs text-slate-400">{video.userProfile.hospital} · {video.userProfile.region}</p>
             </div>
             <div className="ml-auto flex items-center gap-2">

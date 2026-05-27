@@ -22,6 +22,17 @@ const BG_COLORS = [
   '#0d2137','#1a3a5c','#2d4a1e','#3a2a1a','#2a1a4a','#1a2a4a',
 ];
 
+const CAT_KEYS: Record<string, string> = {
+  전체: 'cat_all',
+  임플란트: 'cat_implant',
+  보철: 'cat_prosthetics',
+  치주: 'cat_perio',
+  교정: 'cat_ortho',
+  보존: 'cat_cons',
+  소아: 'cat_pedo',
+  구강외과: 'cat_surgery'
+};
+
 interface Props {
   video: CaseVideo;
   onClick: (v: CaseVideo) => void;
@@ -31,6 +42,7 @@ export default function VideoCard({ video, onClick }: Props) {
   const [hovered, setHovered] = useState(false);
   const locale = useLocale();
   const t = useTranslations('VideoCard');
+  const tHome = useTranslations('HomePage');
   const catStyle = CAT_STYLES[video.category] ?? 'bg-slate-50 text-slate-600 border-slate-100';
   const bgColor = BG_COLORS[video.id.charCodeAt(0) % BG_COLORS.length];
   const likeCount = video.likes?.length ?? 0;
@@ -63,7 +75,7 @@ export default function VideoCard({ video, onClick }: Props) {
 
         {/* Category badge */}
         <span className={`absolute top-2 left-2 text-[9px] font-semibold px-2 py-0.5 rounded border uppercase tracking-wide ${catStyle}`}>
-          {video.category}
+          {CAT_KEYS[video.category] ? tHome(CAT_KEYS[video.category]) : video.category}
         </span>
 
         {/* Duration */}

@@ -369,6 +369,14 @@ export default function LandingPage() {
         .landing-page-upload-root .pb-warn { background: rgba(212,146,12,.12); color: #d4920c; }
         .landing-page-upload-root .pb-fail { background: var(--redd); color: var(--red); }
 
+        .landing-page-upload-root .marketplace-bg { background: var(--bg2); }
+        .landing-page-upload-root .market-features { margin-top: 48px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
+        .landing-page-upload-root .market-card { background: var(--bg); border: 1px solid var(--line); border-radius: 16px; padding: 32px 24px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform .2s, box-shadow .2s; }
+        .landing-page-upload-root .market-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.1); border-color: var(--teal); }
+        .landing-page-upload-root .mc-icon { font-size: 40px; margin-bottom: 20px; line-height: 1; }
+        .landing-page-upload-root .mc-title { font-size: 20px; font-weight: 600; color: var(--text); margin-bottom: 12px; }
+        .landing-page-upload-root .mc-desc { font-size: 15px; color: var(--off); line-height: 1.5; margin: 0; }
+
         .landing-page-upload-root .faq-wrap { margin-top: 64px; max-width: 720px; }
         .landing-page-upload-root .faq-item { border-bottom: .5px solid var(--line); overflow: hidden; }
         .landing-page-upload-root .faq-q { padding: 20px 0; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: color .2s; }
@@ -898,6 +906,34 @@ export default function LandingPage() {
                 <div className="pn-desc">{t('ai_p5_d')}</div>
                 <span className="pn-badge pb-pass">{t('ai_p5_b')}</span>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="divider"></div>
+
+      {/* MARKETPLACE */}
+      <section id="marketplace" className="marketplace-bg">
+        <div className="si">
+          <p className="sk rv">{t('market_eyebrow')}</p>
+          <h2 className="rv d1" dangerouslySetInnerHTML={{ __html: t.raw('market_title') }}></h2>
+          <p className="sdesc rv d2">{t('market_desc')}</p>
+          <div className="market-features">
+            <div className="market-card rv d1">
+              <div className="mc-icon">🛒</div>
+              <div className="mc-title">{t('market_f1_t')}</div>
+              <p className="mc-desc" dangerouslySetInnerHTML={{ __html: t.raw('market_f1_d') }}></p>
+            </div>
+            <div className="market-card rv d2">
+              <div className="mc-icon">🪙</div>
+              <div className="mc-title">{t('market_f2_t')}</div>
+              <p className="mc-desc" dangerouslySetInnerHTML={{ __html: t.raw('market_f2_d') }}></p>
+            </div>
+            <div className="market-card rv d3">
+              <div className="mc-icon">📋</div>
+              <div className="mc-title">{t('market_f3_t')}</div>
+              <p className="mc-desc" dangerouslySetInnerHTML={{ __html: t.raw('market_f3_d') }}></p>
             </div>
           </div>
         </div>

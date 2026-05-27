@@ -335,7 +335,16 @@
     "foot_c3_l3": "Privacy Policy",
     "foot_c3_l4": "Contact",
     "foot_copy": "© 2025 RabTube. All rights reserved.",
-    "foot_rab": "RAB TOKEN · UPLOAD PLATFORM"
+    "foot_rab": "RAB TOKEN · UPLOAD PLATFORM",
+    "market_eyebrow": "Marketplace",
+    "market_title": "Trade Dental Materials<br/><em>with RAB Tokens</em>",
+    "market_desc": "Purchase dental materials and equipment in the Marketplace, or request directly.",
+    "market_f1_t": "Request Product Registration",
+    "market_f1_d": "If you don't find what you need, attach a photo and request to register it.",
+    "market_f2_t": "Pay with RAB Tokens",
+    "market_f2_d": "Use the RAB tokens collected from uploads to buy products in the market.",
+    "market_f3_t": "Easy Status Tracking",
+    "market_f3_d": "Check the review, approval, or rejection status of your requested products at a glance."
   },
   "Points": {
     "tx_SIGNUP_BONUS": "Sign-up Bonus",
@@ -427,5 +436,42 @@
     "loginReq": "Login required.",
     "fillReq": "Please fill in all required fields.",
     "qtyLimit": "Estimated quantity cannot exceed 999."
+  },
+  "VideoPlayer": {
+    "err_load_title": "Cannot load video",
+    "err_load_desc": "This video has been deleted or is unavailable",
+    "err_playback": "Failed to load or play video.",
+    "diff": "Difficulty",
+    "clinical_info": "Clinical Information",
+    "diag": "Diagnosis:",
+    "tech": "Technique:",
+    "mat": "Materials:",
+    "bone": "Bone Class:",
+    "pat": "Patient:",
+    "sys": "Systemic:",
+    "doctor": "Dr. {name}"
+  },
+  "Billing": {
+    "pkg_basic": "Basic",
+    "pkg_standard": "Standard",
+    "pkg_popular": "Popular",
+    "pkg_bulk": "Bulk",
+    "toast_test_rab": "[Test] {rab} RAB has been instantly added!",
+    "confirm_cancel_sub": "Cancel subscription? It will remain active until the end of the current billing period.",
+    "toast_cancel_sub": "✅ Subscription cancellation requested",
+    "toast_payment_success": "✅ Payment successful!",
+    "toast_payment_paid": "🪙 {rab} RAB has been added!",
+    "back_to_feed": "Back to Feed",
+    "title": "Recharge RAB",
+    "subtitle": "Rab Recharge · Marketplace",
+    "my_rab": "My RAB Balance",
+    "market_title": "Dental Supplies Marketplace",
+    "market_desc": "Use RAB to buy dental materials or request products you need.",
+    "recharge_desc": "Recharge RAB to watch cases, download, or boost promotions.",
+    "btn_charging": "Processing...",
+    "btn_charge": "Recharge",
+    "notice_1": "• Payments are securely processed via Stripe",
+    "notice_2": "• Rab is instantly credited upon recharge",
+    "notice_3": "• Recharged Rab is non-refundable"
   }
 }
