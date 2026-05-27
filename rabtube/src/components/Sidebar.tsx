@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Bookmark, CreditCard, Settings, ArrowDownToLine, Info } from 'lucide-react';
+import { Home, Bookmark, CreditCard, Settings, ArrowDownToLine, Info, ShoppingBag } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useTranslations } from 'next-intl';
 
@@ -14,13 +14,13 @@ export default function Sidebar() {
   const navItems = [
     { href: '/', icon: Home, label: t('feed') },
     { href: '/about', icon: Info, label: t('about') },
+    { href: '/marketplace', icon: ShoppingBag, label: '마켓플레이스' },
     { href: '/my', icon: Bookmark, label: t('my_cases') },
-    { href: '/billing', icon: CreditCard, label: t('billing') },
+    { href: '/billing', icon: CreditCard, label: 'RAB 충전' },
   ];
 
   const adminItems = profile?.role === 'admin' ? [
     { href: '/admin', icon: Settings, label: t('admin_home') },
-    { href: '/admin/cashout', icon: ArrowDownToLine, label: t('admin_cashout') },
   ] : [];
 
   return (
