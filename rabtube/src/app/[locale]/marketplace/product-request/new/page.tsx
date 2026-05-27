@@ -28,11 +28,17 @@ export default function NewProductRequestPage() {
     if (!form.title || !form.category || !form.description) {
       return alert('필수 항목을 모두 입력해주세요.');
     }
+    if (form.quantity > 999) {
+      return alert('예상 소요량은 최대 999개까지만 입력 가능합니다.');
+    }
 
     setLoading(true);
     try {
       // Direct client-side write to Firestore using client-side SDK (runs authenticated!)
-      const reqId = await createProductRequest(user.uid, form);
+      const reqId = await createProductRequest(user.uid, {
+        ...form,
+        category: form.category as DentalCategory
+      });
       alert('상품등록 요청이 성공적으로 접수되었습니다.\n관리자 검토 후 쇼핑몰 입점이 추진됩니다.');
       router.push('/marketplace');
     } catch (error: any) {
@@ -90,10 +96,14 @@ export default function NewProductRequestPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">예상 소요량 / 월간 <span className="text-red-500">*</span></label>
               <div className="flex gap-2">
                 <input 
-                  type="number" min="1"
+                  type="number" min="1" max="999"
                   className="w-2/3 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-gray-900"
                   value={form.quantity}
-                  onChange={e => setForm({...form, quantity: Number(e.target.value)})}
+                  onChange={e => {
+                    let val = Number(e.target.value);
+                    if (val > 999) val = 999;
+                    setForm({...form, quantity: val});
+                  }}
                   required
                 />
                 <select 
