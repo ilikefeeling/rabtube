@@ -64,7 +64,7 @@ export default function MarketplacePage() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">마켓플레이스</h1>
         {activeTab === 'requests' && (
-          <Link href="/marketplace/product-request/new" className="px-4 py-2 bg-primary-600 text-white rounded-md text-sm font-medium hover:bg-primary-700 shadow-sm transition-colors flex items-center gap-2">
+          <Link href="/marketplace/product-request/new" className="btn-primary flex items-center gap-2">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
             새 상품등록 요청
           </Link>
@@ -75,13 +75,13 @@ export default function MarketplacePage() {
         <nav className="-mb-px flex space-x-8">
           <button
             onClick={() => setActiveTab('shop')}
-            className={`${activeTab === 'shop' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm`}
+            className={`${activeTab === 'shop' ? 'border-teal-500 text-teal-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm`}
           >
             쇼핑몰
           </button>
           <button
             onClick={() => setActiveTab('requests')}
-            className={`${activeTab === 'requests' ? 'border-primary-500 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm`}
+            className={`${activeTab === 'requests' ? 'border-teal-500 text-teal-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm`}
           >
             상품등록 요청
           </button>
@@ -91,7 +91,7 @@ export default function MarketplacePage() {
       <div className="flex flex-wrap gap-2 mb-6">
         <button
           onClick={() => setCategory('')}
-          className={`px-3 py-1.5 rounded-full text-sm font-medium ${category === '' ? 'bg-primary-100 text-primary-800' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
+          className={`px-3 py-1.5 rounded-full text-sm font-medium ${category === '' ? 'bg-teal-100 text-teal-800' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
         >
           전체
         </button>
@@ -99,7 +99,7 @@ export default function MarketplacePage() {
           <button
             key={c.id}
             onClick={() => setCategory(c.id)}
-            className={`px-3 py-1.5 rounded-full text-sm font-medium ${category === c.id ? 'bg-primary-100 text-primary-800' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
+            className={`px-3 py-1.5 rounded-full text-sm font-medium ${category === c.id ? 'bg-teal-100 text-teal-800' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
           >
             {c.label}
           </button>
@@ -149,7 +149,7 @@ export default function MarketplacePage() {
                 <div className="text-4xl mb-4">🛒</div>
                 <h3 className="text-lg font-bold text-gray-900 mb-2">등록된 요청이 없습니다.</h3>
                 <p className="text-sm text-gray-500 mb-6">원하시는 치과 재료나 장비가 있다면 가장 먼저 입점 요청을 남겨보세요!</p>
-                <Link href="/marketplace/product-request/new" className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 shadow-sm transition-colors">
+                <Link href="/marketplace/product-request/new" className="btn-primary inline-flex items-center gap-2 px-6 py-2.5">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                   상품등록 요청하기
                 </Link>
@@ -173,7 +173,7 @@ export default function MarketplacePage() {
                   <div className="flex flex-col items-center">
                     <button 
                       onClick={() => handleUpvote(req.id)}
-                      className={`flex flex-col items-center justify-center p-2 rounded-md border ${req.upvoterIds?.includes(user?.uid) ? 'bg-primary-50 border-primary-200 text-primary-600' : 'hover:bg-gray-50 border-gray-200 text-gray-600'}`}
+                      className={`flex flex-col items-center justify-center p-2 rounded-md border ${req.upvoterIds?.includes(user?.uid) ? 'bg-teal-50 border-teal-200 text-teal-600' : 'hover:bg-gray-50 border-gray-200 text-gray-600'}`}
                       disabled={req.status === 'LISTED'}
                     >
                       <svg className="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" /></svg>
