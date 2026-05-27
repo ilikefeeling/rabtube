@@ -21,6 +21,7 @@ export default function Sidebar() {
 
   const adminItems = profile?.role === 'admin' ? [
     { href: '/admin', icon: Settings, label: t('admin_home') },
+    { href: '/admin?tab=marketplace', icon: ShoppingBag, label: '마켓플레이스 관리' },
   ] : [];
 
   return (

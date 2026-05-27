@@ -98,6 +98,16 @@ export default function AdminPage() {
     unit: '개',
     imageUrl: '',
   });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tab = urlParams.get('tab');
+      if (tab) {
+        setActiveTab(tab as any);
+      }
+    }
+  }, []);
   const [adminImageFile, setAdminImageFile] = useState<File | null>(null);
   const [adminImagePreview, setAdminImagePreview] = useState<string>('');
   const [linkedReqId, setLinkedReqId] = useState<string>('');
