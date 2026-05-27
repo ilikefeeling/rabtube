@@ -8,8 +8,10 @@ import Link from 'next/link';
 import { createProductRequest } from '@/lib/marketplaceService';
 import { uploadGenericImage } from '@/lib/firebaseService';
 import { ImagePlus, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export default function NewProductRequestPage() {
+  const t = useTranslations('Marketplace');
   const router = useRouter();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -28,12 +30,12 @@ export default function NewProductRequestPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return alert('로그인이 필요합니다.');
+    if (!user) return alert(t('loginReq'));
     if (!form.title || !form.category || !form.description) {
-      return alert('필수 항목을 모두 입력해주세요.');
+      return alert(t('fillReq'));
     }
     if (form.quantity > 999) {
-      return alert('예상 소요량은 최대 999개까지만 입력 가능합니다.');
+      return alert(t('qtyLimit'));
     }
 
     setLoading(true);
@@ -49,7 +51,7 @@ export default function NewProductRequestPage() {
         imageUrl,
         category: form.category as DentalCategory
       });
-      alert('상품등록 요청이 성공적으로 접수되었습니다.\n관리자 검토 후 쇼핑몰 입점이 추진됩니다.');
+      alert(t('successMsg'));
       router.push('/marketplace');
     } catch (error: any) {
       console.error(error);
@@ -62,22 +64,22 @@ export default function NewProductRequestPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">상품등록 신청</h1>
-        <Link href="/marketplace" className="text-sm text-gray-500 hover:text-gray-900">돌아가기</Link>
+        <h1 className="text-2xl font-bold text-gray-900">{t('reqPageTitle')}</h1>
+        <Link href="/marketplace" className="text-sm text-gray-500 hover:text-gray-900">{t('goBack')}</Link>
       </div>
 
       <div className="bg-white rounded-lg shadow p-6">
         <p className="text-sm text-gray-600 mb-6 pb-6 border-b">
-          쇼핑몰에서 구매하고 싶은 치과 용품/재료를 신청해주세요.<br/>
-          다른 원장님들의 공감이 많을수록 우선적으로 입점이 추진됩니다.
+          {t('reqPageDesc1')}<br/>
+          {t('reqPageDesc2')}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">제목 <span className="text-red-500">*</span></label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('reqTitle')} <span className="text-red-500">*</span></label>
             <input 
               type="text" 
-              placeholder="예) 오스템 임플란트 픽스처 TS III SA 필요합니다"
+              placeholder={t('reqTitlePlaceholder')}
               className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-gray-900"
               value={form.title}
               onChange={e => setForm({...form, title: e.target.value})}
@@ -88,14 +90,14 @@ export default function NewProductRequestPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">카테고리 <span className="text-red-500">*</span></label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('category')} <span className="text-red-500">*</span></label>
               <select 
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-gray-900"
                 value={form.category}
                 onChange={e => setForm({...form, category: e.target.value as DentalCategory})}
                 required
               >
-                <option value="">선택해주세요</option>
+                <option value="">{t('selectPlease')}</option>
                 {DENTAL_CATEGORIES.map(c => (
                   <option key={c.id} value={c.id}>{c.label}</option>
                 ))}
@@ -103,7 +105,7 @@ export default function NewProductRequestPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">예상 소요량 / 월간 <span className="text-red-500">*</span></label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('estQuantityLabel')} <span className="text-red-500">*</span></label>
               <div className="flex gap-2">
                 <input 
                   type="number" min="1" max="999"
@@ -121,10 +123,10 @@ export default function NewProductRequestPage() {
                   value={form.unit}
                   onChange={e => setForm({...form, unit: e.target.value})}
                 >
-                  <option value="개">개</option>
-                  <option value="박스">박스</option>
-                  <option value="세트">세트</option>
-                  <option value="기타">기타</option>
+                  <option value="개">{t('unitEa')}</option>
+                  <option value="박스">{t('unitBox')}</option>
+                  <option value="세트">{t('unitSet')}</option>
+                  <option value="기타">{t('unitOther')}</option>
                 </select>
               </div>
             </div>
@@ -132,10 +134,10 @@ export default function NewProductRequestPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">선호 브랜드 (선택)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('prefBrandOpt')}</label>
               <input 
                 type="text" 
-                placeholder="예) 오스템, 덴티움"
+                placeholder={t('prefBrandPlaceholder')}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-gray-900"
                 value={form.preferredBrand}
                 onChange={e => setForm({...form, preferredBrand: e.target.value})}
@@ -143,10 +145,10 @@ export default function NewProductRequestPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">선호 모델명 (선택)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('prefModelOpt')}</label>
               <input 
                 type="text" 
-                placeholder="예) TS III SA"
+                placeholder={t('prefModelPlaceholder')}
                 className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-gray-900"
                 value={form.preferredModel}
                 onChange={e => setForm({...form, preferredModel: e.target.value})}
@@ -156,10 +158,10 @@ export default function NewProductRequestPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">상세 설명 <span className="text-red-500">*</span></label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('detailDesc')} <span className="text-red-500">*</span></label>
             <textarea 
               rows={4}
-              placeholder="필요한 상품에 대해 자세히 설명해주세요. 대체 가능한 다른 상품이 있다면 함께 적어주시면 좋습니다."
+              placeholder={t('detailDescPlaceholder')}
               className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-gray-900"
               value={form.description}
               onChange={e => setForm({...form, description: e.target.value})}
@@ -169,11 +171,11 @@ export default function NewProductRequestPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">첨부창 (사진 등록) <span className="text-slate-400 text-xs font-normal ml-1">선택사항</span></label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">{t('attachment')} <span className="text-slate-400 text-xs font-normal ml-1">{t('optional')}</span></label>
             <div className="mt-1 flex items-center gap-4">
               <label className="relative cursor-pointer bg-white border border-slate-300 rounded-md px-4 py-2 flex items-center gap-2 hover:bg-slate-50 focus-within:ring-2 focus-within:ring-teal-500">
                 <ImagePlus size={18} className="text-slate-500" />
-                <span className="text-sm font-medium text-slate-700">이미지 첨부</span>
+                <span className="text-sm font-medium text-slate-700">{t('attachImage')}</span>
                 <input
                   type="file"
                   className="sr-only"
@@ -214,7 +216,7 @@ export default function NewProductRequestPage() {
               disabled={loading}
               className="px-6 py-2 bg-teal-600 text-white rounded-md text-sm font-medium hover:bg-teal-700 disabled:opacity-50"
             >
-              {loading ? '등록 중...' : '신청하기'}
+              {loading ? t('registering') : t('apply')}
             </button>
           </div>
         </form>
