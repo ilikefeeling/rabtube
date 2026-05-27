@@ -26,6 +26,7 @@ export interface CreateRequestData {
   preferredModel?: string;
   quantity?: number;
   unit?: string;
+  imageUrl?: string;
 }
 
 export async function createProductRequest(requesterId: string, data: CreateRequestData): Promise<string> {
@@ -38,6 +39,7 @@ export async function createProductRequest(requesterId: string, data: CreateRequ
     preferredModel: data.preferredModel ?? '',
     quantity: data.quantity ?? 1,
     unit: data.unit ?? '개',
+    imageUrl: data.imageUrl ?? '',
     status: 'OPEN',
     upvoteCount: 0,
     upvoterIds: [],

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import {
   Users, Coins, TrendingUp, TrendingDown, Clock,
   RefreshCw, ChevronRight, AlertTriangle, CheckCircle,
-  Search, Filter, MoreVertical, Zap,
+  Search, Filter, MoreVertical, Zap, X, ImagePlus,
 } from 'lucide-react';
 import Header from '@/components/Header';
 import StatCard from '@/components/admin/StatCard';
@@ -16,6 +16,7 @@ import {
   doc, getDoc, setDoc, collection, getDocs, addDoc, updateDoc, deleteDoc,
   query, orderBy, where, serverTimestamp
 } from 'firebase/firestore';
+import { uploadGenericImage } from '@/lib/firebaseService';
 import { useAdmin } from '@/hooks/useAdmin';
 import {
   updateMemberStatus,
@@ -73,7 +74,6 @@ export default function AdminPage() {
   const [searchQuery, setSearchQuery]   = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected' | 'deleted'>('all');
 
-  // 재료 관리 관련 State
   const [adminMaterials, setAdminMaterials] = useState<string[]>([]);
   const [newMaterialName, setNewMaterialName] = useState('');
   const [materialSearch, setMaterialSearch] = useState('');
@@ -82,13 +82,11 @@ export default function AdminPage() {
   const [confirmingPending, setConfirmingPending] = useState(false);
   const [confirmResult, setConfirmResult] = useState('');
 
-  // 마켓플레이스 관리 관련 State
   const [shopProducts, setShopProducts] = useState<any[]>([]);
   const [productRequests, setProductRequests] = useState<any[]>([]);
   const [marketLoading, setMarketLoading] = useState(false);
   const [marketSubTab, setMarketSubTab] = useState<'products' | 'requests'>('products');
 
-  // 상품 추가 폼 State
   const [newProd, setNewProd] = useState({
     name: '',
     brand: '',
@@ -100,6 +98,8 @@ export default function AdminPage() {
     unit: '개',
     imageUrl: '',
   });
+  const [adminImageFile, setAdminImageFile] = useState<File | null>(null);
+  const [adminImagePreview, setAdminImagePreview] = useState<string>('');
   const [linkedReqId, setLinkedReqId] = useState<string>('');
 
   useEffect(() => {
@@ -177,6 +177,11 @@ export default function AdminPage() {
       return alert('필수 항목을 입력해주세요.');
     }
     try {
+      let finalImageUrl = newProd.imageUrl;
+      if (adminImageFile) {
+        finalImageUrl = await uploadGenericImage(adminImageFile, 'products');
+      }
+
       const productData = {
         name: newProd.name,
         brand: newProd.brand || '',
@@ -186,7 +191,7 @@ export default function AdminPage() {
         priceCash: Number(newProd.priceCash || 0),
         stock: Number(newProd.stock || 0),
         unit: newProd.unit || '개',
-        imageUrl: newProd.imageUrl || '',
+        imageUrl: finalImageUrl,
         isActive: true,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
@@ -214,6 +219,8 @@ export default function AdminPage() {
         unit: '개',
         imageUrl: '',
       });
+      setAdminImageFile(null);
+      setAdminImagePreview('');
       setLinkedReqId('');
       loadMarketplaceData();
     } catch (e: any) {
@@ -278,7 +285,6 @@ export default function AdminPage() {
     }
   };
 
-  // 재료 관리 관련 콜백 함수
   const loadAdminMaterials = useCallback(async () => {
     const { getCustomMaterials } = await import('@/lib/firebaseService');
     const list = await getCustomMaterials();
@@ -332,7 +338,6 @@ export default function AdminPage() {
     <div className="min-h-screen bg-slate-50">
       <Header />
 
-      {/* Admin Top Bar */}
       <div className="bg-[#0d2137] border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 h-10 flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs text-slate-400">
@@ -371,7 +376,6 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* KPI Grid */}
         <div className="grid grid-cols-4 gap-4 mb-6">
           <StatCard label="총 유통 RAB"     value={fmt(stats?.totalSupply ?? 0)}         sub={`평균 ${fmt(stats?.avgBalance ?? 0)} RAB/회원`}    color="#7c5cbf" />
           <StatCard label="누적 발행 RAB"   value={fmt(stats?.totalEverIssued ?? 0)}      sub={`소각 ${fmt(stats?.totalEverBurned ?? 0)} RAB`}    color="#1a9e75" />
@@ -379,7 +383,6 @@ export default function AdminPage() {
           <StatCard label="전체 회원"        value={fmt(stats?.totalMembers ?? 0)}         sub={`케이스 ${fmt(stats?.totalCases ?? 0)}개`}         color="#d4920c" />
         </div>
 
-        {/* Tabs */}
         <div className="flex gap-2 mb-5 border-b border-slate-200">
           {TABS.map(t => (
             <button
@@ -394,10 +397,8 @@ export default function AdminPage() {
           ))}
         </div>
 
-        {/* ── OVERVIEW ── */}
         {activeTab === 'overview' && (
           <div className="grid grid-cols-2 gap-5">
-            {/* RAB 구성 */}
             <div className="card p-5">
               <h3 className="text-sm font-medium text-slate-700 mb-4">RAB 공급 구성</h3>
               {[
@@ -417,7 +418,6 @@ export default function AdminPage() {
               ))}
             </div>
 
-            {/* 대기 현황 */}
             <div className="card p-5">
               <h3 className="text-sm font-medium text-slate-700 mb-4">대기 현황</h3>
               <div className="space-y-3">
@@ -437,7 +437,6 @@ export default function AdminPage() {
               </div>
             </div>
 
-            {/* 최근 트랜잭션 미리보기 */}
             <div className="card col-span-2 overflow-hidden">
               <div className="px-5 py-3 border-b border-slate-50 flex items-center justify-between">
                 <h3 className="text-sm font-medium text-slate-700">최근 트랜잭션 (실시간)</h3>
@@ -465,7 +464,6 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ── MEMBERS ── */}
         {activeTab === 'members' && (
           <div>
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-5">
@@ -482,7 +480,6 @@ export default function AdminPage() {
                 <span className="text-xs text-slate-400">검색 결과 {filteredMembers.length}명</span>
               </div>
 
-              {/* 상태별 퀵 필터 탭 */}
               <div className="flex items-center gap-1 bg-slate-200/60 p-0.5 rounded-lg border border-slate-200">
                 {[
                   { id: 'all', label: '전체' },
@@ -613,7 +610,6 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ── TRANSACTIONS ── */}
         {activeTab === 'txs' && (
           <div className="card overflow-hidden">
             <div className="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
@@ -660,7 +656,6 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ── SUPPLY ── */}
         {activeTab === 'supply' && (
           <div className="grid grid-cols-3 gap-4">
             {[
@@ -677,7 +672,6 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ── MATERIALS ── */}
         {activeTab === 'materials' && (
           <div className="card p-6">
             <div className="flex items-center justify-between mb-5 border-b border-slate-100 pb-3">
@@ -689,7 +683,6 @@ export default function AdminPage() {
               </div>
             </div>
 
-            {/* 추가 폼 */}
             <div className="flex gap-3 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
               <input
                 type="text"
@@ -709,7 +702,6 @@ export default function AdminPage() {
               </button>
             </div>
 
-            {/* 검색 및 목록 */}
             <div className="space-y-4">
               <div className="relative max-w-xs">
                 <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -746,10 +738,8 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* ── MARKETPLACE ADMIN ── */}
         {activeTab === 'marketplace' && (
           <div className="space-y-6">
-            {/* 서브 탭 */}
             <div className="flex gap-4 border-b pb-3 border-slate-200">
               <button
                 onClick={() => setMarketSubTab('products')}

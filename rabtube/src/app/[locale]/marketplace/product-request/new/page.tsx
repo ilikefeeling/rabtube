@@ -6,11 +6,15 @@ import { DENTAL_CATEGORIES, DentalCategory } from '@/types';
 import { useAuth } from '@/lib/AuthContext';
 import Link from 'next/link';
 import { createProductRequest } from '@/lib/marketplaceService';
+import { uploadGenericImage } from '@/lib/firebaseService';
+import { ImagePlus, X } from 'lucide-react';
 
 export default function NewProductRequestPage() {
   const router = useRouter();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>('');
   
   const [form, setForm] = useState({
     title: '',
@@ -34,9 +38,15 @@ export default function NewProductRequestPage() {
 
     setLoading(true);
     try {
+      let imageUrl = '';
+      if (imageFile) {
+        imageUrl = await uploadGenericImage(imageFile, 'product_requests');
+      }
+
       // Direct client-side write to Firestore using client-side SDK (runs authenticated!)
       const reqId = await createProductRequest(user.uid, {
         ...form,
+        imageUrl,
         category: form.category as DentalCategory
       });
       alert('상품등록 요청이 성공적으로 접수되었습니다.\n관리자 검토 후 쇼핑몰 입점이 추진됩니다.');
@@ -156,6 +166,43 @@ export default function NewProductRequestPage() {
               required
               spellCheck={false}
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">첨부창 (사진 등록) <span className="text-slate-400 text-xs font-normal ml-1">선택사항</span></label>
+            <div className="mt-1 flex items-center gap-4">
+              <label className="relative cursor-pointer bg-white border border-slate-300 rounded-md px-4 py-2 flex items-center gap-2 hover:bg-slate-50 focus-within:ring-2 focus-within:ring-teal-500">
+                <ImagePlus size={18} className="text-slate-500" />
+                <span className="text-sm font-medium text-slate-700">이미지 첨부</span>
+                <input
+                  type="file"
+                  className="sr-only"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setImageFile(file);
+                      setImagePreview(URL.createObjectURL(file));
+                    }
+                  }}
+                />
+              </label>
+              {imagePreview && (
+                <div className="relative inline-block">
+                  <img src={imagePreview} alt="Preview" className="h-16 w-16 object-cover rounded-md border border-slate-200" />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setImageFile(null);
+                      setImagePreview('');
+                    }}
+                    className="absolute -top-2 -right-2 bg-white rounded-full p-0.5 shadow-md border border-slate-200 hover:bg-slate-100"
+                  >
+                    <X size={14} className="text-slate-600" />
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t">

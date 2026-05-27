@@ -376,6 +376,25 @@ export async function submitLicenseForReview(userId: string, licenseUrl: string)
   });
 }
 
+export function uploadGenericImage(file: File, folder: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const ext = file.name.split('.').pop() || 'jpg';
+    const path = `${folder}/${Date.now()}_${Math.random().toString(36).substr(2, 5)}.${ext}`;
+    const storageRef = ref(storage, path);
+    const task = uploadBytesResumable(storageRef, file, { contentType: file.type || 'image/jpeg' });
+
+    task.on(
+      'state_changed',
+      null,
+      (error) => reject(error),
+      async () => {
+        const url = await getDownloadURL(task.snapshot.ref);
+        resolve(url);
+      }
+    );
+  });
+}
+
 /* ── CUSTOM MATERIALS ── */
 
 const DEFAULT_MATERIALS = [
