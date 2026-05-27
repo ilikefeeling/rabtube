@@ -878,14 +878,53 @@ export default function AdminPage() {
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-semibold text-slate-500 mb-1">이미지 URL</label>
-                          <input
-                            type="text"
-                            placeholder="https://..."
-                            className="w-full px-3 py-2 border rounded-xl text-sm"
-                            value={newProd.imageUrl}
-                            onChange={e => setNewProd({ ...newProd, imageUrl: e.target.value })}
-                          />
+                          <label className="block text-xs font-semibold text-slate-500 mb-1">이미지 (첨부 또는 URL)</label>
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-4">
+                              <label className="relative cursor-pointer bg-white border border-slate-300 rounded-md px-4 py-2 flex items-center gap-2 hover:bg-slate-50 focus-within:ring-2 focus-within:ring-teal-500">
+                                <ImagePlus size={18} className="text-slate-500" />
+                                <span className="text-sm font-medium text-slate-700">이미지 첨부</span>
+                                <input
+                                  type="file"
+                                  className="sr-only"
+                                  accept="image/*"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                      setAdminImageFile(file);
+                                      setAdminImagePreview(URL.createObjectURL(file));
+                                      setNewProd({...newProd, imageUrl: ''});
+                                    }
+                                  }}
+                                />
+                              </label>
+                              {adminImagePreview && (
+                                <div className="relative inline-block">
+                                  <img src={adminImagePreview} alt="Preview" className="h-16 w-16 object-cover rounded-md border border-slate-200" />
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setAdminImageFile(null);
+                                      setAdminImagePreview('');
+                                    }}
+                                    className="absolute -top-2 -right-2 bg-white rounded-full p-0.5 shadow-md border border-slate-200 hover:bg-slate-100"
+                                  >
+                                    <X size={14} className="text-slate-600" />
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                            
+                            {!adminImagePreview && (
+                              <input
+                                type="text"
+                                placeholder="또는 이미지 URL을 입력하세요"
+                                className="w-full px-3 py-2 border rounded-xl text-sm"
+                                value={newProd.imageUrl}
+                                onChange={e => setNewProd({ ...newProd, imageUrl: e.target.value })}
+                              />
+                            )}
+                          </div>
                         </div>
                       </div>
 
