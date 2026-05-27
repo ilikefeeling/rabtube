@@ -85,8 +85,6 @@ export default function SearchPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <Header />
-
       <main className="max-w-7xl mx-auto px-6 py-6">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">

@@ -3,6 +3,7 @@ import { DM_Sans, DM_Serif_Display } from 'next/font/google';
 import '../globals.css';
 import { AuthProvider } from '@/lib/AuthContext';
 import { NextIntlClientProvider } from 'next-intl';
+import ClientAppLayout from '@/components/layout/ClientAppLayout';
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -47,7 +48,9 @@ export default async function RootLayout({
       <body className={`${dmSans.variable} ${dmSerif.variable} font-sans bg-slate-50 text-slate-900`}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <AuthProvider>
-            {children}
+            <ClientAppLayout>
+              {children}
+            </ClientAppLayout>
           </AuthProvider>
         </NextIntlClientProvider>
       </body>

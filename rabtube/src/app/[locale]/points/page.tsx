@@ -60,7 +60,6 @@ function PointsPageContent() {
 
   return (
     <div className="min-h-screen bg-slate-50 relative">
-      <Header />
       <main className="max-w-2xl mx-auto px-6 py-8">
         <Link href="/" className="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-600 mb-6 transition-colors">
           <ChevronLeft size={14} />{t('back_to_feed')}

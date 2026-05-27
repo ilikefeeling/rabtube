@@ -35,7 +35,6 @@ export default function MyCasesPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <Header />
       <main className="max-w-4xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-6">
           <div>

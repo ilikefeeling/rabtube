@@ -336,8 +336,6 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <Header />
-
       <div className="bg-[#0d2137] border-t border-white/5">
         <div className="max-w-7xl mx-auto px-6 h-10 flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs text-slate-400">

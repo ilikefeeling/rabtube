@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
-import Header from '@/components/Header';
 import { db } from '@/lib/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { Shield, UserCheck, RefreshCw, Key, ShieldAlert } from 'lucide-react';
@@ -33,8 +32,6 @@ export default function TestHelperPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <Header />
-
       <main className="max-w-xl mx-auto px-6 py-12">
         <div className="card p-8 border border-slate-200/60 shadow-lg">
           <div className="flex items-center gap-3 mb-6">

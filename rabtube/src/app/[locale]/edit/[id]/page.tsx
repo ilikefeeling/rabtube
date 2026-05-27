@@ -304,8 +304,6 @@ export default function EditPage({ params }: { params: { id: string } }) {
           <div className="w-8 h-8 border-4 border-teal-500/30 border-t-teal-500 rounded-full animate-spin" />
         </div>
       )}
-      <Header />
-
       <main className="max-w-2xl mx-auto px-6 py-8">
         {/* Back */}
         <Link href="/" className="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-600 mb-6 transition-colors">

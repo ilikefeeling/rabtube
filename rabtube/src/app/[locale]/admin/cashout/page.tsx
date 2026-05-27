@@ -6,7 +6,6 @@ import {
   CheckCircle, XCircle, Clock, RefreshCw,
   ArrowDownToLine, ChevronRight,
 } from 'lucide-react';
-import Header from '@/components/Header';
 import { useAuth } from '@/lib/AuthContext';
 import {
   collection, query, orderBy, limit,
@@ -141,8 +140,6 @@ export default function AdminCashoutPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <Header />
-
       {toast && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-slate-800 text-white text-sm px-5 py-3 rounded-xl shadow-xl">
           {toast}

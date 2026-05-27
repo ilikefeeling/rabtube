@@ -138,8 +138,6 @@ export default function BillingPage() {
           onPurchase={(rab) => { showToast(`🪙 ${rab} RAB가 지급되었습니다!`); refreshPoints(); }}
         />
       </Suspense>
-      <Header />
-
       {/* Toast */}
       {toast && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-slate-800 text-white text-sm px-5 py-3 rounded-xl shadow-xl">
