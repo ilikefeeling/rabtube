@@ -6,7 +6,8 @@ export const dynamic = 'force-dynamic';
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { adminDb } from '@/lib/firebaseAdmin';
+import { db } from '@/lib/firebase';
+import { runTransaction, doc, collection, serverTimestamp } from 'firebase/firestore';
 import { SUBSCRIPTION_PLANS } from '@/types';
 
 export async function POST(req: NextRequest) {
@@ -20,10 +21,10 @@ export async function POST(req: NextRequest) {
     const plan = SUBSCRIPTION_PLANS[tier as 'pro' | 'clinic'];
     if (!plan) return NextResponse.json({ error: '잘못된 요금제' }, { status: 400 });
 
-    await adminDb.runTransaction(async tx => {
-      const balRef  = adminDb.collection('rab_balances').doc(userId);
+    await runTransaction(db, async tx => {
+      const balRef  = doc(db, 'rab_balances', userId);
       const balSnap = await tx.get(balRef);
-      if (!balSnap.exists) throw new Error('잔액 정보 없음');
+      if (!balSnap.exists()) throw new Error('잔액 정보 없음');
 
       const balance = balSnap.data()!.balance ?? 0;
       if (balance < cost) throw new Error(`RAB 잔액 부족 (현재: ${balance}, 필요: ${cost})`);
@@ -35,22 +36,24 @@ export async function POST(req: NextRequest) {
       tx.update(balRef, {
         balance:   balance - cost,
         totalSpent: (balSnap.data()!.totalSpent ?? 0) + cost,
-        updatedAt: now,
+        updatedAt: serverTimestamp(),
       });
 
       // 트랜잭션 기록
-      tx.set(adminDb.collection('rab_transactions').doc(), {
+      const newTxRef = doc(collection(db, 'rab_transactions'));
+      tx.set(newTxRef, {
         userId,
         type:          'BOOST_SPEND',
         amount:        -cost,
         balanceAfter:  balance - cost,
         status:        'confirmed',
         description:   `RAB 구독 결제: ${plan.name} (${cost} RAB/월)`,
-        createdAt:     now,
+        createdAt:     serverTimestamp(),
       });
 
       // 구독 활성화 (RAB 결제)
-      tx.set(adminDb.collection('subscriptions').doc(userId), {
+      const subRef = doc(db, 'subscriptions', userId);
+      tx.set(subRef, {
         userId,
         tier,
         status:              'active',
@@ -60,19 +63,20 @@ export async function POST(req: NextRequest) {
         currentPeriodStart:  now,
         currentPeriodEnd:    endDate,
         cancelAtPeriodEnd:   false,
-        createdAt:           now,
-        updatedAt:           now,
+        createdAt:           serverTimestamp(),
+        updatedAt:           serverTimestamp(),
       });
 
       // 결제 내역
-      tx.set(adminDb.collection('payments').doc(), {
+      const payRef = doc(collection(db, 'payments'));
+      tx.set(payRef, {
         userId,
         type:        'subscription',
         status:      'succeeded',
         amountKrw:   0,
         amountRab:   cost,
         description: `RAB 구독: ${plan.name} ${cost} RAB/월`,
-        createdAt:   now,
+        createdAt:   serverTimestamp(),
       });
     });
 
