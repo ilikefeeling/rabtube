@@ -12,7 +12,10 @@ import StatCard from '@/components/admin/StatCard';
 import AdjustModal from '@/components/admin/AdjustModal';
 import { useAuth } from '@/lib/AuthContext';
 import { db } from '@/lib/firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import {
+  doc, getDoc, setDoc, collection, getDocs, addDoc, updateDoc, deleteDoc,
+  query, orderBy, where, serverTimestamp
+} from 'firebase/firestore';
 import { useAdmin } from '@/hooks/useAdmin';
 import {
   updateMemberStatus,
@@ -66,7 +69,7 @@ export default function AdminPage() {
   const router = useRouter();
   const { stats, members, recentTxs, loading, error, refresh, isAdmin } = useAdmin();
 
-  const [activeTab, setActiveTab]       = useState<'overview' | 'members' | 'txs' | 'materials' | 'supply' | 'settings'>('overview');
+  const [activeTab, setActiveTab]       = useState<'overview' | 'members' | 'txs' | 'materials' | 'supply' | 'settings' | 'marketplace'>('overview');
   const [searchQuery, setSearchQuery]   = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected' | 'deleted'>('all');
 
@@ -78,6 +81,26 @@ export default function AdminPage() {
   const [adjustTarget, setAdjustTarget] = useState<MemberWithBalance | null>(null);
   const [confirmingPending, setConfirmingPending] = useState(false);
   const [confirmResult, setConfirmResult] = useState('');
+
+  // 마켓플레이스 관리 관련 State
+  const [shopProducts, setShopProducts] = useState<any[]>([]);
+  const [productRequests, setProductRequests] = useState<any[]>([]);
+  const [marketLoading, setMarketLoading] = useState(false);
+  const [marketSubTab, setMarketSubTab] = useState<'products' | 'requests'>('products');
+
+  // 상품 추가 폼 State
+  const [newProd, setNewProd] = useState({
+    name: '',
+    brand: '',
+    modelNumber: '',
+    category: '',
+    priceRab: 100,
+    priceCash: 10000,
+    stock: 50,
+    unit: '개',
+    imageUrl: '',
+  });
+  const [linkedReqId, setLinkedReqId] = useState<string>('');
 
   useEffect(() => {
     if (!authLoading && (!user || !isAdmin)) router.push('/');
@@ -105,6 +128,110 @@ export default function AdminPage() {
       alert('설정 저장 실패');
     }
     setSavingSettings(false);
+  };
+
+  const loadMarketplaceData = useCallback(async () => {
+    setMarketLoading(true);
+    try {
+      const prodSnap = await getDocs(query(collection(db, 'shop_products'), orderBy('createdAt', 'desc')));
+      const prods = prodSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      setShopProducts(prods);
+
+      const reqSnap = await getDocs(query(collection(db, 'product_requests'), orderBy('upvoteCount', 'desc')));
+      const reqs = reqSnap.docs.map(d => {
+        const dData = d.data();
+        return {
+          id: d.id,
+          ...dData,
+          createdAt: dData.createdAt?.toDate() || new Date(),
+        };
+      });
+      setProductRequests(reqs);
+    } catch (err) {
+      console.error('Failed to load marketplace data', err);
+    } finally {
+      setMarketLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === 'marketplace') {
+      loadMarketplaceData();
+    }
+  }, [activeTab, loadMarketplaceData]);
+
+  const handleDeleteProduct = async (id: string, name: string) => {
+    if (!confirm(`정말 '${name}' 상품을 삭제하시겠습니까?`)) return;
+    try {
+      await deleteDoc(doc(db, 'shop_products', id));
+      alert('상품이 성공적으로 삭제되었습니다.');
+      loadMarketplaceData();
+    } catch (e: any) {
+      alert(`삭제 실패: ${e.message}`);
+    }
+  };
+
+  const handleCreateProduct = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newProd.name || !newProd.category || !newProd.priceRab) {
+      return alert('필수 항목을 입력해주세요.');
+    }
+    try {
+      const productData = {
+        name: newProd.name,
+        brand: newProd.brand || '',
+        modelNumber: newProd.modelNumber || '',
+        category: newProd.category,
+        priceRab: Number(newProd.priceRab),
+        priceCash: Number(newProd.priceCash || 0),
+        stock: Number(newProd.stock || 0),
+        unit: newProd.unit || '개',
+        imageUrl: newProd.imageUrl || '',
+        isActive: true,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      };
+      
+      const docRef = await addDoc(collection(db, 'shop_products'), productData);
+      
+      if (linkedReqId) {
+        await updateDoc(doc(db, 'product_requests', linkedReqId), {
+          status: 'LISTED',
+          linkedProductId: docRef.id,
+          updatedAt: serverTimestamp(),
+        });
+      }
+      
+      alert('상품이 성공적으로 등록되었습니다.');
+      setNewProd({
+        name: '',
+        brand: '',
+        modelNumber: '',
+        category: '',
+        priceRab: 100,
+        priceCash: 10000,
+        stock: 50,
+        unit: '개',
+        imageUrl: '',
+      });
+      setLinkedReqId('');
+      loadMarketplaceData();
+    } catch (e: any) {
+      alert(`등록 실패: ${e.message}`);
+    }
+  };
+
+  const handleRequestStatusChange = async (reqId: string, newStatus: string) => {
+    try {
+      await updateDoc(doc(db, 'product_requests', reqId), {
+        status: newStatus,
+        updatedAt: serverTimestamp(),
+      });
+      alert('상태가 변경되었습니다.');
+      loadMarketplaceData();
+    } catch (e: any) {
+      alert(`상태 변경 실패: ${e.message}`);
+    }
   };
 
   const filteredMembers = members.filter(m => {
@@ -195,6 +322,7 @@ export default function AdminPage() {
     { id: 'overview', label: '개요' },
     { id: 'members',  label: `회원 관리 (${members.length})` },
     { id: 'txs',      label: `트랜잭션 (실시간)` },
+    { id: 'marketplace', label: '마켓플레이스 관리' },
     { id: 'materials', label: '재료 관리' },
     { id: 'supply',   label: 'RAB 공급 현황' },
     { id: 'settings', label: '플랫폼 설정' },
@@ -618,6 +746,321 @@ export default function AdminPage() {
           </div>
         )}
 
+        {/* ── MARKETPLACE ADMIN ── */}
+        {activeTab === 'marketplace' && (
+          <div className="space-y-6">
+            {/* 서브 탭 */}
+            <div className="flex gap-4 border-b pb-3 border-slate-200">
+              <button
+                onClick={() => setMarketSubTab('products')}
+                className={`px-4 py-2 text-sm font-semibold rounded-xl transition ${
+                  marketSubTab === 'products'
+                    ? 'bg-teal-600 text-white shadow-sm'
+                    : 'text-slate-600 hover:bg-slate-100'
+                }`}
+              >
+                쇼핑몰 상품 관리 ({shopProducts.length})
+              </button>
+              <button
+                onClick={() => setMarketSubTab('requests')}
+                className={`px-4 py-2 text-sm font-semibold rounded-xl transition ${
+                  marketSubTab === 'requests'
+                    ? 'bg-teal-600 text-white shadow-sm'
+                    : 'text-slate-600 hover:bg-slate-100'
+                }`}
+              >
+                원장님 수요 요청 관리 ({productRequests.length})
+              </button>
+            </div>
+
+            {marketLoading && (
+              <div className="py-12 text-center text-slate-500">
+                <div className="w-6 h-6 border-2 border-teal-600 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                불러오는 중...
+              </div>
+            )}
+
+            {!marketLoading && marketSubTab === 'products' && (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* 상품 등록 폼 */}
+                <div className="lg:col-span-1">
+                  <div className="card p-6 bg-white border border-slate-100 rounded-2xl shadow-sm">
+                    <h3 className="text-base font-bold text-slate-800 mb-4 pb-2 border-b">새 상품 등록</h3>
+                    <form onSubmit={handleCreateProduct} className="space-y-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-500 mb-1">상품명 *</label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="예) 오스템 임플란트 TS III SA"
+                          className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-teal-500"
+                          value={newProd.name}
+                          onChange={e => setNewProd({ ...newProd, name: e.target.value })}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-500 mb-1">브랜드</label>
+                          <input
+                            type="text"
+                            placeholder="예) 오스템"
+                            className="w-full px-3 py-2 border rounded-xl text-sm"
+                            value={newProd.brand}
+                            onChange={e => setNewProd({ ...newProd, brand: e.target.value })}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-500 mb-1">모델명</label>
+                          <input
+                            type="text"
+                            placeholder="예) TS III"
+                            className="w-full px-3 py-2 border rounded-xl text-sm"
+                            value={newProd.modelNumber}
+                            onChange={e => setNewProd({ ...newProd, modelNumber: e.target.value })}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-500 mb-1">카테고리 *</label>
+                          <select
+                            required
+                            className="w-full px-2 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-teal-500 text-slate-700"
+                            value={newProd.category}
+                            onChange={e => setNewProd({ ...newProd, category: e.target.value })}
+                          >
+                            <option value="">선택해주세요</option>
+                            <option value="임플란트_부속">임플란트 부속</option>
+                            <option value="레진_수복재료">레진 수복재료</option>
+                            <option value="인상재_석고">인상재 석고</option>
+                            <option value="근관치료재료">근관치료재료</option>
+                            <option value="소독_위생용품">소독 위생용품</option>
+                            <option value="기타">기타</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-500 mb-1">규격 단위</label>
+                          <input
+                            type="text"
+                            placeholder="예) 개, 박스, 세트"
+                            className="w-full px-3 py-2 border rounded-xl text-sm"
+                            value={newProd.unit}
+                            onChange={e => setNewProd({ ...newProd, unit: e.target.value })}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-500 mb-1">RAB 가격 *</label>
+                          <input
+                            type="number"
+                            required
+                            min="1"
+                            className="w-full px-3 py-2 border rounded-xl text-sm"
+                            value={newProd.priceRab}
+                            onChange={e => setNewProd({ ...newProd, priceRab: Number(e.target.value) })}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-500 mb-1">참고 현금가(₩)</label>
+                          <input
+                            type="number"
+                            min="0"
+                            className="w-full px-3 py-2 border rounded-xl text-sm"
+                            value={newProd.priceCash}
+                            onChange={e => setNewProd({ ...newProd, priceCash: Number(e.target.value) })}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-500 mb-1">초기 재고량</label>
+                          <input
+                            type="number"
+                            min="0"
+                            className="w-full px-3 py-2 border rounded-xl text-sm"
+                            value={newProd.stock}
+                            onChange={e => setNewProd({ ...newProd, stock: Number(e.target.value) })}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-500 mb-1">이미지 URL</label>
+                          <input
+                            type="text"
+                            placeholder="https://..."
+                            className="w-full px-3 py-2 border rounded-xl text-sm"
+                            value={newProd.imageUrl}
+                            onChange={e => setNewProd({ ...newProd, imageUrl: e.target.value })}
+                          />
+                        </div>
+                      </div>
+
+                      {/* 연동할 수요 요청 글 선택 */}
+                      <div className="pt-2">
+                        <label className="block text-xs font-semibold text-teal-600 mb-1">
+                          수요 요청 연동 및 상태 변경 (선택)
+                        </label>
+                        <select
+                          className="w-full px-2 py-2 border border-teal-200 rounded-xl text-xs bg-teal-50/30 text-slate-700"
+                          value={linkedReqId}
+                          onChange={e => setLinkedReqId(e.target.value)}
+                        >
+                          <option value="">연동하지 않음 (일반 신규 상품)</option>
+                          {productRequests
+                            .filter(r => r.status !== 'LISTED')
+                            .map(r => (
+                              <option key={r.id} value={r.id}>
+                                [{r.upvoteCount}공감] {r.title} ({r.category})
+                              </option>
+                            ))}
+                        </select>
+                        <p className="text-[10px] text-teal-600/80 mt-1">
+                          * 상품 등록과 동시에 해당 요청 글이 &apos;입점 완료&apos; 상태로 전환됩니다.
+                        </p>
+                      </div>
+
+                      <button
+                        type="submit"
+                        className="w-full py-2.5 bg-teal-600 text-white rounded-xl text-sm font-bold hover:bg-teal-700 mt-4 transition shadow-sm"
+                      >
+                        쇼핑몰 입점 등록하기
+                      </button>
+                    </form>
+                  </div>
+                </div>
+
+                {/* 상품 목록 및 삭제 기능 */}
+                <div className="lg:col-span-2">
+                  <div className="card p-6 bg-white border border-slate-100 rounded-2xl shadow-sm">
+                    <h3 className="text-base font-bold text-slate-800 mb-4 pb-2 border-b">입점 상품 목록 ({shopProducts.length})</h3>
+                    {shopProducts.length === 0 ? (
+                      <div className="text-center py-12 text-slate-400">등록된 쇼핑몰 상품이 없습니다.</div>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm text-left text-slate-500">
+                          <thead className="text-xs text-slate-700 uppercase bg-slate-50 border-b">
+                            <tr>
+                              <th className="px-4 py-3">상품명 / 카테고리</th>
+                              <th className="px-4 py-3">브랜드 / 모델</th>
+                              <th className="px-4 py-3">RAB / KRW 가격</th>
+                              <th className="px-4 py-3">재고</th>
+                              <th className="px-4 py-3 text-center">관리</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {shopProducts.map(p => (
+                              <tr key={p.id} className="bg-white border-b hover:bg-slate-50/50">
+                                <td className="px-4 py-3 font-semibold text-slate-900">
+                                  <div>{p.name}</div>
+                                  <div className="text-xs font-normal text-slate-400">{p.category}</div>
+                                </td>
+                                <td className="px-4 py-3">
+                                  <div>{p.brand || '-'}</div>
+                                  <div className="text-xs text-slate-400">{p.modelNumber || '-'}</div>
+                                </td>
+                                <td className="px-4 py-3 font-semibold">
+                                  <div className="text-teal-600">{p.priceRab?.toLocaleString()} RAB</div>
+                                  <div className="text-xs text-slate-400">₩{p.priceCash?.toLocaleString()}</div>
+                                </td>
+                                <td className="px-4 py-3">
+                                  {p.stock}{p.unit || '개'}
+                                </td>
+                                <td className="px-4 py-3 text-center">
+                                  <button
+                                    onClick={() => handleDeleteProduct(p.id, p.name)}
+                                    className="px-3 py-1.5 bg-rose-50 text-rose-600 rounded-lg text-xs font-semibold hover:bg-rose-100 transition"
+                                  >
+                                    삭제
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!marketLoading && marketSubTab === 'requests' && (
+              <div className="card p-6 bg-white border border-slate-100 rounded-2xl shadow-sm">
+                <h3 className="text-base font-bold text-slate-800 mb-4 pb-2 border-b">
+                  원장님 수요 조사 / 입점 요청 관리 ({productRequests.length})
+                </h3>
+                {productRequests.length === 0 ? (
+                  <div className="text-center py-12 text-slate-400">접수된 상품등록 요청글이 없습니다.</div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left text-slate-500">
+                      <thead className="text-xs text-slate-700 uppercase bg-slate-50 border-b">
+                        <tr>
+                          <th className="px-4 py-3">공감</th>
+                          <th className="px-4 py-3">요청 제품 / 설명</th>
+                          <th className="px-4 py-3">소요량</th>
+                          <th className="px-4 py-3">선호 모델</th>
+                          <th className="px-4 py-3">신청일</th>
+                          <th className="px-4 py-3">입점 상태 관리</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {productRequests.map(r => (
+                          <tr key={r.id} className="bg-white border-b hover:bg-slate-50/50">
+                            <td className="px-4 py-3">
+                              <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-teal-800 bg-teal-100 rounded-full">
+                                {r.upvoteCount || 0} 공감
+                              </span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <div className="font-bold text-slate-800">{r.title}</div>
+                              <div className="text-xs text-slate-400 max-w-md block break-words whitespace-normal">{r.description}</div>
+                              <div className="text-[10px] text-slate-400 font-normal mt-0.5">카테고리: {r.category}</div>
+                            </td>
+                            <td className="px-4 py-3">
+                              {r.quantity}{r.unit}
+                            </td>
+                            <td className="px-4 py-3 text-xs">
+                              <div>브랜드: {r.preferredBrand || '-'}</div>
+                              <div>모델: {r.preferredModel || '-'}</div>
+                            </td>
+                            <td className="px-4 py-3 text-xs text-slate-400 font-semibold">
+                              {new Date(r.createdAt).toLocaleDateString('ko-KR')}
+                            </td>
+                            <td className="px-4 py-3">
+                              <select
+                                className={`text-xs font-semibold px-2 py-1.5 border rounded-lg focus:ring-1 focus:ring-teal-500 text-slate-700 ${
+                                  r.status === 'LISTED'
+                                    ? 'bg-teal-50 text-teal-700 border-teal-200'
+                                    : r.status === 'REJECTED'
+                                    ? 'bg-rose-50 text-rose-700 border-rose-200'
+                                    : 'bg-amber-50 text-amber-700 border-amber-200'
+                                }`}
+                                value={r.status || 'OPEN'}
+                                onChange={e => handleRequestStatusChange(r.id, e.target.value)}
+                              >
+                                <option value="OPEN">수요 조사 중</option>
+                                <option value="REVIEWING">입점 검토 중</option>
+                                <option value="LISTED">입점 완료</option>
+                                <option value="REJECTED">입점 보류</option>
+                              </select>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── SETTINGS ── */}
         {/* ── SETTINGS ── */}
         {activeTab === 'settings' && (
           <div className="max-w-xl">
