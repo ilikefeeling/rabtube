@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { DENTAL_CATEGORIES, DentalCategory } from '@/types';
 import { useAuth } from '@/lib/AuthContext';
+import { upvoteRequest } from '@/lib/marketplaceService';
 
 export default function MarketplacePage() {
   const t = useTranslations('Marketplace');
@@ -42,20 +43,12 @@ export default function MarketplacePage() {
   const handleUpvote = async (reqId: string) => {
     if (!user) return alert('로그인이 필요합니다.');
     try {
-      const token = await user.getIdToken();
-      const res = await fetch(`/api/marketplace/product-requests/${reqId}/upvote`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (data.success) {
-        alert('공감했습니다.');
-        fetchData();
-      } else {
-        alert(data.error || '오류가 발생했습니다.');
-      }
-    } catch (error) {
+      await upvoteRequest(user.uid, reqId);
+      alert('공감했습니다.');
+      fetchData();
+    } catch (error: any) {
       console.error(error);
+      alert(error.message || '오류가 발생했습니다.');
     }
   };
 

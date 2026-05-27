@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { DENTAL_CATEGORIES, DentalCategory } from '@/types';
 import { useAuth } from '@/lib/AuthContext';
 import Link from 'next/link';
+import { createProductRequest } from '@/lib/marketplaceService';
 
 export default function NewProductRequestPage() {
   const router = useRouter();
@@ -30,25 +31,13 @@ export default function NewProductRequestPage() {
 
     setLoading(true);
     try {
-      const token = await user.getIdToken();
-      const res = await fetch('/api/marketplace/product-requests', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify(form)
-      });
-      const data = await res.json();
-      if (data.success) {
-        alert('상품등록 요청이 성공적으로 접수되었습니다.\n관리자 검토 후 쇼핑몰 입점이 추진됩니다.');
-        router.push('/marketplace');
-      } else {
-        alert(data.error || '오류가 발생했습니다.');
-      }
-    } catch (error) {
+      // Direct client-side write to Firestore using client-side SDK (runs authenticated!)
+      const reqId = await createProductRequest(user.uid, form);
+      alert('상품등록 요청이 성공적으로 접수되었습니다.\n관리자 검토 후 쇼핑몰 입점이 추진됩니다.');
+      router.push('/marketplace');
+    } catch (error: any) {
       console.error(error);
-      alert('등록 중 오류가 발생했습니다.');
+      alert(error.message || '등록 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
@@ -77,6 +66,7 @@ export default function NewProductRequestPage() {
               value={form.title}
               onChange={e => setForm({...form, title: e.target.value})}
               required
+              spellCheck={false}
             />
           </div>
 
@@ -129,6 +119,7 @@ export default function NewProductRequestPage() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-gray-900"
                 value={form.preferredBrand}
                 onChange={e => setForm({...form, preferredBrand: e.target.value})}
+                spellCheck={false}
               />
             </div>
             <div>
@@ -139,6 +130,7 @@ export default function NewProductRequestPage() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 text-gray-900"
                 value={form.preferredModel}
                 onChange={e => setForm({...form, preferredModel: e.target.value})}
+                spellCheck={false}
               />
             </div>
           </div>
@@ -152,6 +144,7 @@ export default function NewProductRequestPage() {
               value={form.description}
               onChange={e => setForm({...form, description: e.target.value})}
               required
+              spellCheck={false}
             />
           </div>
 

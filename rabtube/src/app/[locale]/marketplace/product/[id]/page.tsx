@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/AuthContext';
 import { usePoints } from '@/hooks/usePoints';
 import Link from 'next/link';
+import { purchaseProduct } from '@/lib/marketplaceService';
 
 export default function ProductDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -56,30 +57,12 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
 
     setPurchasing(true);
     try {
-      const token = await user.getIdToken();
-      const res = await fetch('/api/marketplace/products/purchase', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          productId: product.id,
-          quantity,
-          shippingAddress,
-          memo
-        })
-      });
-      const result = await res.json();
-      if (result.success) {
-        alert('결제가 완료되었습니다. 주문 내역에서 확인하세요.');
-        router.push('/my?tab=orders'); // MyPage의 주문 내역으로 이동 (추후 구현 가능)
-      } else {
-        alert(result.error || '결제 중 오류가 발생했습니다.');
-      }
-    } catch (error) {
+      await purchaseProduct(user.uid, product.id, quantity, shippingAddress, memo);
+      alert('결제가 완료되었습니다. 주문 내역에서 확인하세요.');
+      router.push('/my?tab=orders');
+    } catch (error: any) {
       console.error(error);
-      alert('결제 중 오류가 발생했습니다.');
+      alert(error.message || '결제 중 오류가 발생했습니다.');
     } finally {
       setPurchasing(false);
     }
