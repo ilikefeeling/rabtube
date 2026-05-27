@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { getProductRequests, createProductRequest } from '@/lib/marketplaceService';
 import { getAuth } from 'firebase-admin/auth';
