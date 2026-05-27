@@ -1,0 +1,1003 @@
+src\app\api\admin-test-charge\route.ts:50 - description: `[1회성 기능 테스트 충전] +${amountRab.toLocaleString()} RAB`,
+src\app\api\admin-test-charge\route.ts:61 - description: `[1회성 기능 테스트 충전] +${amountRab} RAB`,
+src\app\api\payments\rab-subscription\route.ts:5 - * RAB 토큰으로 구독 결제 처리
+src\app\api\payments\rab-subscription\route.ts:18 - return NextResponse.json({ error: '파라미터 누락' }, { status: 400 });
+src\app\api\payments\rab-subscription\route.ts:22 - if (!plan) return NextResponse.json({ error: '잘못된 요금제' }, { status: 400 });
+src\app\api\payments\rab-subscription\route.ts:27 - if (!balSnap.exists()) throw new Error('잔액 정보 없음');
+src\app\api\payments\rab-subscription\route.ts:30 - if (balance < cost) throw new Error(`RAB 잔액 부족 (현재: ${balance}, 필요: ${cost})`);
+src\app\api\payments\rab-subscription\route.ts:50 - description:   `RAB 구독 결제: ${plan.name} (${cost} RAB/월)`,
+src\app\api\payments\rab-subscription\route.ts:78 - description: `RAB 구독: ${plan.name} ${cost} RAB/월`,
+src\app\api\stripe\cancel\route.ts:5 - * 구독 기간 만료 후 해지 예약
+src\app\api\stripe\cancel\route.ts:19 - return NextResponse.json({ error: '구독 ID 누락' }, { status: 400 });
+src\app\api\stripe\checkout\route.ts:5 - * Stripe 구독 결제 세션 생성
+src\app\api\stripe\checkout\route.ts:21 - return NextResponse.json({ error: '파라미터 누락' }, { status: 400 });
+src\app\api\stripe\checkout\route.ts:26 - return NextResponse.json({ error: '잘못된 요금제' }, { status: 400 });
+src\app\api\stripe\rab-purchase\route.ts:5 - * RAB 토큰 직접 구매 세션 생성 (연속형 과금율 계산)
+src\app\api\stripe\rab-purchase\route.ts:21 - return NextResponse.json({ error: '잘못된 구매 수량' }, { status: 400 });
+src\app\api\stripe\rab-purchase\route.ts:29 - return NextResponse.json({ error: '최소 결제 금액은 $0.50 이상이어야 합니다.' }, { status: 400 });
+src\app\api\stripe\rab-purchase\route.ts:41 - name: `RabTube RAB 토큰 ${billing.rab.toLocaleString()}개`,
+src\app\api\stripe\rab-purchase\route.ts:42 - description: `RAB 토큰 ${billing.rab.toLocaleString()}개 구매 ($${billing.price} USD)`,
+src\app\api\stripe\webhook\route.ts:5 - * Stripe 이벤트 수신 및 처리
+src\app\api\stripe\webhook\route.ts:7 - * 처리 이벤트:
+src\app\api\stripe\webhook\route.ts:8 - * - checkout.session.completed → 구독 활성화 or RAB 지급
+src\app\api\stripe\webhook\route.ts:9 - * - customer.subscription.updated → 구독 상태 갱신
+src\app\api\stripe\webhook\route.ts:10 - * - customer.subscription.deleted → 구독 해지
+src\app\api\stripe\webhook\route.ts:11 - * - invoice.payment_failed → 결제 실패 처리
+src\app\api\stripe\webhook\route.ts:32 - console.error('[Webhook] signature 검증 실패:', err.message);
+src\app\api\stripe\webhook\route.ts:91 - console.log(`[Webhook] 미처리 이벤트: ${event.type}`);
+src\app\api\stripe\webhook\route.ts:96 - console.error('[Webhook] 처리 오류:', err);
+src\app\api\stripe\webhook\route.ts:136 - description:    `${tier === 'pro' ? '프로' : '클리닉'} 구독 활성화`,
+src\app\api\stripe\webhook\route.ts:165 - : `₩${(krwAmount || 0).toLocaleString()}원`;
+src\app\api\stripe\webhook\route.ts:174 - description:   `RAB 구매: ${priceDesc} → +${rabAmount} RAB`,
+src\app\api\stripe\webhook\route.ts:188 - description:     `RAB ${rabAmount}개 구매 (${priceDesc})`,
+src\app\[locale]\layout.tsx:22 - title: 'Rabtube - 치과 케이스 플랫폼',
+src\app\[locale]\layout.tsx:23 - description: '치과 개원의를 위한 전문 케이스 영상 커뮤니티',
+src\app\[locale]\page.tsx:16 - const CATEGORIES = ['전체', '임플란트', '보철', '치주', '교정', '보존', '소아', '구강외과'] as const;
+src\app\[locale]\page.tsx:23 - const [activeCategory, setActiveCategory] = useState<string>('전체');
+src\app\[locale]\page.tsx:31 - case '전체': return t('cat_all');
+src\app\[locale]\page.tsx:32 - case '임플란트': return t('cat_implant');
+src\app\[locale]\page.tsx:33 - case '보철': return t('cat_prosthetics');
+src\app\[locale]\page.tsx:34 - case '치주': return t('cat_perio');
+src\app\[locale]\page.tsx:35 - case '교정': return t('cat_ortho');
+src\app\[locale]\page.tsx:36 - case '보존': return t('cat_cons');
+src\app\[locale]\page.tsx:37 - case '소아': return t('cat_pedo');
+src\app\[locale]\page.tsx:38 - case '구강외과': return t('cat_surgery');
+src\app\[locale]\page.tsx:55 - const data = await getCases(cat === '전체' ? undefined : cat);
+src\app\[locale]\admin\page.tsx:29 - SIGNUP_BONUS:         '가입 보너스',
+src\app\[locale]\admin\page.tsx:30 - UPLOAD_REWARD:        '업로드 보상',
+src\app\[locale]\admin\page.tsx:31 - UPLOAD_QUALITY_BONUS: '품질 보너스',
+src\app\[locale]\admin\page.tsx:32 - LIKE_RECEIVED:        '좋아요 수신',
+src\app\[locale]\admin\page.tsx:33 - VIEW_SHARE:           '시청료 수익',
+src\app\[locale]\admin\page.tsx:34 - VIEW_SPEND:           '케이스 시청',
+src\app\[locale]\admin\page.tsx:35 - DOWNLOAD_SPEND:       '다운로드',
+src\app\[locale]\admin\page.tsx:36 - BOOST_SPEND:          '피드 부스트',
+src\app\[locale]\admin\page.tsx:37 - ADMIN_GRANT:          '관리자 지급',
+src\app\[locale]\admin\page.tsx:38 - ADMIN_DEDUCT:         '관리자 차감',
+src\app\[locale]\admin\page.tsx:39 - REPORT_REWARD:        '신고 보상',
+src\app\[locale]\admin\page.tsx:40 - PENALTY_DEDUCT:       '패널티',
+src\app\[locale]\admin\page.tsx:41 - RAB_PURCHASE:         'RAB 충전',
+src\app\[locale]\admin\page.tsx:42 - UPLOAD_FEE_SPEND:     '업로드 수수료',
+src\app\[locale]\admin\page.tsx:43 - BOUNTY_ESCROW:        '바운티 에스크로',
+src\app\[locale]\admin\page.tsx:44 - BOUNTY_RELEASE:       '바운티 정산',
+src\app\[locale]\admin\page.tsx:45 - BOUNTY_REFUND:        '바운티 환급',
+src\app\[locale]\admin\page.tsx:46 - BOUNTY_FEE:           '바운티 수수료',
+src\app\[locale]\admin\page.tsx:47 - BOUNTY_BURN:          '바운티 소각',
+src\app\[locale]\admin\page.tsx:48 - SHOP_PURCHASE:        '쇼핑몰 구매',
+src\app\[locale]\admin\page.tsx:49 - SHOP_REVENUE:         '쇼핑몰 수익',
+src\app\[locale]\admin\page.tsx:98 - unit: '개',
+src\app\[locale]\admin\page.tsx:136 - alert('설정이 저장되었습니다.');
+src\app\[locale]\admin\page.tsx:138 - alert('설정 저장 실패');
+src\app\[locale]\admin\page.tsx:174 - if (!confirm(`정말 '${name}' 상품을 삭제하시겠습니까?`)) return;
+src\app\[locale]\admin\page.tsx:177 - alert('상품이 성공적으로 삭제되었습니다.');
+src\app\[locale]\admin\page.tsx:180 - alert(`삭제 실패: ${e.message}`);
+src\app\[locale]\admin\page.tsx:187 - return alert('필수 항목을 입력해주세요.');
+src\app\[locale]\admin\page.tsx:203 - unit: newProd.unit || '개',
+src\app\[locale]\admin\page.tsx:220 - alert('상품이 성공적으로 등록되었습니다.');
+src\app\[locale]\admin\page.tsx:229 - unit: '개',
+src\app\[locale]\admin\page.tsx:237 - alert(`등록 실패: ${e.message}`);
+src\app\[locale]\admin\page.tsx:247 - alert('상태가 변경되었습니다.');
+src\app\[locale]\admin\page.tsx:250 - alert(`상태 변경 실패: ${e.message}`);
+src\app\[locale]\admin\page.tsx:270 - setConfirmResult(`${n}건 확정 완료`);
+src\app\[locale]\admin\page.tsx:273 - } catch (e: any) { setConfirmResult(`오류: ${e.message}`); }
+src\app\[locale]\admin\page.tsx:285 - const confirmMsg = `정말 ${m.name} 원장님(이메일: ${m.email})의 계정을 영구 삭제하시겠습니까?\n\n삭제 시 회원 정보와 가입 시 등록된 휴대폰 번호 중복 방지 데이터가 완전히 소멸되며, 해당 번호로 재가입이 즉시 가능해집니다.`;
+src\app\[locale]\admin\page.tsx:291 - alert('회원이 완전히 영구 삭제되었습니다.');
+src\app\[locale]\admin\page.tsx:294 - alert(`삭제 실패: ${e.message}`);
+src\app\[locale]\admin\page.tsx:319 - if (!confirm(`'${name}' 재료를 삭제하시겠습니까?`)) return;
+src\app\[locale]\admin\page.tsx:338 - { id: 'overview', label: '개요' },
+src\app\[locale]\admin\page.tsx:339 - { id: 'marketplace', label: '마켓플레이스 관리' },
+src\app\[locale]\admin\page.tsx:340 - { id: 'members',  label: `회원 관리 (${members.length})` },
+src\app\[locale]\admin\page.tsx:341 - { id: 'txs',      label: `트랜잭션 (실시간)` },
+src\app\[locale]\admin\page.tsx:342 - { id: 'materials', label: '재료 관리' },
+src\app\[locale]\admin\page.tsx:343 - { id: 'supply',   label: 'RAB 공급 현황' },
+src\app\[locale]\admin\page.tsx:344 - { id: 'settings', label: '플랫폼 설정' },
+src\app\[locale]\admin\page.tsx:355 - <span>{profile?.name} 관리자</span>
+src\app\[locale]\admin\page.tsx:367 - {confirmingPending ? '처리 중...' : `Pending 확정 (${stats?.pendingTxCount ?? 0}건)`}
+src\app\[locale]\admin\page.tsx:373 - <RefreshCw size={12} />새로고침
+src\app\[locale]\admin\page.tsx:388 - <StatCard label="총 유통 RAB"     value={fmt(stats?.totalSupply ?? 0)}         sub={`평균 ${fmt(stats?.avgBalance ?? 0)} RAB/회원`}    color="#7c5cbf" />
+src\app\[locale]\admin\page.tsx:389 - <StatCard label="누적 발행 RAB"   value={fmt(stats?.totalEverIssued ?? 0)}      sub={`소각 ${fmt(stats?.totalEverBurned ?? 0)} RAB`}    color="#1a9e75" />
+src\app\[locale]\admin\page.tsx:390 - <StatCard label="플랫폼 누적 수익" value={fmt(stats?.totalPlatformRevenue ?? 0)} sub={`오늘 트랜잭션 ${stats?.todayTxCount ?? 0}건`}    color="#2c7be5" />
+src\app\[locale]\admin\page.tsx:391 - <StatCard label="전체 회원"        value={fmt(stats?.totalMembers ?? 0)}         sub={`케이스 ${fmt(stats?.totalCases ?? 0)}개`}         color="#d4920c" />
+src\app\[locale]\admin\page.tsx:411 - <h3 className="text-sm font-medium text-slate-700 mb-4">RAB 공급 구성</h3>
+src\app\[locale]\admin\page.tsx:413 - { label:'유통 중 (확정 잔액)', val: stats?.totalSupply ?? 0, color:'#7c5cbf', pct: stats ? Math.round((stats.totalSupply / Math.max(stats.totalEverIssued, 1)) * 100) : 0 },
+src\app\[locale]\admin\page.tsx:414 - { label:'누적 소각 (소비)',    val: stats?.totalEverBurned ?? 0, color:'#e24b4a', pct: stats ? Math.round((stats.totalEverBurned / Math.max(stats.totalEverIssued, 1)) * 100) : 0 },
+src\app\[locale]\admin\page.tsx:415 - { label:'플랫폼 수익',         val: stats?.totalPlatformRevenue ?? 0, color:'#1a9e75', pct: stats ? Math.round((stats.totalPlatformRevenue / Math.max(stats.totalEverIssued, 1)) * 100) : 0 },
+src\app\[locale]\admin\page.tsx:430 - <h3 className="text-sm font-medium text-slate-700 mb-4">대기 현황</h3>
+src\app\[locale]\admin\page.tsx:433 - { label:'Pending 트랜잭션', val: `${stats?.pendingTxCount ?? 0}건`, icon:<Clock size={14}/>, color:'text-amber-500', bg:'bg-amber-50' },
+src\app\[locale]\admin\page.tsx:434 - { label:'오늘 발생 트랜잭션', val: `${stats?.todayTxCount ?? 0}건`, icon:<TrendingUp size={14}/>, color:'text-blue-500', bg:'bg-blue-50' },
+src\app\[locale]\admin\page.tsx:435 - { label:'전체 회원', val: `${stats?.totalMembers ?? 0}명`, icon:<Users size={14}/>, color:'text-teal-600', bg:'bg-teal-50' },
+src\app\[locale]\admin\page.tsx:450 - <h3 className="text-sm font-medium text-slate-700">최근 트랜잭션 (실시간)</h3>
+src\app\[locale]\admin\page.tsx:452 - 전체 보기 <ChevronRight size={12} />
+src\app\[locale]\admin\page.tsx:483 - placeholder="이름, 병원명, 이메일, 연락처 검색"
+src\app\[locale]\admin\page.tsx:488 - <span className="text-xs text-slate-400">검색 결과 {filteredMembers.length}명</span>
+src\app\[locale]\admin\page.tsx:493 - { id: 'all', label: '전체' },
+src\app\[locale]\admin\page.tsx:494 - { id: 'pending', label: '승인 대기' },
+src\app\[locale]\admin\page.tsx:495 - { id: 'approved', label: '승인 완료' },
+src\app\[locale]\admin\page.tsx:496 - { id: 'rejected', label: '반려/정지' },
+src\app\[locale]\admin\page.tsx:497 - { id: 'deleted', label: '삭제됨' },
+src\app\[locale]\admin\page.tsx:518 - {['이름/이메일', '병원명', '연락처', '지역', 'RAB 잔액', '누적획득', '누적소비', '상태', '회원작업'].map(h => (
+src\app\[locale]\admin\page.tsx:556 - {m.status === 'approved' ? '승인 완료' : m.status === 'rejected' ? '반려/정지' : m.status === 'deleted' ? '삭제됨' : '승인 대기'}
+src\app\[locale]\admin\page.tsx:564 - title="RAB 수동 지급 및 차감"
+src\app\[locale]\admin\page.tsx:566 - RAB 조정
+src\app\[locale]\admin\page.tsx:575 - 승인
+src\app\[locale]\admin\page.tsx:581 - 반려
+src\app\[locale]\admin\page.tsx:591 - 정지
+src\app\[locale]\admin\page.tsx:600 - 재승인
+src\app\[locale]\admin\page.tsx:607 - title="회원 데이터 영구 삭제"
+src\app\[locale]\admin\page.tsx:609 - 삭제
+src\app\[locale]\admin\page.tsx:624 - <h3 className="text-sm font-medium text-slate-700">전체 트랜잭션 (실시간 · 최근 50건)</h3>
+src\app\[locale]\admin\page.tsx:634 - {['시각', '유형', '금액', '잔액후', '상태', '설명', 'UserID'].map(h => (
+src\app\[locale]\admin\page.tsx:670 - { label:'소각률 (소비/발행)', val: stats ? `${Math.round((stats.totalEverBurned / Math.max(stats.totalEverIssued, 1)) * 100)}%` : '-', good: true, desc:'목표: 15% 이상' },
+src\app\[locale]\admin\page.tsx:671 - { label:'유통 공급량',        val: fmt(stats?.totalSupply ?? 0) + ' RAB', good: true, desc:'확정 잔액 합계' },
+src\app\[locale]\admin\page.tsx:672 - { label:'평균 회원 잔액',     val: fmt(stats?.avgBalance ?? 0) + ' RAB', good: (stats?.avgBalance ?? 0) > 20, desc:'권장: 25 RAB 이상' },
+src\app\[locale]\admin\page.tsx:687 - <h3 className="text-sm font-semibold text-slate-800">임상 사용 재료 관리</h3>
+src\app\[locale]\admin\page.tsx:689 - 원장님들이 케이스 업로드 시 선택할 수 있는 치과 재료 목록을 추가하거나 삭제할 수 있습니다.
+src\app\[locale]\admin\page.tsx:698 - placeholder="추가할 재료명 입력 (예: Osstem TS IV)"
+src\app\[locale]\admin\page.tsx:709 - + 재료 추가
+src\app\[locale]\admin\page.tsx:718 - placeholder="재료 검색"
+src\app\[locale]\admin\page.tsx:737 - title="재료 삭제"
+src\app\[locale]\admin\page.tsx:760 - 쇼핑몰 상품 관리 ({shopProducts.length})
+src\app\[locale]\admin\page.tsx:770 - 원장님 수요 요청 관리 ({productRequests.length})
+src\app\[locale]\admin\page.tsx:777 - 불러오는 중...
+src\app\[locale]\admin\page.tsx:783 - {/* 상품 등록 폼 */}
+src\app\[locale]\admin\page.tsx:786 - <h3 className="text-base font-bold text-slate-800 mb-4 pb-2 border-b">새 상품 등록</h3>
+src\app\[locale]\admin\page.tsx:789 - <label className="block text-xs font-semibold text-slate-500 mb-1">상품명 *</label>
+src\app\[locale]\admin\page.tsx:793 - placeholder="예) 오스템 임플란트 TS III SA"
+src\app\[locale]\admin\page.tsx:802 - <label className="block text-xs font-semibold text-slate-500 mb-1">브랜드</label>
+src\app\[locale]\admin\page.tsx:805 - placeholder="예) 오스템"
+src\app\[locale]\admin\page.tsx:812 - <label className="block text-xs font-semibold text-slate-500 mb-1">모델명</label>
+src\app\[locale]\admin\page.tsx:815 - placeholder="예) TS III"
+src\app\[locale]\admin\page.tsx:825 - <label className="block text-xs font-semibold text-slate-500 mb-1">카테고리 *</label>
+src\app\[locale]\admin\page.tsx:832 - <option value="">선택해주세요</option>
+src\app\[locale]\admin\page.tsx:833 - <option value="임플란트_부속">임플란트 부속</option>
+src\app\[locale]\admin\page.tsx:834 - <option value="레진_수복재료">레진 수복재료</option>
+src\app\[locale]\admin\page.tsx:835 - <option value="인상재_석고">인상재 석고</option>
+src\app\[locale]\admin\page.tsx:836 - <option value="근관치료재료">근관치료재료</option>
+src\app\[locale]\admin\page.tsx:837 - <option value="소독_위생용품">소독 위생용품</option>
+src\app\[locale]\admin\page.tsx:838 - <option value="기타">기타</option>
+src\app\[locale]\admin\page.tsx:842 - <label className="block text-xs font-semibold text-slate-500 mb-1">규격 단위</label>
+src\app\[locale]\admin\page.tsx:845 - placeholder="예) 개, 박스, 세트"
+src\app\[locale]\admin\page.tsx:855 - <label className="block text-xs font-semibold text-slate-500 mb-1">RAB 가격 *</label>
+src\app\[locale]\admin\page.tsx:866 - <label className="block text-xs font-semibold text-slate-500 mb-1">참고 현금가(₩)</label>
+src\app\[locale]\admin\page.tsx:879 - <label className="block text-xs font-semibold text-slate-500 mb-1">초기 재고량</label>
+src\app\[locale]\admin\page.tsx:889 - <label className="block text-xs font-semibold text-slate-500 mb-1">이미지 (첨부 또는 URL)</label>
+src\app\[locale]\admin\page.tsx:894 - <span className="text-sm font-medium text-slate-700">이미지 첨부</span>
+src\app\[locale]\admin\page.tsx:929 - placeholder="또는 이미지 URL을 입력하세요"
+src\app\[locale]\admin\page.tsx:939 - {/* 연동할 수요 요청 글 선택 */}
+src\app\[locale]\admin\page.tsx:942 - 수요 요청 연동 및 상태 변경 (선택)
+src\app\[locale]\admin\page.tsx:949 - <option value="">연동하지 않음 (일반 신규 상품)</option>
+src\app\[locale]\admin\page.tsx:954 - [{r.upvoteCount}공감] {r.title} ({r.category})
+src\app\[locale]\admin\page.tsx:959 - * 상품 등록과 동시에 해당 요청 글이 &apos;입점 완료&apos; 상태로 전환됩니다.
+src\app\[locale]\admin\page.tsx:967 - 쇼핑몰 입점 등록하기
+src\app\[locale]\admin\page.tsx:973 - {/* 상품 목록 및 삭제 기능 */}
+src\app\[locale]\admin\page.tsx:976 - <h3 className="text-base font-bold text-slate-800 mb-4 pb-2 border-b">입점 상품 목록 ({shopProducts.length})</h3>
+src\app\[locale]\admin\page.tsx:978 - <div className="text-center py-12 text-slate-400">등록된 쇼핑몰 상품이 없습니다.</div>
+src\app\[locale]\admin\page.tsx:984 - <th className="px-4 py-3">상품명 / 카테고리</th>
+src\app\[locale]\admin\page.tsx:985 - <th className="px-4 py-3">브랜드 / 모델</th>
+src\app\[locale]\admin\page.tsx:986 - <th className="px-4 py-3">RAB / KRW 가격</th>
+src\app\[locale]\admin\page.tsx:987 - <th className="px-4 py-3">재고</th>
+src\app\[locale]\admin\page.tsx:988 - <th className="px-4 py-3 text-center">관리</th>
+src\app\[locale]\admin\page.tsx:1007 - {p.stock}{p.unit || '개'}
+src\app\[locale]\admin\page.tsx:1014 - 삭제
+src\app\[locale]\admin\page.tsx:1031 - 원장님 수요 조사 / 입점 요청 관리 ({productRequests.length})
+src\app\[locale]\admin\page.tsx:1034 - <div className="text-center py-12 text-slate-400">접수된 상품등록 요청글이 없습니다.</div>
+src\app\[locale]\admin\page.tsx:1040 - <th className="px-4 py-3">공감</th>
+src\app\[locale]\admin\page.tsx:1041 - <th className="px-4 py-3">요청 제품 / 설명</th>
+src\app\[locale]\admin\page.tsx:1042 - <th className="px-4 py-3">소요량</th>
+src\app\[locale]\admin\page.tsx:1043 - <th className="px-4 py-3">선호 모델</th>
+src\app\[locale]\admin\page.tsx:1044 - <th className="px-4 py-3">신청일</th>
+src\app\[locale]\admin\page.tsx:1045 - <th className="px-4 py-3">입점 상태 관리</th>
+src\app\[locale]\admin\page.tsx:1053 - {r.upvoteCount || 0} 공감
+src\app\[locale]\admin\page.tsx:1059 - <div className="text-[10px] text-slate-400 font-normal mt-0.5">카테고리: {r.category}</div>
+src\app\[locale]\admin\page.tsx:1065 - <div>브랜드: {r.preferredBrand || '-'}</div>
+src\app\[locale]\admin\page.tsx:1066 - <div>모델: {r.preferredModel || '-'}</div>
+src\app\[locale]\admin\page.tsx:1083 - <option value="OPEN">수요 조사 중</option>
+src\app\[locale]\admin\page.tsx:1084 - <option value="REVIEWING">입점 검토 중</option>
+src\app\[locale]\admin\page.tsx:1085 - <option value="LISTED">입점 완료</option>
+src\app\[locale]\admin\page.tsx:1086 - <option value="REJECTED">입점 보류</option>
+src\app\[locale]\admin\page.tsx:1105 - <h3 className="text-sm font-medium text-slate-800 mb-5">수수료 및 정산 설정</h3>
+src\app\[locale]\admin\page.tsx:1108 - 플랫폼 수수료율 (%)
+src\app\[locale]\admin\page.tsx:1122 - 데이터 열람 시 업로더에게 지급되는 정산금에서 차감될 수수료 비율입니다.
+src\app\[locale]\admin\page.tsx:1123 - 예: 30% 설정 시 업로더가 70% 수익을 가져갑니다. 변경 시점 이후의 결제부터 적용됩니다.
+src\app\[locale]\admin\page.tsx:1132 - {savingSettings ? '저장 중...' : '저장하기'}
+src\app\[locale]\admin\page.tsx:1140 - {/* RAB 조정 모달 */}
+src\app\[locale]\admin\cashout\page.tsx:33 - pending:    { bg: 'bg-amber-50',  text: 'text-amber-700',  label: '대기 중' },
+src\app\[locale]\admin\cashout\page.tsx:34 - processing: { bg: 'bg-blue-50',   text: 'text-blue-700',   label: '처리 중' },
+src\app\[locale]\admin\cashout\page.tsx:35 - completed:  { bg: 'bg-teal-50',   text: 'text-teal-700',   label: '완료' },
+src\app\[locale]\admin\cashout\page.tsx:36 - rejected:   { bg: 'bg-red-50',    text: 'text-red-600',    label: '거절' },
+src\app\[locale]\admin\cashout\page.tsx:92 - if (!confirm(`${req.accountHolder}님께 ₩${fmt(req.krwAmount)} 입금 처리하시겠습니까?`)) return;
+src\app\[locale]\admin\cashout\page.tsx:99 - showToast(`✅ ${req.accountHolder}님 환전 완료 처리`);
+src\app\[locale]\admin\cashout\page.tsx:110 - if (!rejectReason.trim()) { showToast('❌ 거절 사유를 입력해 주세요'); return; }
+src\app\[locale]\admin\cashout\page.tsx:125 - showToast('✅ 환전 거절 처리 완료 (RAB 반환됨)');
+src\app\[locale]\admin\cashout\page.tsx:153 - <h1 className="text-lg font-medium text-slate-800">RAB 환전 처리</h1>
+src\app\[locale]\admin\cashout\page.tsx:154 - <p className="text-xs text-slate-400 mt-0.5">관리자 전용 — 환전 신청 승인/거절</p>
+src\app\[locale]\admin\cashout\page.tsx:157 - <RefreshCw size={12} />새로고침
+src\app\[locale]\admin\cashout\page.tsx:164 - { label: '대기 중 신청',    val: `${pending}건`,        color: 'text-amber-600' },
+src\app\[locale]\admin\cashout\page.tsx:165 - { label: '대기 중 총액',    val: `₩${fmt(totalKrw)}`,  color: 'text-red-500'  },
+src\app\[locale]\admin\cashout\page.tsx:166 - { label: '전체 처리 건수',  val: `${requests.length}건`, color: 'text-slate-700' },
+src\app\[locale]\admin\cashout\page.tsx:187 - {s === 'all' ? '전체' :
+src\app\[locale]\admin\cashout\page.tsx:188 - s === 'pending' ? '대기 중' :
+src\app\[locale]\admin\cashout\page.tsx:189 - s === 'processing' ? '처리 중' :
+src\app\[locale]\admin\cashout\page.tsx:190 - s === 'completed' ? '완료' : '거절'}
+src\app\[locale]\admin\cashout\page.tsx:205 - <p className="text-sm">신청 내역이 없습니다</p>
+src\app\[locale]\admin\cashout\page.tsx:249 - <h3 className="text-sm font-medium text-slate-700">환전 상세</h3>
+src\app\[locale]\admin\cashout\page.tsx:257 - { label: '예금주',    val: selected.accountHolder },
+src\app\[locale]\admin\cashout\page.tsx:258 - { label: '은행',      val: selected.bankName },
+src\app\[locale]\admin\cashout\page.tsx:259 - { label: '계좌번호',  val: selected.accountNo },
+src\app\[locale]\admin\cashout\page.tsx:260 - { label: '신청 RAB',  val: `${fmt(selected.rabAmount)} RAB` },
+src\app\[locale]\admin\cashout\page.tsx:261 - { label: '수수료',    val: `${fmt(selected.fee)} RAB (5%)` },
+src\app\[locale]\admin\cashout\page.tsx:262 - { label: '입금 금액', val: `₩${fmt(selected.krwAmount)}`, highlight: true },
+src\app\[locale]\admin\cashout\page.tsx:263 - { label: '신청 일시', val: selected.createdAt.toLocaleString('ko-KR') },
+src\app\[locale]\admin\cashout\page.tsx:282 - {processing === selected.id ? '처리 중...' : `₩${fmt(selected.krwAmount)} 입금 완료 처리`}
+src\app\[locale]\admin\cashout\page.tsx:288 - placeholder="거절 사유 입력"
+src\app\[locale]\admin\cashout\page.tsx:297 - <XCircle size={14} />거절 (RAB 반환)
+src\app\[locale]\admin\cashout\page.tsx:305 - ✅ {selected.processedAt.toLocaleString('ko-KR')} 처리 완료
+src\app\[locale]\admin\cashout\page.tsx:310 - ❌ 거절 사유: {selected.rejectedReason}
+src\app\[locale]\admin\cashout\page.tsx:317 - <p className="text-sm">신청 건을 선택하세요</p>
+src\app\[locale]\auth\forgot-password\page.tsx:18 - setError('이메일을 입력해 주세요');
+src\app\[locale]\auth\forgot-password\page.tsx:29 - 'auth/invalid-email': '유효하지 않은 이메일 형식입니다',
+src\app\[locale]\auth\forgot-password\page.tsx:30 - 'auth/user-not-found': '등록되지 않은 이메일입니다',
+src\app\[locale]\auth\forgot-password\page.tsx:32 - setError(msg[e.code] ?? '비밀번호 재설정 메일 전송 중 오류가 발생했습니다');
+src\app\[locale]\auth\forgot-password\page.tsx:44 - <p className="text-slate-400 text-sm mt-2">치과 개원의 케이스 플랫폼</p>
+src\app\[locale]\auth\forgot-password\page.tsx:48 - <h2 className="text-base font-medium text-slate-800 mb-2">비밀번호 찾기</h2>
+src\app\[locale]\auth\forgot-password\page.tsx:49 - <p className="text-xs text-slate-400 mb-5">가입하신 이메일로 비밀번호 재설정 링크를 보내드립니다</p>
+src\app\[locale]\auth\forgot-password\page.tsx:53 - <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wide block mb-1.5">이메일</label>
+src\app\[locale]\auth\forgot-password\page.tsx:76 - <p className="font-bold">이메일 전송 완료!</p>
+src\app\[locale]\auth\forgot-password\page.tsx:77 - <p className="text-[11px] text-teal-600 mt-0.5">입력하신 메일함으로 재설정 메일이 발송되었습니다. 메일 내부의 링크를 통해 비밀번호를 재설정해 주세요.</p>
+src\app\[locale]\auth\forgot-password\page.tsx:87 - {loading ? '전송 중...' : '비밀번호 재설정 메일 전송'}
+src\app\[locale]\auth\forgot-password\page.tsx:93 - <ArrowLeft size={12} /> 로그인으로 돌아가기
+src\app\[locale]\auth\forgot-password\page.tsx:96 - 회원가입
+src\app\[locale]\auth\login\page.tsx:27 - 'auth/invalid-credential': '이메일 또는 비밀번호가 올바르지 않습니다',
+src\app\[locale]\auth\login\page.tsx:28 - 'auth/user-not-found': '등록되지 않은 이메일입니다',
+src\app\[locale]\auth\login\page.tsx:29 - 'auth/wrong-password': '비밀번호가 올바르지 않습니다',
+src\app\[locale]\auth\login\page.tsx:30 - 'auth/too-many-requests': '너무 많은 시도입니다. 잠시 후 다시 시도해 주세요',
+src\app\[locale]\auth\login\page.tsx:32 - setError(msg[e.code] ?? '로그인 중 오류가 발생했습니다');
+src\app\[locale]\auth\login\page.tsx:44 - <p className="text-slate-400 text-sm mt-2">치과 개원의 케이스 플랫폼</p>
+src\app\[locale]\auth\login\page.tsx:48 - <h2 className="text-base font-medium text-slate-800 mb-5">로그인</h2>
+src\app\[locale]\auth\login\page.tsx:52 - <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wide block mb-1.5">이메일</label>
+src\app\[locale]\auth\login\page.tsx:65 - <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wide block">비밀번호</label>
+src\app\[locale]\auth\login\page.tsx:67 - 비밀번호 찾기
+src\app\[locale]\auth\login\page.tsx:98 - {loading ? '로그인 중...' : '로그인'}
+src\app\[locale]\auth\login\page.tsx:103 - 아직 계정이 없으신가요?{' '}
+src\app\[locale]\auth\login\page.tsx:105 - 회원가입
+src\app\[locale]\auth\register\page.tsx:38 - setError('모든 항목을 입력해 주세요');
+src\app\[locale]\auth\register\page.tsx:41 - if (password.length < 6) { setError('비밀번호는 6자 이상이어야 합니다'); return; }
+src\app\[locale]\auth\register\page.tsx:45 - setError('올바른 휴대폰 번호 형식을 입력해 주세요 (예: 010-1234-5678)');
+src\app\[locale]\auth\register\page.tsx:56 - setError('이미 가입된 휴대폰 번호입니다');
+src\app\[locale]\auth\register\page.tsx:65 - alert('회원가입 신청이 완료되었습니다. 관리자 승인 후 서비스 이용이 가능합니다.');
+src\app\[locale]\auth\register\page.tsx:69 - 'auth/email-already-in-use': '이미 사용 중인 이메일입니다',
+src\app\[locale]\auth\register\page.tsx:70 - 'auth/invalid-email': '유효하지 않은 이메일 형식입니다',
+src\app\[locale]\auth\register\page.tsx:71 - 'auth/weak-password': '비밀번호가 너무 약합니다',
+src\app\[locale]\auth\register\page.tsx:73 - setError(msg[e.code] ?? '회원가입 중 오류가 발생했습니다');
+src\app\[locale]\auth\register\page.tsx:79 - const REGIONS = ['서울','경기','인천','부산','대구','광주','대전','울산','세종','강원','충북','충남','전북','전남','경북','경남','제주'];
+src\app\[locale]\auth\register\page.tsx:86 - <p className="text-slate-400 text-sm mt-2">치과 개원의 전용 플랫폼</p>
+src\app\[locale]\auth\register\page.tsx:90 - <h2 className="text-base font-medium text-slate-800 mb-1">회원가입</h2>
+src\app\[locale]\auth\register\page.tsx:91 - <p className="text-xs text-slate-400 mb-5">치과 면허를 보유한 개원의만 가입 가능합니다</p>
+src\app\[locale]\auth\register\page.tsx:95 - { label: '이름 (성명)', key: 'name', placeholder: '홍길동', type: 'text' },
+src\app\[locale]\auth\register\page.tsx:96 - { label: '이메일', key: 'email', placeholder: 'doctor@example.com', type: 'email' },
+src\app\[locale]\auth\register\page.tsx:97 - { label: '휴대폰 번호', key: 'phoneNumber', placeholder: '010-1234-5678', type: 'tel' },
+src\app\[locale]\auth\register\page.tsx:98 - { label: '비밀번호', key: 'password', placeholder: '6자 이상', type: 'password' },
+src\app\[locale]\auth\register\page.tsx:99 - { label: '병원명', key: 'hospital', placeholder: '예) 연세스마일치과', type: 'text' },
+src\app\[locale]\auth\register\page.tsx:100 - { label: '치과 면허 번호', key: 'licenseNumber', placeholder: '예) 제12345호', type: 'text' },
+src\app\[locale]\auth\register\page.tsx:115 - <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wide block mb-1.5">지역</label>
+src\app\[locale]\auth\register\page.tsx:117 - <option value="">선택하세요</option>
+src\app\[locale]\auth\register\page.tsx:130 - 가입 시 이용약관 및 케이스 영상은 회원 전용으로 공개되며, 환자 개인정보가 포함된 영상 업로드는 금지됩니다.
+src\app\[locale]\auth\register\page.tsx:134 - {loading ? '가입 중...' : '가입하기'}
+src\app\[locale]\auth\register\page.tsx:139 - 이미 계정이 있으신가요?{' '}
+src\app\[locale]\auth\register\page.tsx:140 - <Link href="/auth/login" className="text-teal-600 font-medium hover:underline">로그인</Link>
+src\app\[locale]\billing\page.tsx:26 - { rab: 1000,  label: '기본', highlight: false },
+src\app\[locale]\billing\page.tsx:27 - { rab: 3000,  label: '일반', highlight: false },
+src\app\[locale]\billing\page.tsx:28 - { rab: 5000,  label: '인기', highlight: true },
+src\app\[locale]\billing\page.tsx:29 - { rab: 10000, label: '대용량', highlight: false },
+src\app\[locale]\billing\page.tsx:96 - showToast(`🪙 [테스트 충전] ${rab.toLocaleString()} RAB가 즉시 지급되었습니다!`);
+src\app\[locale]\billing\page.tsx:110 - if (!user || !confirm('구독을 취소하시겠습니까? 현재 기간 만료 후 해지됩니다.')) return;
+src\app\[locale]\billing\page.tsx:114 - showToast('✅ 구독 취소 신청이 완료되었습니다');
+src\app\[locale]\billing\page.tsx:137 - onSuccess={() => { showToast('✅ 결제가 완료되었습니다!'); refreshPoints(); }}
+src\app\[locale]\billing\page.tsx:138 - onPurchase={(rab) => { showToast(`🪙 ${rab} RAB가 지급되었습니다!`); refreshPoints(); }}
+src\app\[locale]\billing\page.tsx:150 - <ChevronLeft size={14} />피드로 돌아가기
+src\app\[locale]\billing\page.tsx:156 - <h1 className="text-lg font-medium text-slate-800">RAB 충전</h1>
+src\app\[locale]\billing\page.tsx:157 - <p className="text-xs text-slate-400 mt-0.5">Rab 충전 · 마켓플레이스</p>
+src\app\[locale]\billing\page.tsx:160 - <p className="text-[10px] text-amber-600 font-medium uppercase tracking-wide">내 RAB 잔액</p>
+src\app\[locale]\billing\page.tsx:174 - <p className="text-sm font-semibold text-teal-800">치과 용품 마켓플레이스</p>
+src\app\[locale]\billing\page.tsx:175 - <p className="text-xs text-teal-600 mt-0.5">RAB로 치과 재료·소모품을 구매하거나, 필요한 상품을 요청하세요</p>
+src\app\[locale]\billing\page.tsx:185 - <p className="text-sm text-slate-500 mb-5">Rab을 충전하여 케이스 시청, 다운로드, 홍보 부스트에 사용하세요.</p>
+src\app\[locale]\billing\page.tsx:198 - 인기
+src\app\[locale]\billing\page.tsx:216 - {actionLoading === String(pkg.rab) ? '처리 중...' : '충전하기'}
+src\app\[locale]\billing\page.tsx:222 - <p>• 결제는 Stripe를 통해 안전하게 처리됩니다</p>
+src\app\[locale]\billing\page.tsx:223 - <p>• 충전 즉시 Rab가 계정에 지급됩니다</p>
+src\app\[locale]\billing\page.tsx:224 - <p>• 충전한 Rab는 환불되지 않습니다</p>
+src\app\[locale]\edit\[id]\page.tsx:16 - const CATEGORIES: CaseCategory[] = ['임플란트', '보철', '치주', '교정', '보존', '소아', '구강외과'];
+src\app\[locale]\edit\[id]\page.tsx:17 - const BONE_CLASSES: BoneClassification[] = ['Class I', 'Class II', 'Class III', 'Class IV', '해당없음'];
+src\app\[locale]\edit\[id]\page.tsx:18 - const PATIENT_AGES: PatientAgeRange[] = ['10대', '20대', '30대', '40대', '50대', '60대', '70대이상'];
+src\app\[locale]\edit\[id]\page.tsx:19 - const PRESET_TAGS = ['즉시식립', '골이식', 'GBR', '상악동거상', '발치후즉시', '전치부', '구치부', '지르코니아', '라미네이트', '레진', '인레이', '의치', '근관치료', '치은이식'];
+src\app\[locale]\edit\[id]\page.tsx:56 - const [difficulty, setDifficulty] = useState<Difficulty>('중급');
+src\app\[locale]\edit\[id]\page.tsx:57 - const [visibility, setVisibility] = useState<Visibility>('회원전용');
+src\app\[locale]\edit\[id]\page.tsx:58 - const [price, setPrice] = useState<number>(50); // 기본 가격을 50 RAB으로 변경 (0 ~ 10,000 범위)
+src\app\[locale]\edit\[id]\page.tsx:80 - const [patientGender, setPatientGender] = useState<'남' | '여' | ''>('');
+src\app\[locale]\edit\[id]\page.tsx:135 - setSelectedThumbnailIndex(-1); // 기존 썸네일 유지
+src\app\[locale]\edit\[id]\page.tsx:146 - setSelectedThumbnailIndex(-1); // 기본 선택은 기존 썸네일 유지
+src\app\[locale]\edit\[id]\page.tsx:195 - alert('로그인이 필요합니다.');
+src\app\[locale]\edit\[id]\page.tsx:199 - alert('케이스 제목을 입력해 주세요.');
+src\app\[locale]\edit\[id]\page.tsx:203 - alert('케이스 카테고리를 선택해 주세요.');
+src\app\[locale]\edit\[id]\page.tsx:207 - alert('임상 케이스 업로드 정책 및 면책 동의에 동의해 주세요.');
+src\app\[locale]\edit\[id]\page.tsx:211 - alert('열람 가격은 0 RAB에서 10,000 RAB 사이여야 합니다.');
+src\app\[locale]\edit\[id]\page.tsx:310 - <ChevronLeft size={14} />피드로 돌아가기
+src\app\[locale]\edit\[id]\page.tsx:314 - <h1 className="text-lg font-medium text-slate-800 mb-1">케이스 영상 수정</h1>
+src\app\[locale]\edit\[id]\page.tsx:315 - <p className="text-xs text-slate-400 mb-6">치료 케이스를 동료 원장님들과 공유해 주세요</p>
+src\app\[locale]\edit\[id]\page.tsx:332 - {isDragActive ? '파일을 여기에 놓으세요' : '영상 파일을 드래그하거나 클릭하여 선택'}
+src\app\[locale]\edit\[id]\page.tsx:334 - <p className="text-xs text-slate-400">MP4, WebM 형식만 지원 · 최대 2GB</p>
+src\app\[locale]\edit\[id]\page.tsx:343 - <p className="text-sm font-medium text-slate-700 truncate">{file ? file.name : "기존 영상 유지"}</p>
+src\app\[locale]\edit\[id]\page.tsx:344 - <p className="text-xs text-slate-400">{file ? (file.size / 1024 / 1024).toFixed(1) + " MB" : "(변경 시 새 파일 선택)"}</p>
+src\app\[locale]\edit\[id]\page.tsx:347 - <button onClick={() => { setFile(null); setOldVideoUrl(null); }} className="text-xs text-slate-400 hover:text-slate-600">변경</button>
+src\app\[locale]\edit\[id]\page.tsx:362 - {isDone ? '업로드 완료!' : isError ? progress.error : `${progress.percent}% 업로드 중...`}
+src\app\[locale]\edit\[id]\page.tsx:373 - 썸네일 선택
+src\app\[locale]\edit\[id]\page.tsx:378 - 썸네일 추출 중...
+src\app\[locale]\edit\[id]\page.tsx:396 - 기존 썸네일
+src\app\[locale]\edit\[id]\page.tsx:435 - <span className="text-[10px] font-semibold text-slate-500 group-hover:text-teal-600">프레임 추출</span>
+src\app\[locale]\edit\[id]\page.tsx:491 - <span className="text-[10px] font-medium text-slate-800 bg-white/80 px-1.5 rounded">직접 업로드됨</span>
+src\app\[locale]\edit\[id]\page.tsx:522 - <span className="text-[10px] font-medium text-slate-500">이미지 업로드</span>
+src\app\[locale]\edit\[id]\page.tsx:530 - 썸네일 자막 (선택)
+src\app\[locale]\edit\[id]\page.tsx:536 - placeholder="썸네일 하단에 합성할 짧은 문구를 입력하세요 (최대 18자)"
+src\app\[locale]\edit\[id]\page.tsx:544 - {/* 글자 크기 */}
+src\app\[locale]\edit\[id]\page.tsx:546 - <label className="text-[9px] font-medium text-slate-400 block mb-1">글자 크기</label>
+src\app\[locale]\edit\[id]\page.tsx:553 - <option value="medium">중간 (기본)</option>
+src\app\[locale]\edit\[id]\page.tsx:554 - <option value="large">크게</option>
+src\app\[locale]\edit\[id]\page.tsx:555 - <option value="xlarge">매우 크게</option>
+src\app\[locale]\edit\[id]\page.tsx:559 - {/* 글자 색상 */}
+src\app\[locale]\edit\[id]\page.tsx:561 - <label className="text-[9px] font-medium text-slate-400 block mb-1">글자 색상</label>
+src\app\[locale]\edit\[id]\page.tsx:564 - { name: '흰색', value: '#FFFFFF', bg: 'bg-white border border-slate-300' },
+src\app\[locale]\edit\[id]\page.tsx:565 - { name: '노랑', value: '#FFEB3B', bg: 'bg-yellow-300' },
+src\app\[locale]\edit\[id]\page.tsx:566 - { name: '검정', value: '#000000', bg: 'bg-black' }
+src\app\[locale]\edit\[id]\page.tsx:579 - {/* 배경 상자 */}
+src\app\[locale]\edit\[id]\page.tsx:581 - <label className="text-[9px] font-medium text-slate-400 block mb-1">배경 상자</label>
+src\app\[locale]\edit\[id]\page.tsx:588 - <option value="rgba(15, 23, 42, 0.85)">어두운 반투명</option>
+src\app\[locale]\edit\[id]\page.tsx:589 - <option value="rgba(220, 38, 38, 0.85)">붉은 반투명</option>
+src\app\[locale]\edit\[id]\page.tsx:590 - <option value="rgba(30, 64, 175, 0.85)">푸른 반투명</option>
+src\app\[locale]\edit\[id]\page.tsx:591 - <option value="none">배경 없음 (외곽선)</option>
+src\app\[locale]\edit\[id]\page.tsx:608 - 케이스 카테고리 *
+src\app\[locale]\edit\[id]\page.tsx:616 - <option value="">선택하세요</option>
+src\app\[locale]\edit\[id]\page.tsx:622 - 치아 번호 *
+src\app\[locale]\edit\[id]\page.tsx:627 - placeholder="선택 버튼을 클릭하세요"
+src\app\[locale]\edit\[id]\page.tsx:638 - 치아 선택
+src\app\[locale]\edit\[id]\page.tsx:646 - 케이스 제목 *
+src\app\[locale]\edit\[id]\page.tsx:650 - placeholder="예) 상악 구치부 임플란트 즉시 식립 케이스"
+src\app\[locale]\edit\[id]\page.tsx:659 - 케이스 설명
+src\app\[locale]\edit\[id]\page.tsx:664 - placeholder="케이스 특이사항, 사용 재료, 핵심 포인트를 기록해 주세요"
+src\app\[locale]\edit\[id]\page.tsx:673 - 태그 (선택형 또는 쉼표로 구분)
+src\app\[locale]\edit\[id]\page.tsx:677 - placeholder="예) 즉시식립, 골이식, GBR (아래 태그를 클릭해 쉽게 선택해 보세요)"
+src\app\[locale]\edit\[id]\page.tsx:706 - <label className="block text-xs font-medium text-slate-500 mb-1.5">공개 범위</label>
+src\app\[locale]\edit\[id]\page.tsx:713 - <option value="전체공개">전체 공개</option>
+src\app\[locale]\edit\[id]\page.tsx:714 - <option value="회원전용">회원 전용</option>
+src\app\[locale]\edit\[id]\page.tsx:715 - <option value="비공개">비공개</option>
+src\app\[locale]\edit\[id]\page.tsx:721 - 열람 가격 (0 ~ 10,000 RAB)
+src\app\[locale]\edit\[id]\page.tsx:761 - <p className="text-[10px] text-slate-400 mt-1">최소 0 ~ 최대 10,000 RAB (10단위 증감 가능)</p>
+src\app\[locale]\edit\[id]\page.tsx:767 - <label className="block text-xs font-medium text-slate-500 mb-1.5">난이도</label>
+src\app\[locale]\edit\[id]\page.tsx:774 - <option>초급</option>
+src\app\[locale]\edit\[id]\page.tsx:775 - <option>중급</option>
+src\app\[locale]\edit\[id]\page.tsx:776 - <option>고급</option>
+src\app\[locale]\edit\[id]\page.tsx:789 - 상세 임상 정보 입력 (선택)
+src\app\[locale]\edit\[id]\page.tsx:792 - <p className="text-[11px] text-slate-400 mt-1">상세 정보를 입력하면 다른 원장님들이 유사 케이스로 검색하기 쉬워집니다.</p>
+src\app\[locale]\edit\[id]\page.tsx:797 - <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wide block mb-1.5">진단명 (복수 선택)</label>
+src\app\[locale]\edit\[id]\page.tsx:808 - )) : <p className="text-xs text-slate-400 py-1.5">카테고리를 먼저 선택해주세요.</p>}
+src\app\[locale]\edit\[id]\page.tsx:813 - <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wide block mb-1.5">시술/테크닉 (복수 선택)</label>
+src\app\[locale]\edit\[id]\page.tsx:824 - )) : <p className="text-xs text-slate-400 py-1.5">카테고리를 먼저 선택해주세요.</p>}
+src\app\[locale]\edit\[id]\page.tsx:830 - 사용 재료 (선택형 · 복수 선택 가능)
+src\app\[locale]\edit\[id]\page.tsx:833 - {/* 검색 필터 */}
+src\app\[locale]\edit\[id]\page.tsx:839 - placeholder="재료 이름 검색..."
+src\app\[locale]\edit\[id]\page.tsx:846 - {/* 재료 선택 칩 그리드 */}
+src\app\[locale]\edit\[id]\page.tsx:868 - 검색 결과가 없습니다.
+src\app\[locale]\edit\[id]\page.tsx:875 - 선택됨: <span className="font-semibold text-teal-600">{selectedMaterials.join(', ')}</span>
+src\app\[locale]\edit\[id]\page.tsx:880 - {(category === '임플란트' || category === '치주') && (
+src\app\[locale]\edit\[id]\page.tsx:882 - <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wide block mb-1.5">골분류 (Misch)</label>
+src\app\[locale]\edit\[id]\page.tsx:884 - <option value="">선택 안함</option>
+src\app\[locale]\edit\[id]\page.tsx:892 - <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wide block mb-1.5">환자 연령대</label>
+src\app\[locale]\edit\[id]\page.tsx:894 - <option value="">선택 안함</option>
+src\app\[locale]\edit\[id]\page.tsx:899 - <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wide block mb-1.5">환자 성별</label>
+src\app\[locale]\edit\[id]\page.tsx:900 - <select className="select-field" value={patientGender} onChange={e => setPatientGender(e.target.value as '남' | '여')} disabled={isUploading || isDone}>
+src\app\[locale]\edit\[id]\page.tsx:901 - <option value="">선택 안함</option>
+src\app\[locale]\edit\[id]\page.tsx:902 - <option value="남">남성</option>
+src\app\[locale]\edit\[id]\page.tsx:903 - <option value="여">여성</option>
+src\app\[locale]\edit\[id]\page.tsx:909 - <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wide block mb-1.5">전신질환 (복수 선택)</label>
+src\app\[locale]\edit\[id]\page.tsx:932 - 임상 케이스 업로드 정책 및 면책 동의 <span className="text-red-500">*</span>
+src\app\[locale]\edit\[id]\page.tsx:939 - <Info size={12} /> 크게 자세히 보기
+src\app\[locale]\edit\[id]\page.tsx:948 - <p className="font-semibold text-slate-700">제1조 (환자 개인정보 보호의 의무)</p>
+src\app\[locale]\edit\[id]\page.tsx:949 - <p className="mt-0.5">업로더(Uploader)는 업로드하는 임상 영상/이미지 내에 환자의 성명, 생년월일, 연락처, 특정 병원명, 환자 안면 등 식별이 가능한 모든 개인정보가 노출되지 않도록 완전히 비식별화(모자이크 또는 블러 처리)해야 합니다. 이를 해태하여 발생하는 모든 개인정보 관련 민형사상 법적 분쟁 및 행정 책임은 업로더에게 전적으로 귀책됩니다. [클릭하여 크게 보기]</p>
+src\app\[locale]\edit\[id]\page.tsx:962 - 위 임상 케이스 업로드 정책 및 법적 책임/면책 조건을 충분히 이해하였으며, 이에 전적으로 동의합니다. <span className="text-red-500">(필수)</span>
+src\app\[locale]\edit\[id]\page.tsx:969 - <Link href="/" className="btn-secondary flex-1 text-center">취소</Link>
+src\app\[locale]\edit\[id]\page.tsx:975 - {isDone ? '✓ 업로드 완료' : isUploading ? `${progress.percent}% 업로드 중...` : '수정 시작'}
+src\app\[locale]\edit\[id]\page.tsx:981 - {/* 치아 선택 모달 */}
+src\app\[locale]\edit\[id]\page.tsx:986 - <h3 className="text-sm font-semibold text-slate-800">치아 번호 선택 (FDI Notation)</h3>
+src\app\[locale]\edit\[id]\page.tsx:997 - 영구치 (성인)
+src\app\[locale]\edit\[id]\page.tsx:1008 - 유치 (소아)
+src\app\[locale]\edit\[id]\page.tsx:1014 - 환자의 오른쪽이 좌측 화면, 환자의 왼쪽이 우측 화면에 배치됩니다.
+src\app\[locale]\edit\[id]\page.tsx:1020 - {/* 상악 */}
+src\app\[locale]\edit\[id]\page.tsx:1022 - <p className="text-[10px] font-semibold text-slate-400 mb-2 text-center uppercase tracking-wide">상악 (Maxilla)</p>
+src\app\[locale]\edit\[id]\page.tsx:1024 - {/* 상악 우측 */}
+src\app\[locale]\edit\[id]\page.tsx:1042 - {/* 상악 좌측 */}
+src\app\[locale]\edit\[id]\page.tsx:1062 - {/* 하악 */}
+src\app\[locale]\edit\[id]\page.tsx:1064 - <p className="text-[10px] font-semibold text-slate-400 mb-2 text-center uppercase tracking-wide">하악 (Mandible)</p>
+src\app\[locale]\edit\[id]\page.tsx:1066 - {/* 하악 우측 */}
+src\app\[locale]\edit\[id]\page.tsx:1084 - {/* 하악 좌측 */}
+src\app\[locale]\edit\[id]\page.tsx:1106 - {/* 유치 상악 */}
+src\app\[locale]\edit\[id]\page.tsx:1108 - <p className="text-[10px] font-semibold text-slate-400 mb-2 text-center uppercase tracking-wide">상악 (Maxilla)</p>
+src\app\[locale]\edit\[id]\page.tsx:1146 - {/* 유치 하악 */}
+src\app\[locale]\edit\[id]\page.tsx:1148 - <p className="text-[10px] font-semibold text-slate-400 mb-2 text-center uppercase tracking-wide">하악 (Mandible)</p>
+src\app\[locale]\edit\[id]\page.tsx:1190 - 선택된 치아: <span className="font-semibold text-teal-600">{selectedTeeth.length > 0 ? selectedTeeth.map(t => `#${t}`).join(', ') : '없음'}</span>
+src\app\[locale]\edit\[id]\page.tsx:1202 - 선택 완료
+src\app\[locale]\edit\[id]\page.tsx:1209 - 취소
+src\app\[locale]\edit\[id]\page.tsx:1216 - {/* 면책 동의 및 약관 팝업 모달 */}
+src\app\[locale]\edit\[id]\page.tsx:1221 - 임상 케이스 업로드 정책 및 면책 동의
+src\app\[locale]\edit\[id]\page.tsx:1225 - <p className="font-semibold text-slate-800 text-sm mb-1">제1조 (환자 개인정보 보호의 의무)</p>
+src\app\[locale]\edit\[id]\page.tsx:1226 - <p>업로더(Uploader)는 업로드하는 임상 영상/이미지 내에 환자의 성명, 생년월일, 연락처, 특정 병원명, 환자 안면 등 식별이 가능한 모든 개인정보가 노출되지 않도록 완전히 비식별화(모자이크 또는 블러 처리)해야 합니다. 이를 해태하여 발생하는 모든 개인정보 관련 민형사상 법적 분쟁 및 행정 책임은 업로더에게 전적으로 귀책됩니다.</p>
+src\app\[locale]\edit\[id]\page.tsx:1230 - <p className="font-semibold text-slate-800 text-sm mb-1">제2조 (저작권 및 적법성 인증)</p>
+src\app\[locale]\edit\[id]\page.tsx:1231 - <p>업로더는 업로드하는 모든 임상 데이터의 정당한 소유권자이거나, 제3자 배포 및 유료 조회 서비스 제공(RAB 정산)에 대한 적법한 권한이 있음을 보증합니다. 타인의 지식재산권을 무단으로 침해하는 등의 행위로 발생하는 저작권 분쟁 및 민원은 업로더의 책임 하에 면책 없이 해결해야 합니다.</p>
+src\app\[locale]\edit\[id]\page.tsx:1235 - <p className="font-semibold text-slate-800 text-sm mb-1">제3조 (서비스 운영자 면책)</p>
+src\app\[locale]\edit\[id]\page.tsx:1236 - <p>RabTube(서비스 운영자)는 업로더가 제공한 임상 자료의 정확성, 안전성, 의학적 적합성 및 소유권 여부에 대해 보증을 제공하지 않습니다. 본 서비스에 게시된 케이스 자료 활용 및 실제 임상 적용으로 인해 발생하는 결과 및 손해에 대해 운영자는 일체의 책임을 부담하지 않고 면책됩니다.</p>
+src\app\[locale]\edit\[id]\page.tsx:1240 - <p className="font-semibold text-slate-800 text-sm mb-1">제4조 (운영 권한 및 위반 제재)</p>
+src\app\[locale]\edit\[id]\page.tsx:1241 - <p>환자 개인정보 침해, 타인의 권리 침해, 또는 기타 불법적인 게시물임이 신고되거나 인지될 경우, 운영자는 사전 고지 없이 즉시 해당 게시물을 비공개 또는 삭제 조치할 수 있으며, 이와 관련해 지급 예정이었던 모든 RAB 포인트 보상 및 정산은 전면 취소 및 몰수될 수 있습니다.</p>
+src\app\[locale]\edit\[id]\page.tsx:1253 - 동의하고 닫기
+src\app\[locale]\edit\[id]\page.tsx:1260 - 닫기
+src\app\[locale]\marketplace\page.tsx:51 - alert(error.message || '오류가 발생했습니다.');
+src\app\[locale]\marketplace\page.tsx:73 - 쇼핑몰
+src\app\[locale]\marketplace\page.tsx:79 - 상품등록 요청
+src\app\[locale]\marketplace\page.tsx:89 - 전체
+src\app\[locale]\marketplace\page.tsx:136 - 상품등록 신청하기
+src\app\[locale]\marketplace\product\[id]\page.tsx:43 - if (isLoading) return <div className="p-8 text-center">불러오는 중...</div>;
+src\app\[locale]\marketplace\product\[id]\page.tsx:44 - if (error || !data?.success) return <div className="p-8 text-center text-red-500">상품을 불러올 수 없습니다.</div>;
+src\app\[locale]\marketplace\product\[id]\page.tsx:51 - if (!user) return alert('로그인이 필요합니다.');
+src\app\[locale]\marketplace\product\[id]\page.tsx:52 - if (!shippingAddress) return alert('배송지 주소를 입력해주세요.');
+src\app\[locale]\marketplace\product\[id]\page.tsx:53 - if (product.stock < quantity) return alert('재고가 부족합니다.');
+src\app\[locale]\marketplace\product\[id]\page.tsx:54 - if (!hasEnoughRab) return alert('RAB 잔액이 부족합니다.');
+src\app\[locale]\marketplace\product\[id]\page.tsx:56 - if (!confirm(`총 ${totalRab.toLocaleString()} RAB를 결제하시겠습니까?`)) return;
+src\app\[locale]\marketplace\product\[id]\page.tsx:61 - alert('결제가 완료되었습니다. 주문 내역에서 확인하세요.');
+src\app\[locale]\marketplace\product\[id]\page.tsx:65 - alert(error.message || '결제 중 오류가 발생했습니다.');
+src\app\[locale]\marketplace\product\[id]\page.tsx:74 - <Link href="/marketplace" className="text-sm text-gray-500 hover:text-gray-900">&larr; 마켓플레이스로 돌아가기</Link>
+src\app\[locale]\marketplace\product\[id]\page.tsx:79 - {/* 상품 이미지 영역 */}
+src\app\[locale]\marketplace\product\[id]\page.tsx:84 - <span className="text-gray-400">이미지 준비 중</span>
+src\app\[locale]\marketplace\product\[id]\page.tsx:88 - {/* 상품 정보 및 결제 폼 */}
+src\app\[locale]\marketplace\product\[id]\page.tsx:102 - {product.description || '상세 설명이 없습니다.'}
+src\app\[locale]\marketplace\product\[id]\page.tsx:105 - {/* 결제/주문 폼 */}
+src\app\[locale]\marketplace\product\[id]\page.tsx:108 - <span className="font-medium text-gray-700">구매 수량</span>
+src\app\[locale]\marketplace\product\[id]\page.tsx:121 - <div className="text-right text-xs text-gray-500">남은 재고: {product.stock}{product.unit}</div>
+src\app\[locale]\marketplace\product\[id]\page.tsx:124 - <label className="block text-sm font-medium text-gray-700 mb-1">배송지 주소</label>
+src\app\[locale]\marketplace\product\[id]\page.tsx:129 - placeholder="병원 주소를 입력해주세요"
+src\app\[locale]\marketplace\product\[id]\page.tsx:135 - <label className="block text-sm font-medium text-gray-700 mb-1">배송 메모</label>
+src\app\[locale]\marketplace\product\[id]\page.tsx:140 - placeholder="배송 전 연락주세요"
+src\app\[locale]\marketplace\product\[id]\page.tsx:147 - <span className="text-gray-600">총 결제 RAB</span>
+src\app\[locale]\marketplace\product\[id]\page.tsx:157 - {purchasing ? '결제 처리 중...' :
+src\app\[locale]\marketplace\product\[id]\page.tsx:158 - !hasEnoughRab ? 'RAB 잔액 부족' :
+src\app\[locale]\marketplace\product\[id]\page.tsx:159 - product.stock < quantity ? '재고 부족' : 'RAB로 구매하기'}
+src\app\[locale]\marketplace\product\[id]\page.tsx:163 - 로그인 후 구매 가능합니다
+src\app\[locale]\marketplace\product\[id]\page.tsx:168 - 보유 RAB: <span className="font-bold">{balance?.balance?.toLocaleString() || 0} RAB</span>
+src\app\[locale]\marketplace\product-request\new\page.tsx:27 - unit: '개',
+src\app\[locale]\marketplace\product-request\new\page.tsx:58 - alert(error.message || '등록 중 오류가 발생했습니다.');
+src\app\[locale]\marketplace\product-request\new\page.tsx:126 - <option value="개">{t('unitEa')}</option>
+src\app\[locale]\marketplace\product-request\new\page.tsx:127 - <option value="박스">{t('unitBox')}</option>
+src\app\[locale]\marketplace\product-request\new\page.tsx:128 - <option value="세트">{t('unitSet')}</option>
+src\app\[locale]\marketplace\product-request\new\page.tsx:129 - <option value="기타">{t('unitOther')}</option>
+src\app\[locale]\marketplace\product-request\new\page.tsx:212 - 취소
+src\app\[locale]\my\page.tsx:31 - if (!confirm(`"${v.title}" 케이스를 삭제하시겠습니까?`)) return;
+src\app\[locale]\my\page.tsx:41 - <h1 className="text-lg font-medium text-slate-800">내 케이스</h1>
+src\app\[locale]\my\page.tsx:42 - <p className="text-xs text-slate-400 mt-0.5">{profile?.name} 원장 · {profile?.hospital}</p>
+src\app\[locale]\my\page.tsx:45 - <Plus size={14} />케이스 업로드
+src\app\[locale]\my\page.tsx:56 - <p className="text-sm font-medium text-slate-500">아직 업로드한 케이스가 없습니다</p>
+src\app\[locale]\my\page.tsx:58 - <Plus size={14} />첫 케이스 업로드
+src\app\[locale]\my\page.tsx:87 - title="수정"
+src\app\[locale]\my\page.tsx:90 - <span className="text-[10px] font-bold">수정</span>
+src\app\[locale]\my\page.tsx:95 - title="삭제"
+src\app\[locale]\my\page.tsx:98 - <span className="text-[10px] font-bold">삭제</span>
+src\app\[locale]\points\page.tsx:157 - <p className="text-sm">아직 {t('history_title')}이 없습니다</p>
+src\app\[locale]\search\page.tsx:14 - const CATEGORIES: CaseCategory[] = ['임플란트', '보철', '치주', '교정', '보존', '소아', '구강외과'];
+src\app\[locale]\search\page.tsx:15 - const BONE_CLASSES: BoneClassification[] = ['Class I', 'Class II', 'Class III', 'Class IV', '해당없음'];
+src\app\[locale]\search\page.tsx:16 - const PATIENT_AGES: PatientAgeRange[] = ['10대', '20대', '30대', '40대', '50대', '60대', '70대이상'];
+src\app\[locale]\search\page.tsx:34 - const [patientGender, setPatientGender] = useState<'남' | '여' | ''>('');
+src\app\[locale]\search\page.tsx:61 - setIsAdvancedOpen(false); // 검색 후 필터 닫기
+src\app\[locale]\search\page.tsx:84 - const showBoneClassification = category === '임플란트' || category === '치주';
+src\app\[locale]\search\page.tsx:92 - 케이스 검색
+src\app\[locale]\search\page.tsx:101 - 임상 조건 매칭
+src\app\[locale]\search\page.tsx:109 - 키워드 검색
+src\app\[locale]\search\page.tsx:114 - {/* 검색 패널 */}
+src\app\[locale]\search\page.tsx:120 - placeholder={mode === 'clinical' ? "키워드 추가 필터 (선택)" : "검색어를 입력하세요 (예: 임플란트 뼈이식)"}
+src\app\[locale]\search\page.tsx:129 - {loading ? '검색 중...' : '검색'}
+src\app\[locale]\search\page.tsx:140 - 임상 조건 상세 필터
+src\app\[locale]\search\page.tsx:147 - {/* 카테고리 & 치아 */}
+src\app\[locale]\search\page.tsx:150 - <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wide block mb-1.5">진료 분야</label>
+src\app\[locale]\search\page.tsx:152 - <option value="">모든 분야</option>
+src\app\[locale]\search\page.tsx:157 - <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wide block mb-1.5">치아 번호</label>
+src\app\[locale]\search\page.tsx:158 - <input type="text" className="input-field" placeholder="예: #16, #26, 상악" value={toothNumber} onChange={e => setToothNumber(e.target.value)} />
+src\app\[locale]\search\page.tsx:162 - {/* 진단 & 테크닉 */}
+src\app\[locale]\search\page.tsx:165 - <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wide block mb-1.5">진단명 (복수 선택)</label>
+src\app\[locale]\search\page.tsx:175 - )) : <p className="text-xs text-slate-400 py-1.5">진료 분야를 먼저 선택해주세요.</p>}
+src\app\[locale]\search\page.tsx:179 - <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wide block mb-1.5">시술 / 테크닉 (복수 선택)</label>
+src\app\[locale]\search\page.tsx:189 - )) : <p className="text-xs text-slate-400 py-1.5">진료 분야를 먼저 선택해주세요.</p>}
+src\app\[locale]\search\page.tsx:194 - {/* 재료 & 환자 */}
+src\app\[locale]\search\page.tsx:197 - <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wide block mb-1.5">사용 재료</label>
+src\app\[locale]\search\page.tsx:198 - <input type="text" className="input-field" placeholder="예: Osstem, Bio-Oss" value={materials} onChange={e => setMaterials(e.target.value)} />
+src\app\[locale]\search\page.tsx:200 - <p className="text-[10px] text-slate-400 mt-1 truncate">추천: {MATERIAL_PRESETS[category as CaseCategory].join(', ')}</p>
+src\app\[locale]\search\page.tsx:205 - <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wide block mb-1.5">골분류 (Misch)</label>
+src\app\[locale]\search\page.tsx:207 - <option value="">상관없음</option>
+src\app\[locale]\search\page.tsx:217 - <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wide block mb-1.5">환자 연령대</label>
+src\app\[locale]\search\page.tsx:219 - <option value="">상관없음</option>
+src\app\[locale]\search\page.tsx:224 - <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wide block mb-1.5">환자 성별</label>
+src\app\[locale]\search\page.tsx:225 - <select className="select-field" value={patientGender} onChange={e => setPatientGender(e.target.value as '남' | '여')}>
+src\app\[locale]\search\page.tsx:226 - <option value="">상관없음</option>
+src\app\[locale]\search\page.tsx:227 - <option value="남">남성</option>
+src\app\[locale]\search\page.tsx:228 - <option value="여">여성</option>
+src\app\[locale]\search\page.tsx:233 - <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wide block mb-1.5">전신질환 (복수 선택)</label>
+src\app\[locale]\search\page.tsx:254 - {/* 검색 결과 */}
+src\app\[locale]\search\page.tsx:271 - <p className="text-sm font-medium text-slate-500">일치하는 케이스를 찾지 못했습니다</p>
+src\app\[locale]\search\page.tsx:272 - <p className="text-xs mt-1">검색 조건을 변경해 보세요</p>
+src\app\[locale]\search\page.tsx:277 - 검색 결과 <span className="font-bold text-teal-600">{results.length}</span>건
+src\app\[locale]\search\page.tsx:288 - <p className="text-sm font-medium text-slate-500">내 환자와 비슷한 케이스를 찾아보세요</p>
+src\app\[locale]\test-helper\page.tsx:16 - setMsg('로그인이 필요합니다.');
+src\app\[locale]\test-helper\page.tsx:25 - setMsg('성공적으로 변경되었습니다!');
+src\app\[locale]\test-helper\page.tsx:27 - setMsg(`변경 실패: ${e.message}`);
+src\app\[locale]\test-helper\page.tsx:42 - <h1 className="text-xl font-bold text-slate-900">검증 헬퍼 (Test Helper)</h1>
+src\app\[locale]\test-helper\page.tsx:43 - <p className="text-xs text-slate-500 font-medium">유저 권한 및 상태 강제 시뮬레이션</p>
+src\app\[locale]\test-helper\page.tsx:49 - <p className="text-sm font-bold text-slate-600 mb-4">로그인한 유저가 없습니다.</p>
+src\app\[locale]\test-helper\page.tsx:51 - 로그인 페이지로 이동
+src\app\[locale]\test-helper\page.tsx:58 - <h3 className="text-xs font-bold text-slate-400 mb-3 tracking-wide uppercase">현재 로그인 정보</h3>
+src\app\[locale]\test-helper\page.tsx:60 - <div>이름: <span className="font-bold text-slate-900">{profile?.name || '없음'}</span></div>
+src\app\[locale]\test-helper\page.tsx:61 - <div>이메일: <span className="font-bold text-slate-900">{user.email}</span></div>
+src\app\[locale]\test-helper\page.tsx:62 - <div>상태: <span className="font-extrabold text-teal-600">{profile?.status || '없음'}</span></div>
+src\app\[locale]\test-helper\page.tsx:63 - <div>역할: <span className="font-extrabold text-indigo-600">{profile?.role || '없음'}</span></div>
+src\app\[locale]\test-helper\page.tsx:70 - <RefreshCw size={12} /> 정보 새로고침
+src\app\[locale]\test-helper\page.tsx:76 - <h3 className="text-xs font-bold text-slate-400 tracking-wide uppercase">1. 면허 승인 상태 시뮬레이션</h3>
+src\app\[locale]\test-helper\page.tsx:88 - PENDING (검토대기)
+src\app\[locale]\test-helper\page.tsx:91 - onClick={() => updateProfileFields({ status: 'rejected', rejectionReason: '제출된 면허증 사진이 흐릿하여 식별 불가합니다.' })}
+src\app\[locale]\test-helper\page.tsx:99 - REJECTED (반려)
+src\app\[locale]\test-helper\page.tsx:110 - APPROVED (정회원)
+src\app\[locale]\test-helper\page.tsx:117 - <h3 className="text-xs font-bold text-slate-400 tracking-wide uppercase">2. 역할(Role) 시뮬레이션</h3>
+src\app\[locale]\test-helper\page.tsx:128 - <Key size={13} /> 관리자(admin) 지정
+src\app\[locale]\test-helper\page.tsx:139 - 일반 유저(user) 지정
+src\app\[locale]\test-helper\page.tsx:157 - <ShieldAlert size={16} /> 회원 승인 대시보드(/admin) 바로가기
+src\app\[locale]\test-video\page.tsx:6 - <h1 className="text-2xl font-bold mb-4">비디오 플레이어 테스트</h1>
+src\app\[locale]\test-video\page.tsx:7 - <p className="mb-8 text-slate-600">이 영상이 정상적으로 재생된다면, 플레이어 코드나 브라우저 설정에는 문제가 없는 것입니다. (업로드하신 원본 영상의 코덱이나 인코딩 문제일 확률이 100%입니다.)</p>
+src\app\[locale]\upload\page.tsx:19 - const CATEGORIES: CaseCategory[] = ['임플란트', '보철', '치주', '교정', '보존', '소아', '구강외과'];
+src\app\[locale]\upload\page.tsx:20 - const BONE_CLASSES: BoneClassification[] = ['Class I', 'Class II', 'Class III', 'Class IV', '해당없음'];
+src\app\[locale]\upload\page.tsx:21 - const PATIENT_AGES: PatientAgeRange[] = ['10대', '20대', '30대', '40대', '50대', '60대', '70대이상'];
+src\app\[locale]\upload\page.tsx:22 - const PRESET_TAGS = ['즉시식립', '골이식', 'GBR', '상악동거상', '발치후즉시', '전치부', '구치부', '지르코니아', '라미네이트', '레진', '인레이', '의치', '근관치료', '치은이식'];
+src\app\[locale]\upload\page.tsx:32 - case '임플란트': return tCat('cat_implant');
+src\app\[locale]\upload\page.tsx:33 - case '보철': return tCat('cat_prosthetics');
+src\app\[locale]\upload\page.tsx:34 - case '치주': return tCat('cat_perio');
+src\app\[locale]\upload\page.tsx:35 - case '교정': return tCat('cat_ortho');
+src\app\[locale]\upload\page.tsx:36 - case '보존': return tCat('cat_cons');
+src\app\[locale]\upload\page.tsx:37 - case '소아': return tCat('cat_pedo');
+src\app\[locale]\upload\page.tsx:38 - case '구강외과': return tCat('cat_surgery');
+src\app\[locale]\upload\page.tsx:71 - const [difficulty, setDifficulty] = useState<Difficulty>('중급');
+src\app\[locale]\upload\page.tsx:72 - const [visibility, setVisibility] = useState<Visibility>('회원전용');
+src\app\[locale]\upload\page.tsx:73 - const [price, setPrice] = useState<number>(50); // 기본 가격을 50 RAB으로 {t('change')} (0 ~ 10,000 범위)
+src\app\[locale]\upload\page.tsx:104 - const [patientGender, setPatientGender] = useState<'남' | '여' | ''>('');
+src\app\[locale]\upload\page.tsx:178 - alert('동영상 파일을 선택해 주세요.');
+src\app\[locale]\upload\page.tsx:182 - alert('로그인이 필요합니다.');
+src\app\[locale]\upload\page.tsx:186 - alert('원장님의 프로필 정보를 불러오는 중입니다. 잠시만 기다려 주세요.');
+src\app\[locale]\upload\page.tsx:190 - alert('케이스 제목을 입력해 주세요.');
+src\app\[locale]\upload\page.tsx:194 - alert('케이스 카테고리를 선택해 주세요.');
+src\app\[locale]\upload\page.tsx:198 - alert(`${t('policy_modal_title')}에 동의해 주세요.`);
+src\app\[locale]\upload\page.tsx:202 - alert('열람 가격은 0 RAB에서 10,000 RAB 사이여야 합니다.');
+src\app\[locale]\upload\page.tsx:208 - alert(`업로드 수수료(${uploadFee.toLocaleString()} RAB)를 결제하기 위한 잔액이 부족합니다.\n현재 잔액: ${userBalance.toLocaleString()} RAB\n\n먼저 포인트를 충전해 주세요.`);
+src\app\[locale]\upload\page.tsx:433 - <span className="text-[10px] font-medium text-slate-800 bg-white/80 px-1.5 rounded">직접 업로드됨</span>
+src\app\[locale]\upload\page.tsx:499 - <option value="xlarge">매우 {t('size_lrg')}</option>
+src\app\[locale]\upload\page.tsx:508 - { name: '흰색', value: '#FFFFFF', bg: 'bg-white border border-slate-300' },
+src\app\[locale]\upload\page.tsx:509 - { name: '노랑', value: '#FFEB3B', bg: 'bg-yellow-300' },
+src\app\[locale]\upload\page.tsx:510 - { name: '검정', value: '#000000', bg: 'bg-black' }
+src\app\[locale]\upload\page.tsx:553 - 아이폰 카메라의 기본 설정(고효율)으로 촬영한 영상은 윈도우 PC 환경에서 재생되지 않을 수 있습니다.<br />
+src\app\[locale]\upload\page.tsx:554 - 가장 빠른 업로드 속도와 완벽한 호환성을 위해 <strong>[설정] ➔ [카메라] ➔ [포맷]</strong> 에서 <strong>&apos;높은 호환성&apos;</strong>으로 설정 후 촬영하시기를 강력히 권장드립니다.
+src\app\[locale]\upload\page.tsx:571 - <option value="">선택하세요</option>
+src\app\[locale]\upload\page.tsx:582 - placeholder="선택 버튼을 클릭하세요"
+src\app\[locale]\upload\page.tsx:668 - <option value="전체공개">{t('vis_pub')}</option>
+src\app\[locale]\upload\page.tsx:669 - <option value="회원전용">{t('vis_mem')}</option>
+src\app\[locale]\upload\page.tsx:670 - <option value="비공개">{t('vis_priv')}</option>
+src\app\[locale]\upload\page.tsx:731 - <span className="font-medium text-amber-900 bg-amber-100/50 px-1.5 py-0.5 rounded text-[10px]">10 RAB씩 {t('change')} 가능</span>
+src\app\[locale]\upload\page.tsx:791 - )) : <p className="text-xs text-slate-400 py-1.5">카테고리를 먼저 선택해주세요.</p>}
+src\app\[locale]\upload\page.tsx:807 - )) : <p className="text-xs text-slate-400 py-1.5">카테고리를 먼저 선택해주세요.</p>}
+src\app\[locale]\upload\page.tsx:816 - {/* 검색 필터 */}
+src\app\[locale]\upload\page.tsx:829 - {/* 재료 선택 칩 그리드 */}
+src\app\[locale]\upload\page.tsx:863 - {(category === '임플란트' || category === '치주') && (
+src\app\[locale]\upload\page.tsx:883 - <select className="select-field" value={patientGender} onChange={e => setPatientGender(e.target.value as '남' | '여')} disabled={isUploading || isDone}>
+src\app\[locale]\upload\page.tsx:885 - <option value="남">{t('gender_m')}</option>
+src\app\[locale]\upload\page.tsx:886 - <option value="여">{t('gender_f')}</option>
+src\app\[locale]\upload\page.tsx:922 - <Info size={12} /> {t('size_lrg')} 자세히 보기
+src\app\[locale]\upload\page.tsx:931 - <p className="font-semibold text-slate-700">제1조 (환자 개인정보 보호의 의무)</p>
+src\app\[locale]\upload\page.tsx:932 - <p className="mt-0.5">업로더(Uploader)는 업로드하는 임상 영상/이미지 내에 환자의 성명, 생년월일, 연락처, 특정 병원명, 환자 안면 등 식별이 가능한 모든 개인정보가 노출되지 않도록 완전히 비식별화(모자이크 또는 블러 처리)해야 합니다. 이를 해태하여 발생하는 모든 개인정보 관련 민형사상 법적 분쟁 및 행정 책임은 업로더에게 전적으로 귀책됩니다. [클릭하여 {t('size_lrg')} 보기]</p>
+src\app\[locale]\upload\page.tsx:950 - <span dangerouslySetInnerHTML={{ __html: t('policy_agree_text').replace('(필수)', '<span class="text-red-500">(필수)</span>') }} />
+src\app\[locale]\upload\page.tsx:969 - {/* {t('tooth_btn')} 모달 */}
+src\app\[locale]\upload\page.tsx:1008 - {/* 상악 */}
+src\app\[locale]\upload\page.tsx:1012 - {/* 상악 우측 */}
+src\app\[locale]\upload\page.tsx:1030 - {/* 상악 좌측 */}
+src\app\[locale]\upload\page.tsx:1050 - {/* 하악 */}
+src\app\[locale]\upload\page.tsx:1054 - {/* 하악 우측 */}
+src\app\[locale]\upload\page.tsx:1072 - {/* 하악 좌측 */}
+src\app\[locale]\upload\page.tsx:1094 - {/* 유치 상악 */}
+src\app\[locale]\upload\page.tsx:1134 - {/* 유치 하악 */}
+src\app\[locale]\upload\page.tsx:1178 - 선택된 치아: <span className="font-semibold text-teal-600">{selectedTeeth.length > 0 ? selectedTeeth.map(t => `#${t}`).join(', ') : '없음'}</span>
+src\app\[locale]\upload\page.tsx:1204 - {/* 면책 동의 및 약관 팝업 모달 */}
+src\app\[locale]\upload\page.tsx:1213 - <p className="font-semibold text-slate-800 text-sm mb-1">제1조 (환자 개인정보 보호의 의무)</p>
+src\app\[locale]\upload\page.tsx:1214 - <p>업로더(Uploader)는 업로드하는 임상 영상/이미지 내에 환자의 성명, 생년월일, 연락처, 특정 병원명, 환자 안면 등 식별이 가능한 모든 개인정보가 노출되지 않도록 완전히 비식별화(모자이크 또는 블러 처리)해야 합니다. 이를 해태하여 발생하는 모든 개인정보 관련 민형사상 법적 분쟁 및 행정 책임은 업로더에게 전적으로 귀책됩니다.</p>
+src\app\[locale]\upload\page.tsx:1218 - <p className="font-semibold text-slate-800 text-sm mb-1">제2조 (저작권 및 적법성 인증)</p>
+src\app\[locale]\upload\page.tsx:1219 - <p>업로더는 업로드하는 모든 임상 데이터의 정당한 소유권자이거나, 제3자 배포 및 유료 조회 서비스 제공(RAB 정산)에 대한 적법한 권한이 있음을 보증합니다. 타인의 지식재산권을 무단으로 침해하는 등의 행위로 발생하는 저작권 분쟁 및 민원은 업로더의 책임 하에 면책 없이 해결해야 합니다.</p>
+src\app\[locale]\upload\page.tsx:1223 - <p className="font-semibold text-slate-800 text-sm mb-1">제3조 (서비스 운영자 면책)</p>
+src\app\[locale]\upload\page.tsx:1224 - <p>RabTube(서비스 운영자)는 업로더가 제공한 임상 자료의 정확성, 안전성, 의학적 적합성 및 소유권 여부에 대해 보증을 제공하지 않습니다. 본 서비스에 게시된 케이스 자료 활용 및 실제 임상 적용으로 인해 발생하는 결과 및 손해에 대해 운영자는 일체의 책임을 부담하지 않고 면책됩니다.</p>
+src\app\[locale]\upload\page.tsx:1228 - <p className="font-semibold text-slate-800 text-sm mb-1">제4조 (운영 권한 및 위반 제재)</p>
+src\app\[locale]\upload\page.tsx:1229 - <p>환자 개인정보 침해, 타인의 권리 침해, 또는 기타 불법적인 게시물임이 신고되거나 인지될 경우, 운영자는 사전 고지 없이 즉시 해당 게시물을 {t('vis_priv')} 또는 삭제 조치할 수 있으며, 이와 관련해 지급 예정이었던 모든 RAB 포인트 보상 및 정산은 전면 {t('btn_cancel')} 및 몰수될 수 있습니다.</p>
+src\components\CaseStepEditor.tsx:22 - label: '원인 / 초진',
+src\components\CaseStepEditor.tsx:28 - label: '치료 과정',
+src\components\CaseStepEditor.tsx:34 - label: '치료 결과',
+src\components\CaseStepEditor.tsx:48 - CaseStepEditor — 타임라인 단계 에디터
+src\components\CaseStepEditor.tsx:126 - {/* ── 섹션 헤더 ── */}
+src\components\CaseStepEditor.tsx:129 - <h3 className="text-sm font-bold text-slate-700">치료 타임라인 *</h3>
+src\components\CaseStepEditor.tsx:131 - 치료 과정을 단계별로 기록해 주세요 · 사진 {totalImages}장
+src\components\CaseStepEditor.tsx:140 - <Plus size={14} /> 과정 추가
+src\components\CaseStepEditor.tsx:144 - {/* ── 타임라인 ── */}
+src\components\CaseStepEditor.tsx:146 - {/* 세로 연결선 */}
+src\components\CaseStepEditor.tsx:153 - const placeholderLabel = step.type === 'cause' ? '예) 치주 질환' :
+src\components\CaseStepEditor.tsx:154 - step.type === 'result' ? '예) 완치 결과' : `예) ${idx}차 치료`;
+src\components\CaseStepEditor.tsx:158 - {/* 도트 */}
+src\components\CaseStepEditor.tsx:163 - {/* 카드 */}
+src\components\CaseStepEditor.tsx:165 - {/* 헤더 */}
+src\components\CaseStepEditor.tsx:176 - title="이 단계 삭제"
+src\components\CaseStepEditor.tsx:183 - {/* 단계명 */}
+src\components\CaseStepEditor.tsx:193 - {/* 설명 */}
+src\components\CaseStepEditor.tsx:195 - placeholder="이 단계의 상세 설명 (선택)"
+src\components\CaseStepEditor.tsx:203 - {/* 사진 그리드 */}
+src\components\CaseStepEditor.tsx:221 - {/* 사진 추가 버튼 */}
+src\components\CaseStepEditor.tsx:251 - JPG, PNG, WebP · 단계당 최대 {MAX_IMAGES_PER_STEP}장
+src\components\CaseStepEditor.tsx:261 - {/* ── 과정 추가 버튼 (하단) ── */}
+src\components\CaseStepEditor.tsx:269 - <Plus size={14} /> 치료 과정 단계 추가
+src\components\CaseTimeline.tsx:12 - label: '원인 / 초진',
+src\components\CaseTimeline.tsx:18 - label: '치료 과정',
+src\components\CaseTimeline.tsx:24 - label: '치료 결과',
+src\components\CaseTimeline.tsx:36 - CaseTimeline — 열람용 타임라인 뷰어
+src\components\CaseTimeline.tsx:52 - {/* 섹션 타이틀 */}
+src\components\CaseTimeline.tsx:55 - 치료 타임라인
+src\components\CaseTimeline.tsx:59 - {/* 세로 연결선 */}
+src\components\CaseTimeline.tsx:67 - {/* 도트 */}
+src\components\CaseTimeline.tsx:72 - {/* 카드 */}
+src\components\CaseTimeline.tsx:88 - {/* 사진 그리드 */}
+src\components\CaseTimeline.tsx:114 - {/* ── Lightbox 모달 ── */}
+src\components\CaseTimeline.tsx:129 - alt="확대 이미지"
+src\components\Header.tsx:149 - <ShoppingBag size={14} /> 마켓플레이스
+src\components\Header.tsx:157 - <CreditCard size={14} />RAB 충전
+src\components\LandingPage.tsx:23 - const [uploadCat, setUploadCat] = useState('임플란트');
+src\components\LandingPage.tsx:24 - const [uploadDiff, setUploadDiff] = useState('중급');
+src\components\LandingPage.tsx:73 - const demoBonus = uploadDiff === '고급' ? 18 : uploadDiff === '중급' ? 14 : 8;
+src\components\LicenseGate.tsx:13 - * LicenseGate — 준회원/검토대기/반려 상태에서 핵심 기능을 차단하는 게이트 컴포넌트
+src\components\LicenseGate.tsx:15 - * status별 표시:
+src\components\LicenseGate.tsx:16 - *  ASSOCIATE → 면허증 업로드 드롭존
+src\components\LicenseGate.tsx:17 - *  PENDING   → 검토 대기 안내
+src\components\LicenseGate.tsx:18 - *  REJECTED  → 반려 사유 + 재업로드
+src\components\LicenseGate.tsx:19 - *  APPROVED  → 렌더하지 않음 (null)
+src\components\LicenseGate.tsx:61 - {/* ── PENDING 또는 REJECTED 후 재업로드: 면허증 업로드 ── */}
+src\components\LicenseGate.tsx:69 - <h2 className="text-lg font-bold text-slate-900 leading-snug">정회원 인증이 필요합니다</h2>
+src\components\LicenseGate.tsx:71 - 치과의사 면허증을 업로드하시면 관리자 검토 후 정회원으로 승인됩니다.
+src\components\LicenseGate.tsx:91 - {isDragActive ? '파일을 여기에 놓으세요' : '보건복지부 치과의사 면허증'}
+src\components\LicenseGate.tsx:94 - PDF 또는 사진 파일 (JPG, PNG) · 최대 20MB
+src\components\LicenseGate.tsx:110 - <><CheckCircle size={14} className="text-teal-500" /> 면허증이 성공적으로 제출되었습니다!</>
+src\components\LicenseGate.tsx:112 - `${progress.percent}% 업로드 중...`
+src\components\LicenseGate.tsx:121 - {progress.error || '업로드 중 오류가 발생했습니다'}
+src\components\LicenseGate.tsx:126 - <p className="font-bold text-slate-600 mb-1">📋 제출 안내</p>
+src\components\LicenseGate.tsx:128 - <li>보건복지부 발급 치과의사 면허증 원본 사진 또는 PDF</li>
+src\components\LicenseGate.tsx:129 - <li>영업일 기준 1~2일 내 검토 완료</li>
+src\components\LicenseGate.tsx:130 - <li>승인 완료 후 모든 기능을 이용하실 수 있습니다</li>
+src\components\LicenseGate.tsx:136 - {/* ── PENDING: 검토 대기 ── */}
+src\components\LicenseGate.tsx:142 - <h2 className="text-lg font-bold text-slate-900 mb-2">면허증 검토 중입니다</h2>
+src\components\LicenseGate.tsx:144 - 제출해 주신 면허증을 관리자가 확인하고 있습니다.<br />
+src\components\LicenseGate.tsx:145 - <span className="font-semibold text-slate-600">영업일 기준 1~2일</span> 내에 승인이 완료됩니다.
+src\components\LicenseGate.tsx:149 - 제출 일시: {profile.licenseSubmittedAt.toLocaleDateString('ko-KR')}
+src\components\LicenseGate.tsx:156 - <RefreshCw size={14} /> 승인 상태 새로고침
+src\components\LicenseGate.tsx:161 - {/* ── REJECTED: 반려 ── */}
+src\components\LicenseGate.tsx:167 - <h2 className="text-lg font-bold text-slate-900 mb-2">면허 인증이 반려되었습니다</h2>
+src\components\LicenseGate.tsx:170 - <p className="font-bold text-red-800 mb-1">반려 사유</p>
+src\components\LicenseGate.tsx:175 - 면허증을 다시 제출하시면 재검토가 진행됩니다.
+src\components\LicenseGate.tsx:181 - 면허증 재업로드
+src\components\MobileDrawer.tsx:24 - { href: '/marketplace', icon: ShoppingBag, label: '마켓플레이스' },
+src\components\MobileDrawer.tsx:26 - { href: '/billing', icon: CreditCard, label: 'RAB 충전' },
+src\components\PurchaseModal.tsx:24 - alert(`구매 수량은 최소 ${MIN_RAB.toLocaleString()} RAB 부터 최대 ${MAX_RAB.toLocaleString()} RAB 까지 가능합니다.`);
+src\components\PurchaseModal.tsx:34 - alert(`🪙 [테스트 충전] ${rabAmount.toLocaleString()} RAB가 즉시 지급되었습니다!`);
+src\components\PurchaseModal.tsx:53 - throw new Error(data.error || '결제 요청 실패');
+src\components\PurchaseModal.tsx:59 - throw new Error('결제 세션 URL이 전달되지 않았습니다.');
+src\components\PurchaseModal.tsx:63 - alert(`결제 요청 중 오류가 발생했습니다: ${e.message}`);
+src\components\PurchaseModal.tsx:90 - RAB 충전하기
+src\components\PurchaseModal.tsx:98 - <label className="block text-xs font-medium text-slate-500 mb-2">충전할 RAB 수량 (최소 {MIN_RAB.toLocaleString()} RAB / $10)</label>
+src\components\PurchaseModal.tsx:134 - <p className="text-[11px] text-amber-600 font-medium mb-1">총 결제 금액 (USD)</p>
+src\components\PurchaseModal.tsx:137 - 1 RAB = $0.01988 USD 고정 환율 적용 (충전 할인 없음)
+src\components\PurchaseModal.tsx:149 - Stripe 안전 결제창으로 이동 중...
+src\components\PurchaseModal.tsx:152 - `$${billing.price.toFixed(2)} USD 결제하기`
+src\components\QualityBadge.tsx:32 - none:   { bg: 'bg-slate-50',  border: 'border-slate-200', text: 'text-slate-500', label: '일반'       },
+src\components\QualityBadge.tsx:36 - { key: 'durationPass',     label: '영상 길이 (최소 2분)' },
+src\components\QualityBadge.tsx:37 - { key: 'isDentalContent',  label: '치과 콘텐츠 감지' },
+src\components\QualityBadge.tsx:38 - { key: 'noFaceDetected',   label: '환자 얼굴 미노출' },
+src\components\QualityBadge.tsx:39 - { key: 'notDuplicate',     label: '중복 영상 없음' },
+src\components\QualityBadge.tsx:40 - { key: 'notStaticFrame',   label: '정상 영상 (정지화면 아님)' },
+src\components\QualityBadge.tsx:62 - <Clock size={12} />검수 중...
+src\components\QualityBadge.tsx:68 - <Clock size={12} />검수 대기
+src\components\QualityBadge.tsx:86 - <XCircle size={10} />검수 실패
+src\components\QualityBadge.tsx:91 - <AlertTriangle size={10} />검토 중
+src\components\QualityBadge.tsx:95 - <span className="text-[10px] text-slate-400">{score}점</span>
+src\components\QualityBadge.tsx:108 - {/* 헤더 */}
+src\components\QualityBadge.tsx:115 - {verdict === 'pass' ? 'AI 품질 검수 통과' :
+src\components\QualityBadge.tsx:116 - verdict === 'fail' ? 'AI 품질 검수 실패' : 'AI 검토 중'}
+src\components\QualityBadge.tsx:128 - <span className="text-sm font-medium text-slate-700">{score}점</span>
+src\components\QualityBadge.tsx:134 - {/* 점수 바 */}
+src\components\QualityBadge.tsx:150 - {/* AI 체크 항목 */}
+src\components\QualityBadge.tsx:168 - {/* 실패 사유 */}
+src\components\QualityBadge.tsx:180 - {/* 신고 수 */}
+src\components\QualityBadge.tsx:184 - 커뮤니티 신고 {quality.communityFlags}건
+src\components\RabBadge.tsx:26 - title="RAB 포인트 내역으로 이동"
+src\components\SearchResultCard.tsx:12 - 임플란트: 'bg-teal-50 text-teal-700 border-teal-100',
+src\components\SearchResultCard.tsx:13 - 보철:     'bg-blue-50 text-blue-700 border-blue-100',
+src\components\SearchResultCard.tsx:14 - 치주:     'bg-amber-50 text-amber-700 border-amber-100',
+src\components\SearchResultCard.tsx:15 - 교정:     'bg-violet-50 text-violet-700 border-violet-100',
+src\components\SearchResultCard.tsx:16 - 보존:     'bg-emerald-50 text-emerald-700 border-emerald-100',
+src\components\SearchResultCard.tsx:17 - 소아:     'bg-pink-50 text-pink-700 border-pink-100',
+src\components\SearchResultCard.tsx:18 - 구강외과:  'bg-red-50 text-red-700 border-red-100',
+src\components\SearchResultCard.tsx:77 - {score}% 일치
+src\components\SearchResultCard.tsx:94 - {/* 매칭된 조건 표시 */}
+src\components\SearchResultCard.tsx:99 - <Check size={8} /> 치아위치
+src\components\SearchResultCard.tsx:104 - <Check size={8} /> 진단명
+src\components\SearchResultCard.tsx:109 - <Check size={8} /> 시술/테크닉
+src\components\SearchResultCard.tsx:114 - <Check size={8} /> 재료/골상태
+src\components\SearchResultCard.tsx:119 - <Check size={8} /> 환자조건
+src\components\SearchResultCard.tsx:128 - 키워드 부분 일치
+src\components\SearchResultCard.tsx:138 - <span className="text-slate-500">{video.userProfile.name} 원장</span>
+src\components\Sidebar.tsx:17 - { href: '/marketplace', icon: ShoppingBag, label: '마켓플레이스' },
+src\components\Sidebar.tsx:19 - { href: '/billing', icon: CreditCard, label: 'RAB 충전' },
+src\components\VideoCard.tsx:12 - 임플란트: 'bg-teal-50 text-teal-700 border-teal-100',
+src\components\VideoCard.tsx:13 - 보철:     'bg-blue-50 text-blue-700 border-blue-100',
+src\components\VideoCard.tsx:14 - 치주:     'bg-amber-50 text-amber-700 border-amber-100',
+src\components\VideoCard.tsx:15 - 교정:     'bg-violet-50 text-violet-700 border-violet-100',
+src\components\VideoCard.tsx:16 - 보존:     'bg-emerald-50 text-emerald-700 border-emerald-100',
+src\components\VideoCard.tsx:17 - 소아:     'bg-pink-50 text-pink-700 border-pink-100',
+src\components\VideoCard.tsx:18 - 구강외과:  'bg-red-50 text-red-700 border-red-100',
+src\components\VideoPlayer.tsx:11 - 임플란트: 'bg-teal-50 text-teal-700',
+src\components\VideoPlayer.tsx:12 - 보철:     'bg-blue-50 text-blue-700',
+src\components\VideoPlayer.tsx:13 - 치주:     'bg-amber-50 text-amber-700',
+src\components\VideoPlayer.tsx:14 - 교정:     'bg-violet-50 text-violet-700',
+src\components\VideoPlayer.tsx:15 - 보존:     'bg-emerald-50 text-emerald-700',
+src\components\VideoPlayer.tsx:16 - 소아:     'bg-pink-50 text-pink-700',
+src\components\VideoPlayer.tsx:17 - 구강외과:  'bg-red-50 text-red-700',
+src\components\VideoPlayer.tsx:93 - <p className="font-medium">영상을 불러올 수 없습니다</p>
+src\components\VideoPlayer.tsx:94 - <p className="text-sm text-slate-400 mt-1">삭제되었거나 접근할 수 없는 영상입니다</p>
+src\components\VideoPlayer.tsx:109 - setVideoError("영상을 불러오거나 재생할 수 없습니다.");
+src\components\VideoPlayer.tsx:141 - 난이도: {video.difficulty}
+src\components\VideoPlayer.tsx:155 - <h3 className="font-semibold text-slate-700 mb-1.5">임상 정보</h3>
+src\components\VideoPlayer.tsx:158 - <div><span className="text-slate-400 mr-1">진단명:</span>{video.clinical.diagnosis.join(', ')}</div>
+src\components\VideoPlayer.tsx:161 - <div><span className="text-slate-400 mr-1">시술/테크닉:</span>{video.clinical.technique.join(', ')}</div>
+src\components\VideoPlayer.tsx:164 - <div className="col-span-2"><span className="text-slate-400 mr-1">사용재료:</span>{video.clinical.materials.join(', ')}</div>
+src\components\VideoPlayer.tsx:167 - <div><span className="text-slate-400 mr-1">골분류:</span>{video.clinical.boneClassification}</div>
+src\components\VideoPlayer.tsx:170 - <div><span className="text-slate-400 mr-1">환자:</span>{video.clinical.patientAge} {video.clinical.patientGender}</div>
+src\components\VideoPlayer.tsx:173 - <div className="col-span-2"><span className="text-slate-400 mr-1">전신질환:</span>{video.clinical.systemicConditions.join(', ')}</div>
+src\components\VideoPlayer.tsx:185 - <p className="text-sm font-medium text-slate-800">{video.userProfile.name} 원장</p>
+src\components\admin\AdjustModal.tsx:44 - setErrMsg(e.message ?? '오류 발생');
+src\components\admin\AdjustModal.tsx:59 - grant:  ['이벤트 보상', '운영자 사례', '오류 보정', '베타 참여 보상'],
+src\components\admin\AdjustModal.tsx:60 - deduct: ['불량 케이스 패널티', '어뷰징 제재', '환불 처리', '오류 보정'],
+src\components\admin\AdjustModal.tsx:75 - <p className="text-white text-sm font-medium">RAB 수동 조정</p>
+src\components\admin\AdjustModal.tsx:76 - <p className="text-slate-400 text-xs mt-0.5">{member.name} 원장 · {member.hospital}</p>
+src\components\admin\AdjustModal.tsx:90 - <p className="text-[10px] text-slate-400 uppercase tracking-wide mb-0.5">현재 잔액</p>
+src\components\admin\AdjustModal.tsx:95 - <p className="text-[10px] text-slate-400 uppercase tracking-wide mb-0.5">조정 후</p>
+src\components\admin\AdjustModal.tsx:117 - {t === 'grant' ? '+ 지급' : '− 차감'}
+src\components\admin\AdjustModal.tsx:124 - <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wide block mb-1.5">금액 (RAB)</label>
+src\components\admin\AdjustModal.tsx:129 - placeholder="조정할 RAB 수량"
+src\components\admin\AdjustModal.tsx:149 - <label className="text-[11px] font-medium text-slate-400 uppercase tracking-wide block mb-1.5">사유</label>
+src\components\admin\AdjustModal.tsx:152 - placeholder="조정 사유를 입력해 주세요"
+src\components\admin\AdjustModal.tsx:172 - <CheckCircle size={14} />조정 완료
+src\components\admin\AdjustModal.tsx:183 - <button onClick={onClose} className="btn-secondary flex-1">취소</button>
+src\components\admin\AdjustModal.tsx:193 - {loading ? '처리 중...' : type === 'grant' ? `+${parsedAmount} RAB 지급` : `-${parsedAmount} RAB 차감`}
+src\hooks\useAdmin.ts:41 - setError(e.message ?? '데이터 로드 실패');
+src\lib\adminService.ts:3 - * 관리자 전용 Firestore 쿼리 및 RAB 수동 지급/차감
+src\lib\adminService.ts:23 - 대시보드 집계 지표
+src\lib\adminService.ts:29 - totalSupply: number;          // 전체 유통 중인 RAB
+src\lib\adminService.ts:30 - totalEverIssued: number;      // 누적 발행
+src\lib\adminService.ts:31 - totalEverBurned: number;      // 누적 소각 (spent)
+src\lib\adminService.ts:32 - totalPlatformRevenue: number; // 플랫폼 누적 수익
+src\lib\adminService.ts:33 - pendingTxCount: number;       // 대기 중 트랜잭션 수
+src\lib\adminService.ts:34 - todayTxCount: number;         // 오늘 트랜잭션 수
+src\lib\adminService.ts:35 - avgBalance: number;           // 평균 회원 잔액
+src\lib\adminService.ts:88 - 실시간 트랜잭션 스트림
+src\lib\adminService.ts:114 - 전체 회원 + 잔액 목록
+src\lib\adminService.ts:149 - 회원별 트랜잭션 조회
+src\lib\adminService.ts:171 - 수동 지급 / 차감
+src\lib\adminService.ts:176 - amount: number;        // 양수: 지급, 음수: 차감
+src\lib\adminService.ts:183 - if (amount === 0) throw new Error('금액은 0이 될 수 없습니다');
+src\lib\adminService.ts:184 - if (!reason.trim()) throw new Error('사유를 입력해 주세요');
+src\lib\adminService.ts:189 - throw new Error('관리자 권한이 없습니다');
+src\lib\adminService.ts:209 - throw new Error(`차감 불가: 현재 잔액(${current.balance} RAB) 부족`);
+src\lib\adminService.ts:228 - description: `[관리자] ${reason}`,
+src\lib\adminService.ts:237 - 회원 상태 변경 (승인/거절)
+src\lib\adminService.ts:247 - throw new Error('관리자 권한이 없습니다');
+src\lib\adminService.ts:259 - throw new Error('관리자 권한이 없습니다');
+src\lib\adminService.ts:275 - RAB 공급량 타임라인 (일별 집계)
+src\lib\adminService.ts:316 - pending 트랜잭션 전체 확정 (관리자용)
+src\lib\clinicalPresets.ts:4 - 임플란트: ['치아결손', '치근파절', '치근흡수', '선천성결손', '외상', '기타'],
+src\lib\clinicalPresets.ts:5 - 보철: ['치아결손', '치질손상', '교합부조화', '심미불량', '보철물파손', '기타'],
+src\lib\clinicalPresets.ts:6 - 치주: ['만성치주염', '급성치주염', '치은퇴축', '치주농양', '치은비대', '기타'],
+src\lib\clinicalPresets.ts:7 - 교정: ['총생', '반대교합', '개방교합', '과개교합', '공간부족', '매복치', '기타'],
+src\lib\clinicalPresets.ts:8 - 보존: ['치아우식', '치수염', '근관치료재치료', '치아파절', '치경부마모', '기타'],
+src\lib\clinicalPresets.ts:9 - 소아: ['유치우식', '과잉치', '선천성결손', '외상', '맹출장애', '기타'],
+src\lib\clinicalPresets.ts:10 - 구강외과: ['매복치발거', '낭종', '양성종양', '골절', '턱관절장애', '기타'],
+src\lib\clinicalPresets.ts:14 - 임플란트: ['GBR', '상악동거상(lateral)', '상악동거상(crestal)', '즉시식립', '지연식립', '발치후즉시', 'All-on-4', '틸티드임플란트', '기타'],
+src\lib\clinicalPresets.ts:15 - 보철: ['올세라믹크라운', 'PFM크라운', '지르코니아', '라미네이트', '브릿지', '의치', '임플란트보철', '기타'],
+src\lib\clinicalPresets.ts:16 - 치주: ['스케일링/SRP', '치주판막술', '골이식', '치은이식', '치관연장술', '재생술', '기타'],
+src\lib\clinicalPresets.ts:17 - 교정: ['메탈브라켓', '세라믹브라켓', '투명교정', '설측교정', 'TAD(미니스크류)', '기능성장치', '기타'],
+src\lib\clinicalPresets.ts:18 - 보존: ['직접수복(레진)', '간접수복(인레이/온레이)', '근관치료', '재근관치료', '치수복조', '치근단절제술', '기타'],
+src\lib\clinicalPresets.ts:19 - 소아: ['치수절단술', '기성금속관', '불소도포', '실란트', '공간유지장치', '외상처치', '기타'],
+src\lib\clinicalPresets.ts:20 - 구강외과: ['단순발거', '매복치발거', '낭종적출', '골절정복', '조직생검', '턱관절치료', '기타'],
+src\lib\clinicalPresets.ts:25 - 임플란트: ['Osstem TS III', 'Dentium SuperLine', 'Straumann BLX', 'NeoBiotech', 'MegaGen AnyRidge', 'Bio-Oss', 'OCS-B', 'Jason membrane'],
+src\lib\clinicalPresets.ts:26 - 보철: ['3M Lava', 'Katana Zirconia', 'E.max', 'Cerec', 'Fuji IX', 'RelyX U200'],
+src\lib\clinicalPresets.ts:27 - 치주: ['Bio-Oss', 'Emdogain', 'Geistlich Mucograft', 'OssBuilder', 'CollaTape'],
+src\lib\clinicalPresets.ts:28 - 교정: ['Damon Clear', 'Invisalign', 'Incognito', 'Tomy', 'Dentaurum'],
+src\lib\clinicalPresets.ts:29 - 보존: ['Filtek Z350', 'Tetric N-Ceram', 'Charisma', 'MTA', 'Cavit', 'Gutta Percha'],
+src\lib\clinicalPresets.ts:30 - 소아: ['SS Crown', 'NuSmile', 'Fuji II LC', 'Ketac Molar', 'Formocresol'],
+src\lib\clinicalPresets.ts:31 - 구강외과: ['Surgicel', 'CollaPlug', 'Bone wax', 'Vicryl 4-0', 'Nylon 5-0'],
+src\lib\firebaseAdmin.ts:2 - * Firebase Admin SDK (서버 전용)
+src\lib\firebaseAdmin.ts:3 - * Webhook, API Routes에서 사용
+src\lib\firebaseAdmin.ts:4 - * 지연 초기화(lazy init)로 빌드 타임 오류 방지
+src\lib\firebaseService.ts:35 - const status = isTargetAdmin ? 'approved' : 'pending'; // 일반 원장님은 가입 시 대기(pending) 상태
+src\lib\firebaseService.ts:80 - where('visibility', '!=', '비공개'),
+src\lib\firebaseService.ts:85 - if (category && category !== '전체') {
+src\lib\firebaseService.ts:89 - where('visibility', '!=', '비공개'),
+src\lib\firebaseService.ts:119 - where('visibility', '!=', '비공개'),
+src\lib\firebaseService.ts:124 - if (category && category !== '전체') {
+src\lib\firebaseService.ts:128 - where('visibility', '!=', '비공개'),
+src\lib\marketplaceService.ts:18 - 1. 상품등록 요청 (Product Requests) - 에스크로/RAB 없음
+src\lib\marketplaceService.ts:41 - unit: data.unit ?? '개',
+src\lib\marketplaceService.ts:81 - if (!snap.exists()) throw new Error('요청을 찾을 수 없습니다.');
+src\lib\marketplaceService.ts:87 - throw new Error('이미 공감한 요청입니다.');
+src\lib\marketplaceService.ts:99 - 2. 쇼핑몰 (Shop) - 상품 관리 및 RAB 결제
+src\lib\marketplaceService.ts:147 - if (!pSnap.exists()) throw new Error('상품을 찾을 수 없습니다.');
+src\lib\marketplaceService.ts:149 - if (!product.isActive) throw new Error('현재 판매 중인 상품이 아닙니다.');
+src\lib\marketplaceService.ts:150 - if (product.stock < quantity) throw new Error(`재고가 부족합니다. (남은 수량: ${product.stock})`);
+src\lib\marketplaceService.ts:154 - if (!bSnap.exists()) throw new Error('포인트 정보를 찾을 수 없습니다.');
+src\lib\marketplaceService.ts:159 - throw new Error(`RAB 잔액이 부족합니다. (필요: ${totalRab} RAB)`);
+src\lib\marketplaceService.ts:181 - description: `쇼핑몰 구매: ${product.name} ${quantity}개`,
+src\lib\marketplaceService.ts:182 - relatedCaseId: newOrderRef.id, // 편의상 orderId 저장
+src\lib\pointService.ts:3 - * Phase 1: DB 포인트 시스템 (블록체인 전 단계)
+src\lib\pointService.ts:5 - * 핵심 원칙:
+src\lib\pointService.ts:6 - * - 모든 잔액 변경은 Firestore 트랜잭션으로 원자적 처리
+src\lib\pointService.ts:7 - * - 업로드 보상은 48시간 pending → confirmed
+src\lib\pointService.ts:8 - * - 월 업로드 보상 상한(10건) 초과 시 보상 미지급
+src\lib\pointService.ts:9 - * - 신규 회원 3개월간 보상 50%만 지급
+src\lib\pointService.ts:29 - 잔액 조회
+src\lib\pointService.ts:59 - 트랜잭션 목록 조회
+src\lib\pointService.ts:84 - 내부 헬퍼: 트랜잭션 기록 + 잔액 갱신
+src\lib\pointService.ts:90 - amount: number,         // 양수 or 음수
+src\lib\pointService.ts:119 - throw new Error(`RAB 잔액이 부족합니다. 현재: ${current.balance} RAB`);
+src\lib\pointService.ts:168 - 관리자 설정 조회 (수수료율 등)
+src\lib\pointService.ts:190 - 이번 달 업로드 보상 수령 건수 확인
+src\lib\pointService.ts:209 - 신규 회원 여부 확인
+src\lib\pointService.ts:219 - 공개 API: 포인트 이벤트
+src\lib\pointService.ts:232 - if (!snap.empty) return; // 이미 지급됨
+src\lib\pointService.ts:238 - `회원가입 보너스 +${RAB_POLICY.SIGNUP_BONUS} RAB`
+src\lib\pointService.ts:253 - reason: `업로드 보상 기능이 비활성화 상태입니다.`,
+src\lib\pointService.ts:263 - reason: `월 업로드 보상 상한(${RAB_POLICY.MONTHLY_UPLOAD_CAP}건)에 도달했습니다`,
+src\lib\pointService.ts:278 - `케이스 업로드 보상 (48시간 후 확정) +${amount} RAB`,
+src\lib\pointService.ts:300 - `케이스 품질 보너스 (점수: ${qualityScore}) +${bonus} RAB`,
+src\lib\pointService.ts:315 - `케이스 좋아요 수신 +${RAB_POLICY.LIKE_REWARD} RAB`,
+src\lib\pointService.ts:333 - `케이스 업로드 수수료: ${caseTitle}`,
+src\lib\pointService.ts:346 - if (casePrice <= 0) return; // 무료 케이스
+src\lib\pointService.ts:357 - `케이스 시청: ${caseTitle}`,
+src\lib\pointService.ts:367 - `시청료 수익 배분 (${sharePercentStr}): ${caseTitle} +${uploaderShare} RAB`,
+src\lib\pointService.ts:383 - `케이스 다운로드: ${caseTitle}`,
+src\lib\pointService.ts:397 - `케이스 피드 부스트`,
+src\lib\pointService.ts:411 - `신고 검수 기여 보상 +2 RAB`,
+src\lib\pointService.ts:426 - `불량 케이스 패널티: ${reason}`,
+src\lib\pointService.ts:469 - amount: number,   // 양수: 지급, 음수: 차감
+src\lib\pointService.ts:522 - const priceDesc = isUsd ? `$${amountKrw.toFixed(2)} USD` : `₩${amountKrw.toLocaleString()}원`;
+src\lib\pointService.ts:531 - description: `현금 결제 충전 (${priceDesc})`,
+src\lib\pointService.ts:544 - description: `${amountRab} RAB 구매 (${priceDesc})`,
+src\lib\searchService.ts:14 - patientGender?: '남' | '여' | '';
+src\lib\searchService.ts:139 - details.keywordScore = calculateKeywordMatch(termsToSearch, searchableText) * 50; // Fallback은 최대 50점
+src\lib\searchService.ts:154 - details.diagnosisScore = 25; // 질의에 없으면 만점 처리하여 패널티 없앰
+src\lib\stripeService.ts:2 - * Stripe 결제 서비스
+src\lib\stripeService.ts:3 - * - 구독 결제 (Pro / Clinic)
+src\lib\stripeService.ts:4 - * - RAB 직접 구매
+src\lib\stripeService.ts:5 - * - Webhook 처리
+src\lib\stripeService.ts:27 - Stripe Checkout 세션 생성 (서버 API 호출)
+src\lib\stripeService.ts:40 - if (!res.ok) throw new Error('결제 세션 생성 실패');
+src\lib\stripeService.ts:46 - RAB 직접 구매 ($0.01988 / RAB)
+src\lib\stripeService.ts:59 - if (!res.ok) throw new Error('RAB 구매 세션 생성 실패');
+src\lib\stripeService.ts:65 - 구독 정보 조회
+src\lib\stripeService.ts:88 - 결제 내역 조회
+src\lib\stripeService.ts:110 - 구독 취소
+src\lib\stripeService.ts:115 - if (!sub) throw new Error('구독 정보가 없습니다');
+src\lib\stripeService.ts:122 - if (!res.ok) throw new Error('구독 취소 실패');
+src\lib\stripeService.ts:133 - RAB 구독 결제 (현금 대신 RAB로 구독)
+src\lib\stripeService.ts:145 - throw new Error(`RAB 잔액이 부족합니다. 필요: ${cost} RAB`);
+src\lib\stripeService.ts:154 - if (!res.ok) throw new Error('RAB 구독 처리 실패');
+src\types\index.ts:2 - | '임플란트'
+src\types\index.ts:3 - | '보철'
+src\types\index.ts:4 - | '치주'
+src\types\index.ts:5 - | '교정'
+src\types\index.ts:6 - | '보존'
+src\types\index.ts:7 - | '소아'
+src\types\index.ts:8 - | '구강외과';
+src\types\index.ts:10 - export type Visibility = '회원전용' | '비공개' | '전체공개';
+src\types\index.ts:11 - export type Difficulty = '초급' | '중급' | '고급';
+src\types\index.ts:34 - 임플란트: '치아결손' | '치근파절' | '치근흡수' | '선천성결손' | '외상' | '기타';
+src\types\index.ts:35 - 보철: '치아결손' | '치질손상' | '교합부조화' | '심미불량' | '보철물파손' | '기타';
+src\types\index.ts:36 - 치주: '만성치주염' | '급성치주염' | '치은퇴축' | '치주농양' | '치은비대' | '기타';
+src\types\index.ts:37 - 교정: '총생' | '반대교합' | '개방교합' | '과개교합' | '공간부족' | '매복치' | '기타';
+src\types\index.ts:38 - 보존: '치아우식' | '치수염' | '근관치료재치료' | '치아파절' | '치경부마모' | '기타';
+src\types\index.ts:39 - 소아: '유치우식' | '과잉치' | '선천성결손' | '외상' | '맹출장애' | '기타';
+src\types\index.ts:40 - 구강외과: '매복치발거' | '낭종' | '양성종양' | '골절' | '턱관절장애' | '기타';
+src\types\index.ts:44 - 임플란트: 'GBR' | '상악동거상(lateral)' | '상악동거상(crestal)' | '즉시식립' | '지연식립' | '발치후즉시' | 'All-on-4' | '틸티드임플란트' | '기타';
+src\types\index.ts:45 - 보철: '올세라믹크라운' | 'PFM크라운' | '지르코니아' | '라미네이트' | '브릿지' | '의치' | '임플란트보철' | '기타';
+src\types\index.ts:46 - 치주: '스케일링/SRP' | '치주판막술' | '골이식' | '치은이식' | '치관연장술' | '재생술' | '기타';
+src\types\index.ts:47 - 교정: '메탈브라켓' | '세라믹브라켓' | '투명교정' | '설측교정' | 'TAD(미니스크류)' | '기능성장치' | '기타';
+src\types\index.ts:48 - 보존: '직접수복(레진)' | '간접수복(인레이/온레이)' | '근관치료' | '재근관치료' | '치수복조' | '치근단절제술' | '기타';
+src\types\index.ts:49 - 소아: '치수절단술' | '기성금속관' | '불소도포' | '실란트' | '공간유지장치' | '외상처치' | '기타';
+src\types\index.ts:50 - 구강외과: '단순발거' | '매복치발거' | '낭종적출' | '골절정복' | '조직생검' | '턱관절치료' | '기타';
+src\types\index.ts:53 - export type BoneClassification = 'Class I' | 'Class II' | 'Class III' | 'Class IV' | '해당없음';
+src\types\index.ts:55 - export type PatientAgeRange = '10대' | '20대' | '30대' | '40대' | '50대' | '60대' | '70대이상';
+src\types\index.ts:58 - '당뇨(조절됨)', '당뇨(비조절)', '고혈압', '골다공증',
+src\types\index.ts:59 - '혈액희석제복용', '비스포스포네이트', '흡연', '임신',
+src\types\index.ts:60 - '심장질환', '간질환', '신장질환', '면역억제',
+src\types\index.ts:71 - patientGender?: '남' | '여';
+src\types\index.ts:95 - price: number; // 업로더가 설정한 열람 가격 (RAB)
+src\types\index.ts:137 - | 'SIGNUP_BONUS'        // 회원가입 보너스
+src\types\index.ts:138 - | 'UPLOAD_REWARD'       // 케이스 업로드 보상
+src\types\index.ts:139 - | 'UPLOAD_QUALITY_BONUS'// 품질 점수 보너스
+src\types\index.ts:140 - | 'LIKE_RECEIVED'       // 좋아요 수신 보상
+src\types\index.ts:141 - | 'VIEW_SHARE'          // 시청료 배분 (업로더)
+src\types\index.ts:142 - | 'VIEW_SPEND'          // 시청 소비
+src\types\index.ts:143 - | 'DOWNLOAD_SPEND'      // 다운로드 소비
+src\types\index.ts:144 - | 'BOOST_SPEND'         // 홍보 부스트 소비
+src\types\index.ts:145 - | 'ADMIN_GRANT'         // 관리자 지급
+src\types\index.ts:146 - | 'ADMIN_DEDUCT'        // 관리자 차감
+src\types\index.ts:147 - | 'REPORT_REWARD'       // 신고 보상
+src\types\index.ts:148 - | 'PENALTY_DEDUCT'      // 불량 업로드 패널티
+src\types\index.ts:149 - | 'RAB_PURCHASE'        // 현금 결제 충전
+src\types\index.ts:150 - | 'UPLOAD_FEE_SPEND'    // 업로드 1회성 과금 (수수료)
+src\types\index.ts:151 - | 'BOUNTY_ESCROW'       // 바운티 에스크로 동결
+src\types\index.ts:152 - | 'BOUNTY_RELEASE'      // 바운티 정산 (제안자 수령)
+src\types\index.ts:153 - | 'BOUNTY_REFUND'       // 바운티 환급 (만료/취소)
+src\types\index.ts:154 - | 'BOUNTY_FEE'          // 바운티 플랫폼 수수료
+src\types\index.ts:155 - | 'BOUNTY_BURN'         // 바운티 소각분
+src\types\index.ts:156 - | 'SHOP_PURCHASE'       // 쇼핑몰 구매 (RAB 지불)
+src\types\index.ts:157 - | 'SHOP_REVENUE';       // 쇼핑몰 판매 수익 (공급사)
+src\types\index.ts:165 - amount: number;           // 양수: 획득, 음수: 소비
+src\types\index.ts:166 - balanceAfter: number;     // 트랜잭션 후 잔액
+src\types\index.ts:169 - relatedCaseId?: string;   // 관련 케이스 ID
+src\types\index.ts:170 - relatedUserId?: string;   // 관련 유저 ID (예: 좋아요 누른 사람)
+src\types\index.ts:171 - commissionRateApplied?: number; // 결제 시 적용된 플랫폼 수수료율 (업로더 정산 시)
+src\types\index.ts:172 - confirmedAt?: Date;       // pending → confirmed 시각 (업로드: +48h)
+src\types\index.ts:178 - balance: number;          // 확정 잔액
+src\types\index.ts:179 - pendingBalance: number;   // 보류 중 잔액 (48h 대기)
+src\types\index.ts:180 - totalEarned: number;      // 누적 획득
+src\types\index.ts:181 - totalSpent: number;       // 누적 소비
+src\types\index.ts:188 - platformCommissionRate: number; // 플랫폼 수수료 (예: 0.3 = 30%)
+src\types\index.ts:189 - enableUploadReward?: boolean;   // 업로드 보상(100 RAB) 토글
+src\types\index.ts:190 - uploadFeeRab?: number;          // 사용되지 않음(과금은 사용자가 설정한 가격과 동일하게 부과)
+src\types\index.ts:218 - amountKrw:        number;   // 원화 금액
+src\types\index.ts:219 - amountRab:        number;   // RAB 금액
+src\types\index.ts:227 - name: '스타터',
+src\types\index.ts:231 - features: ['가입 보너스 50 RAB', '월 5건 업로드', '전체 케이스 시청', '기본 검색'],
+src\types\index.ts:234 - name: '프로',
+src\types\index.ts:239 - features: ['월 50건 업로드', '무제한 시청', '프리미엄 케이스', '다운로드', '홍보 부스트'],
+src\types\index.ts:242 - name: '클리닉',
+src\types\index.ts:247 - features: ['무제한 업로드', '무제한 시청', '5인 서브계정', '무제한 다운로드', '분석 대시보드'],
+src\types\index.ts:252 - krwPerRab:       10,     // 1 RAB = 10원 (참고 기준)
+src\types\index.ts:253 - rabPerKrw1000:   90,     // ₩1,000 → 90 RAB (10% 보너스)
+src\types\index.ts:259 - | '임플란트_부속' | '레진_수복재료' | '인상재_석고' | '근관치료재료'
+src\types\index.ts:260 - | '교정재료' | '예방치과재료' | '소독_위생용품' | '진료실_소모품'
+src\types\index.ts:261 - | '수술용품' | '보철재료' | '디지털장비_부속' | '병원_운영용품' | '기타';
+src\types\index.ts:268 - { id: '임플란트_부속', label: '임플란트 부속' },
+src\types\index.ts:269 - { id: '레진_수복재료', label: '레진·수복재료' },
+src\types\index.ts:270 - { id: '인상재_석고', label: '인상재·석고' },
+src\types\index.ts:271 - { id: '근관치료재료', label: '근관치료재료' },
+src\types\index.ts:272 - { id: '교정재료', label: '교정재료' },
+src\types\index.ts:273 - { id: '예방치과재료', label: '예방치과재료' },
+src\types\index.ts:274 - { id: '소독_위생용품', label: '소독·위생용품' },
+src\types\index.ts:275 - { id: '진료실_소모품', label: '진료실 소모품' },
+src\types\index.ts:276 - { id: '수술용품', label: '수술용품' },
+src\types\index.ts:277 - { id: '보철재료', label: '보철재료' },
+src\types\index.ts:278 - { id: '디지털장비_부속', label: '디지털장비 부속' },
+src\types\index.ts:279 - { id: '병원_운영용품', label: '병원 운영용품' },
+src\types\index.ts:280 - { id: '기타', label: '기타' },
+src\types\index.ts:289 - UPLOAD_QUALITY_MAX: 20,   // 품질 점수 보너스 최대
+src\types\index.ts:291 - MIN_CASE_PRICE: 0,        // 업로더 설정 최소 가격
+src\types\index.ts:292 - MAX_CASE_PRICE: 10000,    // 업로더 설정 최대 가격
+src\types\index.ts:293 - VIEW_BURN: 0.1,           // 소각 10%
+src\types\index.ts:296 - UPLOAD_PENDING_HOURS: 48, // 업로드 보상 보류 시간
+src\types\index.ts:297 - MONTHLY_UPLOAD_CAP: 10,   // 월 업로드 보상 상한 건수
+src\types\index.ts:298 - NEW_USER_MONTHS: 3,       // 신규 회원 기간 (절반 지급)
+src\types\index.ts:299 - NEW_USER_RATE: 0.5,       // 신규 회원 보상 비율

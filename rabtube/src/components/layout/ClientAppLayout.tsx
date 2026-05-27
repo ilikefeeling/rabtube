@@ -22,7 +22,7 @@ export default function ClientAppLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="h-screen bg-slate-50 flex flex-col">
       <Header />
       <div className="flex flex-1 overflow-hidden">
         {mounted && isDesktopSidebarOpen && <Sidebar />}
