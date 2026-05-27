@@ -97,7 +97,7 @@ export default function NewProductRequestPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">필요 수량 / 단위 <span className="text-red-500">*</span></label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">예상 소요량 / 월간 <span className="text-red-500">*</span></label>
               <div className="flex gap-2">
                 <input 
                   type="number" min="1"

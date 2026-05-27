@@ -167,7 +167,7 @@ export default function MarketplacePage() {
                     <h3 className="font-bold text-lg text-gray-900 mb-1">{req.title}</h3>
                     <p className="text-sm text-gray-600 mb-2">{req.description}</p>
                     <div className="text-xs text-gray-500">
-                      선호 브랜드: {req.preferredBrand || '무관'} | 필요 수량: {req.quantity}{req.unit} | {new Date(req.createdAt).toLocaleDateString()}
+                      선호 브랜드: {req.preferredBrand || '무관'} | 예상 소요량/월: {req.quantity}{req.unit} | {new Date(req.createdAt).toLocaleDateString()}
                     </div>
                   </div>
                   <div className="flex flex-col items-center">
