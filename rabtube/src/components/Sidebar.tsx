@@ -58,7 +58,6 @@ export default function Sidebar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  target="_blank"
                   className={`flex items-center gap-4 px-3 py-2.5 rounded-xl transition-colors ${
                     isActive 
                       ? 'bg-red-50 font-semibold text-red-700' 
