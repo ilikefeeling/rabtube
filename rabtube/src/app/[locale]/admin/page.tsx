@@ -326,9 +326,9 @@ export default function AdminPage() {
 
   const TABS = [
     { id: 'overview', label: '개요' },
+    { id: 'marketplace', label: '마켓플레이스 관리' },
     { id: 'members',  label: `회원 관리 (${members.length})` },
     { id: 'txs',      label: `트랜잭션 (실시간)` },
-    { id: 'marketplace', label: '마켓플레이스 관리' },
     { id: 'materials', label: '재료 관리' },
     { id: 'supply',   label: 'RAB 공급 현황' },
     { id: 'settings', label: '플랫폼 설정' },
@@ -381,7 +381,7 @@ export default function AdminPage() {
           <StatCard label="전체 회원"        value={fmt(stats?.totalMembers ?? 0)}         sub={`케이스 ${fmt(stats?.totalCases ?? 0)}개`}         color="#d4920c" />
         </div>
 
-        <div className="flex gap-2 mb-5 border-b border-slate-200">
+        <div className="flex flex-wrap gap-2 mb-5 border-b border-slate-200">
           {TABS.map(t => (
             <button
               key={t.id}
