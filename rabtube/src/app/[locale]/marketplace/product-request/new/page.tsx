@@ -73,7 +73,7 @@ export default function NewProductRequestPage() {
             <input 
               type="text" 
               placeholder="예) 오스템 임플란트 픽스처 TS III SA 필요합니다"
-              className="w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+              className="w-full border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
               value={form.title}
               onChange={e => setForm({...form, title: e.target.value})}
               required
@@ -84,7 +84,7 @@ export default function NewProductRequestPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">카테고리 <span className="text-red-500">*</span></label>
               <select 
-                className="w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                className="w-full border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
                 value={form.category}
                 onChange={e => setForm({...form, category: e.target.value as DentalCategory})}
                 required
@@ -101,13 +101,13 @@ export default function NewProductRequestPage() {
               <div className="flex gap-2">
                 <input 
                   type="number" min="1"
-                  className="w-2/3 border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                  className="w-2/3 border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
                   value={form.quantity}
                   onChange={e => setForm({...form, quantity: Number(e.target.value)})}
                   required
                 />
                 <select 
-                  className="w-1/3 border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                  className="w-1/3 border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
                   value={form.unit}
                   onChange={e => setForm({...form, unit: e.target.value})}
                 >
@@ -126,7 +126,7 @@ export default function NewProductRequestPage() {
               <input 
                 type="text" 
                 placeholder="예) 오스템, 덴티움"
-                className="w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                className="w-full border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
                 value={form.preferredBrand}
                 onChange={e => setForm({...form, preferredBrand: e.target.value})}
               />
@@ -136,7 +136,7 @@ export default function NewProductRequestPage() {
               <input 
                 type="text" 
                 placeholder="예) TS III SA"
-                className="w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+                className="w-full border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
                 value={form.preferredModel}
                 onChange={e => setForm({...form, preferredModel: e.target.value})}
               />
@@ -148,7 +148,7 @@ export default function NewProductRequestPage() {
             <textarea 
               rows={4}
               placeholder="필요한 상품에 대해 자세히 설명해주세요. 대체 가능한 다른 상품이 있다면 함께 적어주시면 좋습니다."
-              className="w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
+              className="w-full border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500"
               value={form.description}
               onChange={e => setForm({...form, description: e.target.value})}
               required
@@ -162,7 +162,7 @@ export default function NewProductRequestPage() {
             <button 
               type="submit" 
               disabled={loading}
-              className="px-6 py-2 bg-primary-600 text-white rounded-md text-sm font-medium hover:bg-primary-700 disabled:opacity-50"
+              className="px-6 py-2 bg-teal-600 text-white rounded-md text-sm font-medium hover:bg-teal-700 disabled:opacity-50"
             >
               {loading ? '등록 중...' : '신청하기'}
             </button>
