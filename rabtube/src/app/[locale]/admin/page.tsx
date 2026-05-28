@@ -258,7 +258,8 @@ export default function AdminPage() {
       m.email?.includes(searchQuery) ||
       m.phoneNumber?.includes(searchQuery);
 
-    const matchesStatus = statusFilter === 'all' || m.status === statusFilter;
+    const effStatus = m.status || 'pending';
+    const matchesStatus = statusFilter === 'all' || effStatus === statusFilter;
 
     return matchesSearch && matchesStatus;
   });
@@ -566,7 +567,7 @@ export default function AdminPage() {
                             RAB 조정
                           </button>
                           
-                          {m.status === 'pending' && (
+                          {(!m.status || m.status === 'pending') && (
                             <>
                               <button
                                 onClick={() => handleStatusChange(m.uid, 'approved')}
@@ -602,11 +603,19 @@ export default function AdminPage() {
                           )}
 
                           <button
+                            onClick={() => handleStatusChange(m.uid, 'deleted')}
+                            className="text-[11px] px-2 py-1 rounded-md bg-slate-50 hover:bg-slate-100 text-slate-600 transition-colors border border-slate-200 font-medium ml-auto"
+                            title="회원 데이터 유지한 채 계정 비활성화"
+                          >
+                            비활성화
+                          </button>
+
+                          <button
                             onClick={() => handleDeleteMemberClick(m)}
-                            className="text-[11px] px-2 py-1 rounded-md bg-red-50 hover:bg-red-100 text-red-600 transition-colors border border-red-200 font-medium ml-auto"
+                            className="text-[11px] px-2 py-1 rounded-md bg-red-50 hover:bg-red-100 text-red-600 transition-colors border border-red-200 font-medium"
                             title="회원 데이터 영구 삭제"
                           >
-                            삭제
+                            영구삭제
                           </button>
                         </div>
                       </td>
