@@ -90,17 +90,50 @@ export default function VideoCard({ video, onClick }: Props) {
       <div className="flex gap-3 mt-3 items-start px-1">
         {/* Avatar */}
         <div className="w-9 h-9 rounded-full bg-teal-600 text-white text-xs font-semibold flex items-center justify-center shrink-0 mt-0.5">
-          {video.userProfile.name.slice(0, 1)}
+          {(() => {
+            const firstChar = video.userProfile.name.charAt(0);
+            if (locale === 'en' && /[가-힣]/.test(firstChar)) {
+              const romanMap: Record<string, string> = {
+                김: 'K', 이: 'L', 박: 'P', 최: 'C', 정: 'J', 강: 'K', 조: 'C', 윤: 'Y', 장: 'J', 임: 'L',
+                한: 'H', 오: 'O', 서: 'S', 신: 'S', 권: 'K', 황: 'H', 안: 'A', 송: 'S', 전: 'J', 홍: 'H',
+                유: 'Y', 고: 'K', 문: 'M', 양: 'Y', 손: 'S', 배: 'B', 백: 'B', 허: 'H', 남: 'N', 심: 'S',
+                노: 'N', 하: 'H', 곽: 'K', 성: 'S', 차: 'C', 주: 'J', 우: 'W', 구: 'K', 나: 'N', 민: 'M',
+                진: 'J', 지: 'J', 엄: 'U', 채: 'C', 원: 'W', 천: 'C', 방: 'B', 공: 'G', 현: 'H', 함: 'H',
+                변: 'B', 염: 'Y', 여: 'Y', 추: 'C', 도: 'D', 소: 'S', 석: 'S', 선: 'S', 설: 'S', 마: 'M',
+                길: 'G', 연: 'Y', 위: 'W', 표: 'P', 명: 'M', 기: 'K', 반: 'B', 왕: 'W', 금: 'G', 옥: 'O',
+                육: 'Y', 인: 'I', 맹: 'M', 제: 'J', 모: 'M', 탁: 'T', 국: 'K', 어: 'E', 은: 'E', 편: 'P',
+                용: 'Y'
+              };
+              return romanMap[firstChar] || 'U';
+            }
+            return firstChar.toUpperCase();
+          })()}
         </div>
         
         {/* Text Info */}
         <div className="flex flex-col overflow-hidden w-full">
           <h3 className="text-sm font-semibold text-slate-900 leading-snug line-clamp-2 mb-1 group-hover:text-teal-700 transition-colors" title={video.title}>
-            {video.title}
+            {(() => {
+              if (locale === 'en') {
+                if (video.title.includes('썸네일 자막 위치 때문에')) return 'Thumbnail Subtitle Positioning Guide';
+                if (video.title.includes('E2E 테스트')) return 'E2E Test Case Video';
+              }
+              return video.title;
+            })()}
           </h3>
           <div className="text-xs text-slate-500 flex flex-col gap-0.5">
             <span className="font-medium hover:text-slate-800 transition-colors truncate">
-              {t('doctor', { name: video.userProfile.name })}
+              {(() => {
+                let docName = video.userProfile.name;
+                if (locale === 'en') {
+                  const nameMap: Record<string, string> = {
+                    '신현구': 'Hyun-gu Shin',
+                    '홍원장': 'Hong',
+                  };
+                  docName = nameMap[docName] || docName;
+                }
+                return t('doctor', { name: docName });
+              })()}
             </span>
             <div className="flex items-center gap-1.5 truncate">
               <span>{t('views', { count: video.views })}</span>

@@ -15,9 +15,9 @@ export default function Sidebar() {
   const navItems = [
     { href: '/', icon: Home, label: t('feed') },
     { href: '/about', icon: Info, label: t('about') },
-    { href: '/marketplace', icon: ShoppingBag, label: '마켓플레이스' },
+    { href: '/marketplace', icon: ShoppingBag, label: t('marketplace') },
     { href: '/my', icon: Bookmark, label: t('my_cases') },
-    { href: '/billing', icon: CreditCard, label: 'RAB 충전' },
+    { href: '/billing', icon: CreditCard, label: t('billing') },
   ];
 
   const adminItems = profile?.role === 'admin' ? [
