@@ -61,16 +61,34 @@ export default function HomePage() {
     }
   };
 
-  useEffect(() => {
-    if (mounted && !authLoading && !user) {
-      router.push('/auth/login');
-    }
-  }, [mounted, authLoading, user, router]);
+  // 로그인 안된 유저는 useEffect로 튕기지 않고 아래 조건부 렌더링에서 랜딩 화면을 보여줍니다.
 
-  if (!mounted || authLoading || !user) {
+  if (!mounted || authLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-50">
+      <div className="flex items-center justify-center min-h-[calc(100vh-56px)] bg-slate-50">
         <div className="w-6 h-6 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-56px)] bg-slate-50/50">
+        <div className="text-center max-w-2xl px-4 py-20">
+          <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight">
+            치과의사 전용 임상 영상 플랫폼<br />
+            <span className="text-teal-600 inline-block mt-2">RabTube</span>
+          </h1>
+          <p className="text-lg sm:text-xl text-slate-600 mb-10 leading-relaxed font-medium">
+            전 세계 치과의사들에게 나만의 임상 케이스를 알리세요.
+          </p>
+          <button
+            onClick={() => router.push('/auth/login')}
+            className="px-8 py-3.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-lg transition-all shadow-xl shadow-slate-900/20 hover:scale-[1.02]"
+          >
+            로그인 / 회원가입으로 시작하기
+          </button>
+        </div>
       </div>
     );
   }

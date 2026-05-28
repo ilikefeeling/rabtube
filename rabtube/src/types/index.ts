@@ -9,11 +9,13 @@ export type CaseCategory =
 
 export type Visibility = '회원전용' | '비공개' | '전체공개';
 export type Difficulty = '초급' | '중급' | '고급';
-export type UserStatus = 'pending' | 'approved' | 'rejected' | 'deleted';
+export type UserStatus = 'associate' | 'pending' | 'approved' | 'rejected' | 'deleted';
 
 export interface UserProfile {
   uid: string;
   name: string;
+  birthdate?: string; // 생년월일 (본인인증 기반)
+  ciValue?: string;   // CI 값 (본인인증 기반, 중복가입 방지)
   email: string;
   phoneNumber?: string;
   hospital: string;

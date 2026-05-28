@@ -25,17 +25,31 @@ export async function checkDuplicatePhoneNumber(phoneNumber: string): Promise<bo
   return snap.exists();
 }
 
+export async function checkDuplicateCI(ciValue: string): Promise<boolean> {
+  if (!ciValue) return false;
+  const snap = await getDoc(doc(db, 'ci_values', ciValue));
+  return snap.exists();
+}
+
 export async function createUserProfile(
   uid: string,
-  data: Omit<UserProfile, 'uid' | 'createdAt' | 'status' | 'role'>
+  data: Omit<UserProfile, 'uid' | 'createdAt' | 'status' | 'role'> & { ciName?: string }
 ) {
+  // 본인인증 이름과 프로필 표시 이름이 다를 경우 보안 처리
+  if (data.ciName && data.name !== data.ciName) {
+    throw new Error('본인인증된 실명과 가입 이름이 일치하지 않습니다.');
+  }
+
   const ref = doc(db, COLLECTIONS.USERS, uid);
   const isTargetAdmin = data.email === 'ilikefeeling@gmail.com';
   const role = isTargetAdmin ? 'admin' : 'user';
-  const status = isTargetAdmin ? 'approved' : 'pending'; // 일반 원장님은 가입 시 대기(pending) 상태
+  const status = isTargetAdmin ? 'approved' : 'associate'; // 선 가입 후 승인 전략: 기본 '준회원(associate)'
+
+  // ciName은 저장 시 제거해도 되지만 일단 삭제
+  const { ciName, ...profileDataToSave } = data;
 
   const profileData = {
-    ...data,
+    ...profileDataToSave,
     uid,
     status,
     role,
@@ -52,6 +66,11 @@ export async function createUserProfile(
     if (cleanPhone) {
       await setDoc(doc(db, 'phone_numbers', cleanPhone), { uid });
     }
+  }
+
+  // CI 값 중복 가입 방지 컬렉션 등록
+  if (data.ciValue) {
+    await setDoc(doc(db, 'ci_values', data.ciValue), { uid });
   }
 }
 
@@ -70,6 +89,33 @@ export async function getUserProfile(uid: string): Promise<UserProfile | null> {
     ...d,
     createdAt: (d.createdAt as Timestamp)?.toDate() ?? new Date(),
   } as UserProfile;
+}
+
+export async function getAllUsers(): Promise<UserProfile[]> {
+  const q = query(
+    collection(db, COLLECTIONS.USERS),
+    orderBy('createdAt', 'desc')
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map(d => {
+    const data = d.data();
+    return {
+      ...data,
+      uid: d.id,
+      createdAt: (data.createdAt as Timestamp)?.toDate() ?? new Date(),
+    } as UserProfile;
+  });
+}
+
+export async function updateUserStatus(userId: string, newStatus: string, rejectionReason?: string) {
+  const userRef = doc(db, COLLECTIONS.USERS, userId);
+  const dataToUpdate: any = { status: newStatus };
+  if (newStatus === 'rejected') {
+    dataToUpdate.rejectionReason = rejectionReason || '면허증 정보가 일치하지 않거나 식별이 어렵습니다.';
+  } else if (newStatus === 'approved') {
+    dataToUpdate.rejectionReason = '';
+  }
+  await updateDoc(userRef, dataToUpdate);
 }
 
 /* ─────────────── CASES ─────────────── */
@@ -365,15 +411,36 @@ export function uploadLicenseFile(
   });
 }
 
-export async function submitLicenseForReview(userId: string, licenseUrl: string) {
+export async function submitLicenseForReview(
+  userId: string, 
+  licenseUrl: string, 
+  additionalInfo?: {
+    name?: string;
+    phoneNumber?: string;
+    hospital?: string;
+    region?: string;
+    licenseNumber?: string;
+  }
+) {
   const { serverTimestamp: st } = await import('firebase/firestore');
   const userRef = doc(db, COLLECTIONS.USERS, userId);
-  await updateDoc(userRef, {
+  
+  const updateData: any = {
     licenseUrl,
     status: 'pending',
     licenseSubmittedAt: st(),
     rejectionReason: '',
-  });
+  };
+
+  if (additionalInfo) {
+    if (additionalInfo.name) updateData.name = additionalInfo.name;
+    if (additionalInfo.phoneNumber) updateData.phoneNumber = additionalInfo.phoneNumber;
+    if (additionalInfo.hospital) updateData.hospital = additionalInfo.hospital;
+    if (additionalInfo.region) updateData.region = additionalInfo.region;
+    if (additionalInfo.licenseNumber) updateData.licenseNumber = additionalInfo.licenseNumber;
+  }
+
+  await updateDoc(userRef, updateData);
 }
 
 export function uploadGenericImage(file: File, folder: string): Promise<string> {

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Bookmark, CreditCard, Settings, ArrowDownToLine, Info, ShoppingBag } from 'lucide-react';
+import { Home, Bookmark, CreditCard, Settings, ArrowDownToLine, Info, ShoppingBag, Users } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useTranslations } from 'next-intl';
 
@@ -21,6 +21,7 @@ export default function Sidebar() {
   ];
 
   const adminItems = profile?.role === 'admin' ? [
+    { href: '/admin/users', icon: Users, label: '회원 승인' },
     { href: '/admin', icon: Settings, label: t('admin_home') },
   ] : [];
 
@@ -56,7 +57,7 @@ export default function Sidebar() {
               <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Admin</span>
             </div>
             {adminItems.map((item) => {
-              const isActive = normalizedPath === item.href || (item.href !== '/' && normalizedPath.startsWith(item.href));
+              const isActive = normalizedPath === item.href;
               const Icon = item.icon;
               return (
                 <Link

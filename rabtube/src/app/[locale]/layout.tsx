@@ -20,10 +20,10 @@ const dmSerif = DM_Serif_Display({
 
 export const metadata: Metadata = {
   title: '랩튜브 | 잠자는 임상 영상이 원장님의 새로운 수익으로',
-  description: '하드디스크에 쌓인 치과 임상 영상, AI로 편집하고 수익화하세요. 전국의 치과의사들과 노하우를 나누며 새로운 가치를 창출합니다.',
+  description: '하드디스크에 쌓인 치과 임상 영상, 동영상 올리고 전세계 치과의사 대상으로 수익화하세요. 전국의 치과의사들과 노하우를 나누며 새로운 가치를 창출합니다.',
   openGraph: {
     title: '랩튜브 | 잠자는 임상 영상이 원장님의 새로운 수익으로',
-    description: '하드디스크에 쌓인 치과 임상 영상, AI로 편집하고 수익화하세요. 전국의 치과의사들과 노하우를 나누며 새로운 가치를 창출합니다.',
+    description: '하드디스크에 쌓인 치과 임상 영상, 동영상 올리고 전세계 치과의사 대상으로 수익화하세요. 전국의 치과의사들과 노하우를 나누며 새로운 가치를 창출합니다.',
     url: 'https://www.rabtube.com',
     siteName: 'Rabtube (랩튜브)',
     images: [
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: '랩튜브 | 잠자는 임상 영상이 원장님의 새로운 수익으로',
-    description: '하드디스크에 쌓인 치과 임상 영상, AI로 편집하고 수익화하세요. 전국의 치과의사들과 노하우를 나누며 새로운 가치를 창출합니다.',
+    description: '하드디스크에 쌓인 치과 임상 영상, 동영상 올리고 전세계 치과의사 대상으로 수익화하세요. 전국의 치과의사들과 노하우를 나누며 새로운 가치를 창출합니다.',
     images: ['https://www.rabtube.com/images/og-image-dental.png'],
   },
 };

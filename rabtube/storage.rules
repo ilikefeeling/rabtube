@@ -12,6 +12,16 @@ service firebase.storage {
       allow delete: if request.auth != null && request.auth.uid == userId;
     }
 
+    // 면허증 업로드: 본인 폴더에만 업로드
+    match /licenses/{userId}/{fileName} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.size < 10 * 1024 * 1024  // 10MB 제한
+        && request.resource.contentType.matches('image/.*');
+      allow delete: if request.auth != null && request.auth.uid == userId;
+    }
+
     // 썸네일: 본인 폴더에만 업로드, 회원 전체 읽기
     match /thumbnails/{userId}/{fileName} {
       allow read: if request.auth != null;

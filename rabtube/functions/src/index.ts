@@ -23,6 +23,7 @@ import {
   confirmDuePending,
 } from './rabRewardDistributor';
 import { sendNewUserAdminAlert } from './adminNotifier';
+import { sendApprovalEmail, sendRejectionEmail } from './userNotifier';
 
 const db = admin.firestore();
 
@@ -267,4 +268,37 @@ export const onUserSignUp = functions.auth.user().onCreate(async (user) => {
   // 관리자 알림 메일 전송
   await sendNewUserAdminAlert(email, uid, displayName);
 });
+
+/* ══════════════════════════════════════════
+   9. Firestore Trigger: 유저 상태 변경 감지
+   → 정회원 승인 / 반려 시 이메일 알림 전송
+══════════════════════════════════════════ */
+
+export const onUserStatusChanged = functions.firestore
+  .document('users/{userId}')
+  .onUpdate(async (change, context) => {
+    const beforeData = change.before.data();
+    const afterData = change.after.data();
+
+    const previousStatus = beforeData.status;
+    const currentStatus = afterData.status;
+
+    // status 값이 변경되지 않았다면 무시
+    if (previousStatus === currentStatus) return;
+
+    const email = afterData.email;
+    const name = afterData.name || afterData.ciName || '회원';
+
+    if (!email) {
+      console.warn(`[UserStatus] email not found for userId=${context.params.userId}`);
+      return;
+    }
+
+    if (currentStatus === 'approved') {
+      await sendApprovalEmail(email, name);
+    } else if (currentStatus === 'rejected') {
+      const reason = afterData.rejectionReason || '면허증 정보 불일치 또는 식별 불가';
+      await sendRejectionEmail(email, name, reason);
+    }
+  });
 

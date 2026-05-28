@@ -1,38 +1,18 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
-import { AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 
 export default function LoginPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const error = searchParams.get('error');
 
-  const handleLogin = async () => {
-    const trimmedEmail = email.trim();
-    if (!trimmedEmail || !password) return;
-    setLoading(true);
-    setError('');
-    try {
-      await signInWithEmailAndPassword(auth, trimmedEmail, password);
-      router.push('/');
-    } catch (e: any) {
-      const msg: Record<string, string> = {
-        'auth/invalid-credential': '이메일 또는 비밀번호가 올바르지 않습니다',
-        'auth/user-not-found': '등록되지 않은 이메일입니다',
-        'auth/wrong-password': '비밀번호가 올바르지 않습니다',
-        'auth/too-many-requests': '너무 많은 시도입니다. 잠시 후 다시 시도해 주세요',
-      };
-      setError(msg[e.code] ?? '로그인 중 오류가 발생했습니다');
-    } finally {
-      setLoading(false);
+  const getErrorMessage = (errorCode: string) => {
+    switch (errorCode) {
+      case 'kakao_login_failed': return '카카오 로그인에 실패했습니다.';
+      case 'kakao_token_error': return '카카오 인증 토큰을 받아오지 못했습니다.';
+      case 'kakao_profile_error': return '카카오 프로필 정보를 가져오지 못했습니다.';
+      case 'server_error': return '서버 처리 중 오류가 발생했습니다.';
+      default: return '로그인 중 오류가 발생했습니다.';
     }
   };
 
@@ -40,72 +20,39 @@ export default function LoginPage() {
     <div className="min-h-screen bg-[#0d2137] flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         {/* Logo */}
-        <div className="text-center mb-8">
-          <span className="font-serif text-3xl text-white">RabTube</span>
-          <p className="text-slate-400 text-sm mt-2">치과 개원의 케이스 플랫폼</p>
+        <div className="text-center mb-10">
+          <span className="font-serif text-4xl text-white font-bold">RabTube</span>
+          <p className="text-slate-400 text-sm mt-3">치과의사 전용 임상 영상 플랫폼</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-7">
-          <h2 className="text-base font-medium text-slate-800 mb-5">로그인</h2>
+        <div className="bg-white rounded-2xl p-8 shadow-xl">
+          <h2 className="text-xl font-bold text-slate-900 mb-2 text-center">시작하기</h2>
+          <p className="text-sm text-slate-500 mb-8 text-center">
+            RabTube는 치과의사 면허 인증 후<br />이용 가능한 폐쇄형 커뮤니티입니다.
+          </p>
 
           <div className="space-y-4">
-            <div>
-              <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wide block mb-1.5">이메일</label>
-              <input
-                type="email"
-                className="input-field"
-                placeholder="doctor@example.com"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleLogin()}
-                autoComplete="username"
-              />
-            </div>
-            <div>
-              <div className="flex justify-between items-center mb-1.5">
-                <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wide block">비밀번호</label>
-                <Link href="/auth/forgot-password" className="text-[10px] text-teal-600 hover:underline">
-                  비밀번호 찾기
-                </Link>
-              </div>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  className="input-field pr-10"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && handleLogin()}
-                  autoComplete="current-password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-            </div>
-
-            {error && (
-              <div className="flex items-center gap-2 bg-red-50 text-red-600 text-xs p-3 rounded-lg">
-                <AlertCircle size={14} />
-                {error}
-              </div>
-            )}
-
-            <button onClick={handleLogin} disabled={loading} className="btn-primary w-full">
-              {loading ? '로그인 중...' : '로그인'}
+            <button
+              onClick={() => { window.location.href = '/api/auth/kakao/login'; }}
+              className="w-full flex items-center justify-center gap-3 px-4 py-3.5 rounded-xl font-bold transition-transform hover:scale-[1.02] active:scale-[0.98]"
+              style={{ backgroundColor: '#FEE500', color: '#000000' }}
+            >
+              <svg viewBox="0 0 32 32" className="w-6 h-6">
+                <path d="M16 4.64C9.23 4.64 3.75 9.1 3.75 14.6c0 3.52 2.29 6.62 5.76 8.36L8.43 27c-.06.2.02.42.2.53.18.1.4.08.56-.05l4.83-3.23c.64.09 1.3.14 1.98.14 6.77 0 12.25-4.46 12.25-9.96S22.77 4.64 16 4.64z" fill="#000000"/>
+              </svg>
+              카카오로 3초 만에 시작하기
             </button>
           </div>
 
-          <p className="text-xs text-slate-400 text-center mt-5">
-            아직 계정이 없으신가요?{' '}
-            <Link href="/auth/register" className="text-teal-600 font-medium hover:underline">
-              회원가입
-            </Link>
-          </p>
+          {error && (
+            <div className="mt-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg text-center font-medium">
+              {getErrorMessage(error)}
+            </div>
+          )}
+
+          <div className="mt-6 bg-slate-50 rounded-lg p-4 text-[11px] text-slate-500 leading-relaxed text-center">
+            가입 시 이용약관에 동의하는 것으로 간주되며,<br />치과의사 면허 인증 후 정식 활동이 가능합니다.
+          </div>
         </div>
       </div>
     </div>

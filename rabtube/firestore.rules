@@ -17,6 +17,13 @@ service cloud.firestore {
       allow update, delete: if request.auth != null && isAdmin();
     }
 
+    // ── CI Values (본인인증 중복 가입 방지 고유값 보장) ────
+    match /ci_values/{ciValue} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && isAdmin();
+    }
+
     // ── Cases ──────────────────────────────────────
     match /cases/{caseId} {
       allow read: if request.auth != null && isApproved();
