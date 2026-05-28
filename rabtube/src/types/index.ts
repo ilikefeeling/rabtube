@@ -16,6 +16,7 @@ export interface UserProfile {
   name: string;
   birthdate?: string; // 생년월일 (본인인증 기반)
   ciValue?: string;   // CI 값 (본인인증 기반, 중복가입 방지)
+  ciName?: string;    // CI 실명
   email: string;
   phoneNumber?: string;
   hospital: string;

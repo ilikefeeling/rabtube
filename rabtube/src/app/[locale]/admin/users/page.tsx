@@ -242,8 +242,8 @@ export default function AdminUsersPage() {
               <div>
                 <h3 className="text-sm font-medium text-slate-500 mb-2 flex items-center justify-between">
                   면허증 사본
-                  {selectedUser.licenseFileUrl && (
-                    <a href={selectedUser.licenseFileUrl} target="_blank" rel="noreferrer" className="text-teal-600 flex items-center gap-1 text-xs hover:underline">
+                  {selectedUser.licenseUrl && (
+                    <a href={selectedUser.licenseUrl} target="_blank" rel="noreferrer" className="text-teal-600 flex items-center gap-1 text-xs hover:underline">
                       원본 보기 <ExternalLink size={12} />
                     </a>
                   )}
