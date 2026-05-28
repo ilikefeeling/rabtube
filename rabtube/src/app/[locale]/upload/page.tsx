@@ -732,11 +732,11 @@ export default function UploadPage() {
                     </div>
                     <div className="h-px bg-amber-200/60 my-0.5 w-full"></div>
                     <div className="flex justify-between items-center pt-0.5">
-                      <span className="text-amber-800 font-bold text-[12px]">{t('upload_fee')}</span>
-                      <div className="flex items-center gap-1.5 bg-white px-2 py-1 rounded-lg border border-amber-200 shadow-sm">
-                        <Coins size={14} className="text-amber-500" />
-                        <span className="font-extrabold text-amber-600 text-[14px]">
-                          {calculateUploadFeeRab(price).toLocaleString()} <span className="text-[10px]">RAB</span>
+                      <span className="text-amber-900 font-extrabold text-base">{t('upload_fee')}</span>
+                      <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-lg border border-amber-300 shadow-md">
+                        <Coins size={18} className="text-amber-600" />
+                        <span className="font-extrabold text-amber-600 text-xl">
+                          {calculateUploadFeeRab(price).toLocaleString()} <span className="text-sm">RAB</span>
                         </span>
                       </div>
                     </div>

@@ -9,7 +9,7 @@ import Header from '@/components/Header';
 import PurchaseModal from '@/components/PurchaseModal';
 import { usePoints } from '@/hooks/usePoints';
 import { useAuth } from '@/lib/AuthContext';
-import { RAB_POLICY } from '@/types';
+import { RAB_POLICY, RAB_EXCHANGE } from '@/types';
 import type { PointTxType } from '@/types';
 
 
@@ -71,11 +71,19 @@ function PointsPageContent() {
             <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wide mb-2">
               {t('confirmed_balance')}
             </p>
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-medium text-slate-800">
-                {(balance?.balance ?? 0).toLocaleString()}
-              </span>
-              <span className="text-sm font-bold text-amber-500">RAB</span>
+            <div className="flex flex-col gap-1">
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-medium text-slate-800">
+                  {(balance?.balance ?? 0).toLocaleString()}
+                </span>
+                <span className="text-sm font-bold text-amber-500">RAB</span>
+              </div>
+              <div className="text-[11px] text-slate-500 font-medium tracking-wide">
+                ≈ $ {((balance?.balance ?? 0) * RAB_EXCHANGE.usdPerRab).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                <span className="ml-1 text-slate-400 font-normal">
+                  (약 {Math.round((balance?.balance ?? 0) * RAB_EXCHANGE.usdPerRab * 1400).toLocaleString()}원)
+                </span>
+              </div>
             </div>
             <div className="mt-3">
               <button
@@ -207,7 +215,7 @@ function PointsPageContent() {
                       {tx.amount > 0 ? '+' : ''}{tx.amount} RAB
                     </p>
                     <p className="text-[11px] text-slate-300">
-                      {t('balance_after', { amount: tx.balanceAfter.toLocaleString() })}
+                      {t('balance_after', { amount: (tx.balanceAfter ?? tx.amount ?? 0).toLocaleString() })}
                     </p>
                   </div>
                 </div>

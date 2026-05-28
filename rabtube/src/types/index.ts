@@ -250,6 +250,7 @@ export const SUBSCRIPTION_PLANS = {
 
 export const RAB_EXCHANGE = {
   krwPerRab:       10,     // 1 RAB = 10원 (참고 기준)
+  usdPerRab:       0.01988, // 1 RAB = $0.01988
   rabPerKrw1000:   90,     // ₩1,000 → 90 RAB (10% 보너스)
 } as const;
 
