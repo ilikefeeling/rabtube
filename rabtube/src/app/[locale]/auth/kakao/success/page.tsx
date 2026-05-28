@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signInWithCustomToken } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
-export default function KakaoSuccessPage() {
+function SuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
@@ -25,7 +25,7 @@ export default function KakaoSuccessPage() {
         const user = userCredential.user;
 
         // Check user status in Firestore
-        const docRef = doc(db, 'ci_values', user.uid);
+        const docRef = doc(db, 'users', user.uid);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
@@ -68,5 +68,17 @@ export default function KakaoSuccessPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function KakaoSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#0d2137] flex items-center justify-center px-4">
+        <div className="w-10 h-10 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto" />
+      </div>
+    }>
+      <SuccessContent />
+    </Suspense>
   );
 }
