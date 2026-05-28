@@ -19,22 +19,22 @@ export default function Footer() {
           --mono: 'DM Mono', monospace;
           --ease: cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .app-footer-wrapper footer { background: var(--ink); border-top: .5px solid var(--line); padding: 60px 52px 36px; }
-        .app-footer-wrapper .foot-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 56px; margin-bottom: 56px; }
-        .app-footer-wrapper .flogo { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--off); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-        .app-footer-wrapper .flogo-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); }
-        .app-footer-wrapper .fdesc { font-size: 14px; color: var(--off3); line-height: 1.7; font-weight: 300; max-width: 240px; }
-        .app-footer-wrapper .fcol-t { font-size: 11px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: var(--off3); margin-bottom: 18px; opacity: .6; }
-        .app-footer-wrapper .flinks { list-style: none; display: flex; flex-direction: column; gap: 9px; padding: 0; margin: 0; }
-        .app-footer-wrapper .flinks a { font-size: 14px; color: var(--off3); text-decoration: none; transition: color .2s; }
+        .app-footer-wrapper footer { background: var(--ink); border-top: .5px solid var(--line); padding: 40px 32px 24px; }
+        .app-footer-wrapper .foot-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 32px; margin-bottom: 32px; }
+        .app-footer-wrapper .flogo { font-family: var(--serif); font-size: 18px; font-weight: 600; color: var(--off); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .app-footer-wrapper .flogo-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--teal); }
+        .app-footer-wrapper .fdesc { font-size: 13px; color: var(--off3); line-height: 1.6; font-weight: 300; max-width: 220px; }
+        .app-footer-wrapper .fcol-t { font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--off3); margin-bottom: 12px; opacity: .6; }
+        .app-footer-wrapper .flinks { list-style: none; display: flex; flex-direction: column; gap: 6px; padding: 0; margin: 0; }
+        .app-footer-wrapper .flinks a { font-size: 13px; color: var(--off3); text-decoration: none; transition: color .2s; }
         .app-footer-wrapper .flinks a:hover { color: var(--off); }
-        .app-footer-wrapper .foot-bot { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding-top: 28px; border-top: .5px solid var(--line); }
-        .app-footer-wrapper .fcopy { font-size: 13px; color: var(--off3); opacity: .5; }
-        .app-footer-wrapper .frab { font-family: var(--mono); font-size: 11px; color: var(--gold); opacity: .5; letter-spacing: 1px; }
+        .app-footer-wrapper .foot-bot { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding-top: 16px; border-top: .5px solid var(--line); }
+        .app-footer-wrapper .fcopy { font-size: 12px; color: var(--off3); opacity: .5; }
+        .app-footer-wrapper .frab { font-family: var(--mono); font-size: 10px; color: var(--gold); opacity: .5; letter-spacing: 1px; }
 
         @media(max-width:960px) {
-          .app-footer-wrapper footer { padding: 48px 22px 28px; }
-          .app-footer-wrapper .foot-inner { grid-template-columns: 1fr 1fr; }
+          .app-footer-wrapper footer { padding: 32px 20px 20px; }
+          .app-footer-wrapper .foot-inner { grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
         }
       `}} />
       <footer>
