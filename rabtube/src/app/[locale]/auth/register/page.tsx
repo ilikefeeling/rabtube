@@ -35,17 +35,16 @@ export default function RegisterPage() {
   const handleRegister = async () => {
     const { name, email, phoneNumber, password, hospital, region, licenseNumber } = form;
     const trimmedEmail = email.trim();
-    const trimmedPassword = password.trim();
     const trimmedName = name.trim();
     const trimmedPhone = phoneNumber.trim();
     const trimmedHospital = hospital.trim();
     const trimmedLicense = licenseNumber.trim();
 
-    if (!trimmedName || !trimmedEmail || !trimmedPhone || !trimmedPassword || !trimmedHospital || !region || !trimmedLicense) {
+    if (!trimmedName || !trimmedEmail || !trimmedPhone || !password || !trimmedHospital || !region || !trimmedLicense) {
       setError('모든 항목을 입력해 주세요');
       return;
     }
-    if (trimmedPassword.length < 6) { setError('비밀번호는 6자 이상이어야 합니다'); return; }
+    if (password.length < 6) { setError('비밀번호는 6자 이상이어야 합니다'); return; }
 
     const phoneRegex = /^01[0-9]-[0-9]{3,4}-[0-9]{4}$/;
     if (!phoneRegex.test(trimmedPhone)) {
@@ -66,7 +65,7 @@ export default function RegisterPage() {
       }
 
       // 2. Auth 계정 및 프로필 생성
-      const cred = await createUserWithEmailAndPassword(auth, trimmedEmail, trimmedPassword);
+      const cred = await createUserWithEmailAndPassword(auth, trimmedEmail, password);
       await createUserProfile(cred.user.uid, {
         name: trimmedName,
         email: trimmedEmail,

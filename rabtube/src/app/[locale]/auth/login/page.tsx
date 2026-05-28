@@ -17,12 +17,11 @@ export default function LoginPage() {
 
   const handleLogin = async () => {
     const trimmedEmail = email.trim();
-    const trimmedPassword = password.trim();
-    if (!trimmedEmail || !trimmedPassword) return;
+    if (!trimmedEmail || !password) return;
     setLoading(true);
     setError('');
     try {
-      await signInWithEmailAndPassword(auth, trimmedEmail, trimmedPassword);
+      await signInWithEmailAndPassword(auth, trimmedEmail, password);
       router.push('/');
     } catch (e: any) {
       const msg: Record<string, string> = {
