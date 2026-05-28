@@ -34,14 +34,21 @@ export default function RegisterPage() {
 
   const handleRegister = async () => {
     const { name, email, phoneNumber, password, hospital, region, licenseNumber } = form;
-    if (!name || !email || !phoneNumber || !password || !hospital || !region || !licenseNumber) {
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+    const trimmedName = name.trim();
+    const trimmedPhone = phoneNumber.trim();
+    const trimmedHospital = hospital.trim();
+    const trimmedLicense = licenseNumber.trim();
+
+    if (!trimmedName || !trimmedEmail || !trimmedPhone || !trimmedPassword || !trimmedHospital || !region || !trimmedLicense) {
       setError('모든 항목을 입력해 주세요');
       return;
     }
-    if (password.length < 6) { setError('비밀번호는 6자 이상이어야 합니다'); return; }
+    if (trimmedPassword.length < 6) { setError('비밀번호는 6자 이상이어야 합니다'); return; }
 
     const phoneRegex = /^01[0-9]-[0-9]{3,4}-[0-9]{4}$/;
-    if (!phoneRegex.test(phoneNumber)) {
+    if (!phoneRegex.test(trimmedPhone)) {
       setError('올바른 휴대폰 번호 형식을 입력해 주세요 (예: 010-1234-5678)');
       return;
     }
@@ -51,7 +58,7 @@ export default function RegisterPage() {
     try {
       // 1. 휴대폰 번호 중복 가입 체크
       const { checkDuplicatePhoneNumber } = await import('@/lib/firebaseService');
-      const isDuplicate = await checkDuplicatePhoneNumber(phoneNumber);
+      const isDuplicate = await checkDuplicatePhoneNumber(trimmedPhone);
       if (isDuplicate) {
         setError('이미 가입된 휴대폰 번호입니다');
         setLoading(false);
@@ -59,8 +66,15 @@ export default function RegisterPage() {
       }
 
       // 2. Auth 계정 및 프로필 생성
-      const cred = await createUserWithEmailAndPassword(auth, email, password);
-      await createUserProfile(cred.user.uid, { name, email, phoneNumber, hospital, region, licenseNumber });
+      const cred = await createUserWithEmailAndPassword(auth, trimmedEmail, trimmedPassword);
+      await createUserProfile(cred.user.uid, {
+        name: trimmedName,
+        email: trimmedEmail,
+        phoneNumber: trimmedPhone,
+        hospital: trimmedHospital,
+        region,
+        licenseNumber: trimmedLicense,
+      });
       
       alert('회원가입 신청이 완료되었습니다. 관리자 승인 후 서비스 이용이 가능합니다.');
       router.push('/');
