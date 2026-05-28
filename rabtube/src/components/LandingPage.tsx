@@ -1002,31 +1002,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer>
-        <div className="foot-inner">
-          <div>
-            <div className="flogo"><span className="flogo-dot"></span>RabTube</div>
-            <p className="fdesc">{t('foot_desc')}</p>
-          </div>
-          <div>
-            <div className="fcol-t">{t('foot_c1_t')}</div>
-            <ul className="flinks"><li><a href="#">{t('foot_c1_l1')}</a></li><li><a href="#">{t('foot_c1_l2')}</a></li><li><a href="#">{t('foot_c1_l3')}</a></li><li><a href="#">{t('foot_c1_l4')}</a></li></ul>
-          </div>
-          <div>
-            <div className="fcol-t">{t('foot_c2_t')}</div>
-            <ul className="flinks"><li><a href="#">{t('foot_c2_l1')}</a></li><li><a href="#">{t('foot_c2_l2')}</a></li><li><a href="#">{t('foot_c2_l3')}</a></li><li><a href="#">{t('foot_c2_l4')}</a></li></ul>
-          </div>
-          <div>
-            <div className="fcol-t">{t('foot_c3_t')}</div>
-            <ul className="flinks"><li><a href="#">{t('foot_c3_l1')}</a></li><li><a href="#">{t('foot_c3_l2')}</a></li><li><a href="#">{t('foot_c3_l3')}</a></li><li><a href="#">{t('foot_c3_l4')}</a></li></ul>
-          </div>
-        </div>
-        <div className="foot-bot">
-          <div className="fcopy">{t('foot_copy')}</div>
-          <div className="frab">{t('foot_rab')}</div>
-        </div>
-      </footer>
+
     </div>
   );
 }

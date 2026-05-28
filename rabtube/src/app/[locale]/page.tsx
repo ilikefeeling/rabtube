@@ -76,10 +76,10 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      <div className="flex flex-1 overflow-hidden">
+    <div className="bg-white flex flex-col h-full">
+      <div className="flex flex-1">
         {/* Main Content Area */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1">
           {/* Filter Bar */}
           <div className="bg-white sticky top-0 z-30 pb-2 pt-3">
             <div className="px-4 sm:px-6">

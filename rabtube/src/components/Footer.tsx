@@ -1,0 +1,65 @@
+'use client';
+import { useTranslations } from 'next-intl';
+
+export default function Footer() {
+  const t = useTranslations('Landing');
+
+  return (
+    <div className="app-footer-wrapper">
+      <style dangerouslySetInnerHTML={{ __html: `
+        .app-footer-wrapper {
+          --ink:#07121b;
+          --teal:#0ec28e;
+          --gold:#c8a84a;
+          --off:#f0ebe2;--off2:#ccc5b8;--off3:#8a9aaa;
+          --line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.12);
+          --serif: 'Cormorant Garamond', 'DM Serif Display', serif;
+          --sans: 'DM Sans', sans-serif;
+          --mono: 'DM Mono', monospace;
+          --ease: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .app-footer-wrapper footer { background: var(--ink); border-top: .5px solid var(--line); padding: 60px 52px 36px; }
+        .app-footer-wrapper .foot-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 56px; margin-bottom: 56px; }
+        .app-footer-wrapper .flogo { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--off); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .app-footer-wrapper .flogo-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); }
+        .app-footer-wrapper .fdesc { font-size: 14px; color: var(--off3); line-height: 1.7; font-weight: 300; max-width: 240px; }
+        .app-footer-wrapper .fcol-t { font-size: 11px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: var(--off3); margin-bottom: 18px; opacity: .6; }
+        .app-footer-wrapper .flinks { list-style: none; display: flex; flex-direction: column; gap: 9px; padding: 0; margin: 0; }
+        .app-footer-wrapper .flinks a { font-size: 14px; color: var(--off3); text-decoration: none; transition: color .2s; }
+        .app-footer-wrapper .flinks a:hover { color: var(--off); }
+        .app-footer-wrapper .foot-bot { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding-top: 28px; border-top: .5px solid var(--line); }
+        .app-footer-wrapper .fcopy { font-size: 13px; color: var(--off3); opacity: .5; }
+        .app-footer-wrapper .frab { font-family: var(--mono); font-size: 11px; color: var(--gold); opacity: .5; letter-spacing: 1px; }
+
+        @media(max-width:960px) {
+          .app-footer-wrapper footer { padding: 48px 22px 28px; }
+          .app-footer-wrapper .foot-inner { grid-template-columns: 1fr 1fr; }
+        }
+      `}} />
+      <footer>
+        <div className="foot-inner">
+          <div>
+            <div className="flogo"><span className="flogo-dot"></span>RabTube</div>
+            <p className="fdesc">{t('foot_desc')}</p>
+          </div>
+          <div>
+            <div className="fcol-t">{t('foot_c1_t')}</div>
+            <ul className="flinks"><li><a href="#">{t('foot_c1_l1')}</a></li><li><a href="#">{t('foot_c1_l2')}</a></li><li><a href="#">{t('foot_c1_l3')}</a></li><li><a href="#">{t('foot_c1_l4')}</a></li></ul>
+          </div>
+          <div>
+            <div className="fcol-t">{t('foot_c2_t')}</div>
+            <ul className="flinks"><li><a href="#">{t('foot_c2_l1')}</a></li><li><a href="#">{t('foot_c2_l2')}</a></li><li><a href="#">{t('foot_c2_l3')}</a></li><li><a href="#">{t('foot_c2_l4')}</a></li></ul>
+          </div>
+          <div>
+            <div className="fcol-t">{t('foot_c3_t')}</div>
+            <ul className="flinks"><li><a href="#">{t('foot_c3_l1')}</a></li><li><a href="#">{t('foot_c3_l2')}</a></li><li><a href="#">{t('foot_c3_l3')}</a></li><li><a href="#">{t('foot_c3_l4')}</a></li></ul>
+          </div>
+        </div>
+        <div className="foot-bot">
+          <div className="fcopy">{t('foot_copy')}</div>
+          <div className="frab">{t('foot_rab')}</div>
+        </div>
+      </footer>
+    </div>
+  );
+}
