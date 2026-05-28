@@ -10,6 +10,7 @@
  * 6. onAdminQualityOverride HTTP callable → 관리자 수동 판정
  */
 
+import './init';
 import * as functions from 'firebase-functions';
 import * as admin     from 'firebase-admin';
 import { runQualityCheck }             from './aiQualityChecker';
@@ -21,8 +22,8 @@ import {
   applyPenalty,
   confirmDuePending,
 } from './rabRewardDistributor';
+import { sendNewUserAdminAlert } from './adminNotifier';
 
-admin.initializeApp();
 const db = admin.firestore();
 
 /* ══════════════════════════════════════════
@@ -253,3 +254,17 @@ export const adminOverrideQuality = functions.https.onCall(
     return { success: true };
   }
 );
+
+/* ══════════════════════════════════════════
+   8. Auth Trigger: 신규 회원가입 감지
+   → 관리자에게 이메일 알림 전송
+══════════════════════════════════════════ */
+
+export const onUserSignUp = functions.auth.user().onCreate(async (user) => {
+  const { email, uid, displayName } = user;
+  console.log(`[AuthTrigger] 신규 회원가입 감지: uid=${uid}, email=${email}`);
+  
+  // 관리자 알림 메일 전송
+  await sendNewUserAdminAlert(email, uid, displayName);
+});
+
