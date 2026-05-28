@@ -1,5 +1,6 @@
 'use client';
 import { useTranslations } from 'next-intl';
+import Link from 'next/link';
 
 export default function Footer() {
   const t = useTranslations('Landing');
@@ -44,15 +45,30 @@ export default function Footer() {
           </div>
           <div>
             <div className="fcol-t">{t('foot_c1_t')}</div>
-            <ul className="flinks"><li><a href="#">{t('foot_c1_l1')}</a></li><li><a href="#">{t('foot_c1_l2')}</a></li><li><a href="#">{t('foot_c1_l3')}</a></li><li><a href="#">{t('foot_c1_l4')}</a></li></ul>
+            <ul className="flinks">
+              <li><Link href="/">{t('foot_c1_l1')}</Link></li>
+              <li><Link href="/upload">{t('foot_c1_l2')}</Link></li>
+              <li><Link href="/my">{t('foot_c1_l3')}</Link></li>
+              <li><Link href="/billing">{t('foot_c1_l4')}</Link></li>
+            </ul>
           </div>
           <div>
             <div className="fcol-t">{t('foot_c2_t')}</div>
-            <ul className="flinks"><li><a href="#">{t('foot_c2_l1')}</a></li><li><a href="#">{t('foot_c2_l2')}</a></li><li><a href="#">{t('foot_c2_l3')}</a></li><li><a href="#">{t('foot_c2_l4')}</a></li></ul>
+            <ul className="flinks">
+              <li><Link href="/about">{t('foot_c2_l1')}</Link></li>
+              <li><Link href="/about">{t('foot_c2_l2')}</Link></li>
+              <li><Link href="/about">{t('foot_c2_l3')}</Link></li>
+              <li><Link href="/about">{t('foot_c2_l4')}</Link></li>
+            </ul>
           </div>
           <div>
             <div className="fcol-t">{t('foot_c3_t')}</div>
-            <ul className="flinks"><li><a href="#">{t('foot_c3_l1')}</a></li><li><a href="#">{t('foot_c3_l2')}</a></li><li><a href="#">{t('foot_c3_l3')}</a></li><li><a href="#">{t('foot_c3_l4')}</a></li></ul>
+            <ul className="flinks">
+              <li><Link href="/about">{t('foot_c3_l1')}</Link></li>
+              <li><Link href="#">{t('foot_c3_l2')}</Link></li>
+              <li><Link href="#">{t('foot_c3_l3')}</Link></li>
+              <li><a href="mailto:support@rabtube.com">{t('foot_c3_l4')}</a></li>
+            </ul>
           </div>
         </div>
         <div className="foot-bot">
