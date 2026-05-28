@@ -249,9 +249,9 @@ export default function AdminUsersPage() {
                   )}
                 </h3>
                 <div className="bg-slate-100 rounded-xl overflow-hidden aspect-[3/4] flex items-center justify-center border border-slate-200 relative">
-                  {selectedUser.licenseFileUrl ? (
+                  {selectedUser.licenseUrl ? (
                     <img 
-                      src={selectedUser.licenseFileUrl} 
+                      src={selectedUser.licenseUrl} 
                       alt="면허증 사본" 
                       className="w-full h-full object-contain"
                     />
