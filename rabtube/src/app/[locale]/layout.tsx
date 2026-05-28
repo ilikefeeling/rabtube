@@ -19,8 +19,30 @@ const dmSerif = DM_Serif_Display({
 });
 
 export const metadata: Metadata = {
-  title: 'Rabtube - 치과 케이스 플랫폼',
-  description: '치과 개원의를 위한 전문 케이스 영상 커뮤니티',
+  title: '랩튜브 | 잠자는 임상 영상이 원장님의 새로운 수익으로',
+  description: '하드디스크에 쌓인 치과 임상 영상, AI로 편집하고 수익화하세요. 전국의 치과의사들과 노하우를 나누며 새로운 가치를 창출합니다.',
+  openGraph: {
+    title: '랩튜브 | 잠자는 임상 영상이 원장님의 새로운 수익으로',
+    description: '하드디스크에 쌓인 치과 임상 영상, AI로 편집하고 수익화하세요. 전국의 치과의사들과 노하우를 나누며 새로운 가치를 창출합니다.',
+    url: 'https://www.rabtube.com',
+    siteName: 'Rabtube (랩튜브)',
+    images: [
+      {
+        url: 'https://www.rabtube.com/images/og-image-dental.png',
+        width: 1200,
+        height: 630,
+        alt: '치과의사를 위한 임상 영상 수익화 플랫폼, 랩튜브',
+      },
+    ],
+    locale: 'ko_KR',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: '랩튜브 | 잠자는 임상 영상이 원장님의 새로운 수익으로',
+    description: '하드디스크에 쌓인 치과 임상 영상, AI로 편집하고 수익화하세요. 전국의 치과의사들과 노하우를 나누며 새로운 가치를 창출합니다.',
+    images: ['https://www.rabtube.com/images/og-image-dental.png'],
+  },
 };
 
 // Force Next.js App Router to generate individual static layouts for both ko and en
