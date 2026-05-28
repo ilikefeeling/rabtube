@@ -706,6 +706,12 @@ export default function LandingPage() {
                     </span>
                     <span className="crm-unit">RAB</span>
                   </div>
+                  <div style={{ fontSize: '13px', color: 'var(--off3)', marginTop: '8px', fontFamily: 'var(--mono)' }}>
+                    ≈ $ {(Math.max(0, Math.round(netRab - (uploads * getUploadFeeRab(casePrice)))) * 0.01988).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    <span style={{ marginLeft: '4px', opacity: 0.7, fontFamily: 'var(--sans)' }}>
+                      (약 {Math.round(Math.max(0, Math.round(netRab - (uploads * getUploadFeeRab(casePrice)))) * 0.01988 * 1400).toLocaleString()}원)
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

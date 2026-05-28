@@ -150,17 +150,24 @@ export default function MarketplacePage() {
             ) : (
               requests.map(req => (
                 <div key={req.id} className="border rounded-lg p-5 bg-white flex justify-between items-start">
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded font-medium">{req.category}</span>
-                      <span className={`px-2 py-1 text-xs rounded font-medium ${req.status === 'LISTED' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                        {req.status === 'LISTED' ? t('listed') : req.status === 'REVIEWING' ? t('reviewing') : t('surveying')}
-                      </span>
-                    </div>
-                    <h3 className="font-bold text-lg text-gray-900 mb-1">{req.title}</h3>
-                    <p className="text-sm text-gray-600 mb-2">{req.description}</p>
-                    <div className="text-xs text-gray-500">
-                      {t('preferredBrand')}: {req.preferredBrand || t('any')} | {t('estQuantity')}: {req.quantity}{req.unit} | {new Date(req.createdAt).toLocaleDateString()}
+                  <div className="flex gap-4 items-start">
+                    {req.imageUrl && (
+                      <div className="w-24 h-24 flex-shrink-0 bg-gray-50 rounded-md overflow-hidden border border-gray-100">
+                        <img src={req.imageUrl} alt={req.title} className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded font-medium">{req.category}</span>
+                        <span className={`px-2 py-1 text-xs rounded font-medium ${req.status === 'LISTED' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                          {req.status === 'LISTED' ? t('listed') : req.status === 'REVIEWING' ? t('reviewing') : t('surveying')}
+                        </span>
+                      </div>
+                      <h3 className="font-bold text-lg text-gray-900 mb-1">{req.title}</h3>
+                      <p className="text-sm text-gray-600 mb-2">{req.description}</p>
+                      <div className="text-xs text-gray-500">
+                        {t('preferredBrand')}: {req.preferredBrand || t('any')} | {t('estQuantity')}: {req.quantity}{req.unit} | {new Date(req.createdAt).toLocaleDateString()}
+                      </div>
                     </div>
                   </div>
                   <div className="flex flex-col items-center">
