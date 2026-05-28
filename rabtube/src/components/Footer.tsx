@@ -9,11 +9,14 @@ export default function Footer() {
     <div className="app-footer-wrapper">
       <style dangerouslySetInnerHTML={{ __html: `
         .app-footer-wrapper {
-          --ink:#07121b;
-          --teal:#0ec28e;
-          --gold:#c8a84a;
-          --off:#f0ebe2;--off2:#ccc5b8;--off3:#8a9aaa;
-          --line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.12);
+          --ink: transparent;
+          --teal: #0f766e;
+          --gold: #d97706;
+          --off: #334155;
+          --off2: #475569;
+          --off3: #64748b;
+          --line: #e2e8f0;
+          --line2: #cbd5e1;
           --serif: 'Cormorant Garamond', 'DM Serif Display', serif;
           --sans: 'DM Sans', sans-serif;
           --mono: 'DM Mono', monospace;
