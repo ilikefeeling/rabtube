@@ -16,34 +16,37 @@ export function getAdminApp(): admin.app.App {
   const privateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY;
 
   if (projectId && clientEmail && privateKey) {
-    // Parse private key: handle quotes, JSON encoding, and escaped newlines
     let parsedKey = privateKey;
+    let finalProjectId = projectId;
+    let finalClientEmail = clientEmail;
     
-    // Debug: log the first/last 30 chars to understand the format (no sensitive data)
-    console.log('PRIVATE_KEY debug - length:', parsedKey.length);
-    console.log('PRIVATE_KEY debug - first 40 chars:', JSON.stringify(parsedKey.substring(0, 40)));
-    console.log('PRIVATE_KEY debug - last 40 chars:', JSON.stringify(parsedKey.substring(parsedKey.length - 40)));
-    
-    // If the entire value is JSON-encoded (wrapped in quotes), parse it
-    if (parsedKey.startsWith('"') && parsedKey.endsWith('"')) {
+    // Case 1: User pasted the ENTIRE service account JSON file as the env var
+    if (parsedKey.trimStart().startsWith('{')) {
       try {
-        parsedKey = JSON.parse(parsedKey);
+        const serviceAccount = JSON.parse(parsedKey);
+        parsedKey = serviceAccount.private_key || '';
+        finalProjectId = serviceAccount.project_id || projectId;
+        finalClientEmail = serviceAccount.client_email || clientEmail;
       } catch {
-        // If JSON.parse fails, just strip the quotes manually
-        parsedKey = parsedKey.slice(1, -1);
+        console.error('FIREBASE_ADMIN_PRIVATE_KEY looks like JSON but failed to parse');
       }
+    } else {
+      // Case 2: User pasted just the private_key value (possibly JSON-encoded with quotes)
+      if (parsedKey.startsWith('"') && parsedKey.endsWith('"')) {
+        try {
+          parsedKey = JSON.parse(parsedKey);
+        } catch {
+          parsedKey = parsedKey.slice(1, -1);
+        }
+      }
+      // Replace literal \n with actual newlines
+      parsedKey = parsedKey.replace(/\\n/g, '\n');
     }
-    
-    // Replace literal \n with actual newlines
-    parsedKey = parsedKey.replace(/\\n/g, '\n');
-    
-    console.log('PRIVATE_KEY debug - starts with BEGIN:', parsedKey.startsWith('-----BEGIN'));
-    console.log('PRIVATE_KEY debug - contains real newlines:', parsedKey.includes('\n'));
     
     return admin.initializeApp({
       credential: admin.credential.cert({
-        projectId,
-        clientEmail,
+        projectId: finalProjectId,
+        clientEmail: finalClientEmail,
         privateKey: parsedKey,
       }),
       storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
