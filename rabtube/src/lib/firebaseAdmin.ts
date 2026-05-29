@@ -16,11 +16,35 @@ export function getAdminApp(): admin.app.App {
   const privateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY;
 
   if (projectId && clientEmail && privateKey) {
+    // Parse private key: handle quotes, JSON encoding, and escaped newlines
+    let parsedKey = privateKey;
+    
+    // Debug: log the first/last 30 chars to understand the format (no sensitive data)
+    console.log('PRIVATE_KEY debug - length:', parsedKey.length);
+    console.log('PRIVATE_KEY debug - first 40 chars:', JSON.stringify(parsedKey.substring(0, 40)));
+    console.log('PRIVATE_KEY debug - last 40 chars:', JSON.stringify(parsedKey.substring(parsedKey.length - 40)));
+    
+    // If the entire value is JSON-encoded (wrapped in quotes), parse it
+    if (parsedKey.startsWith('"') && parsedKey.endsWith('"')) {
+      try {
+        parsedKey = JSON.parse(parsedKey);
+      } catch {
+        // If JSON.parse fails, just strip the quotes manually
+        parsedKey = parsedKey.slice(1, -1);
+      }
+    }
+    
+    // Replace literal \n with actual newlines
+    parsedKey = parsedKey.replace(/\\n/g, '\n');
+    
+    console.log('PRIVATE_KEY debug - starts with BEGIN:', parsedKey.startsWith('-----BEGIN'));
+    console.log('PRIVATE_KEY debug - contains real newlines:', parsedKey.includes('\n'));
+    
     return admin.initializeApp({
       credential: admin.credential.cert({
         projectId,
         clientEmail,
-        privateKey: privateKey.replace(/\\n/g, '\n').replace(/^"|"$/g, ''),
+        privateKey: parsedKey,
       }),
       storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
     });
