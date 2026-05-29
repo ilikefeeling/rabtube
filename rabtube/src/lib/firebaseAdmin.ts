@@ -20,7 +20,7 @@ export function getAdminApp(): admin.app.App {
       credential: admin.credential.cert({
         projectId,
         clientEmail,
-        privateKey: privateKey.replace(/\\n/g, '\n'),
+        privateKey: privateKey.replace(/\\n/g, '\n').replace(/^"|"$/g, ''),
       }),
       storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
     });
