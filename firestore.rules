@@ -1,0 +1,147 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Users ──────────────────────────────────────
+    match /users/{userId} {
+      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow delete: if request.auth != null && isAdmin();
+    }
+
+    // ── Phone Numbers (중복 가입 방지 고유값 보장) ────
+    match /phone_numbers/{phoneNumber} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && isAdmin();
+    }
+
+    // ── CI Values (본인인증 중복 가입 방지 고유값 보장) ────
+    match /ci_values/{ciValue} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && isAdmin();
+    }
+
+    // ── Cases ──────────────────────────────────────
+    match /cases/{caseId} {
+      allow read: if true;  // 비로그인 유저도 피드 탐색 허용
+      allow create: if request.auth != null && isApproved()
+        && request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null && (
+        resource.data.userId == request.auth.uid
+        || (isApproved() && onlyUpdating(['likes', 'views']))
+      );
+      allow delete: if request.auth != null
+        && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // ── RAB 잔액 ──────────────────────────────────
+    match /rab_balances/{userId} {
+      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow write: if request.auth != null && (request.auth.uid == userId || isAdmin());
+    }
+
+    // ── RAB 트랜잭션 ──────────────────────────────
+    match /rab_transactions/{txId} {
+      allow read: if request.auth != null
+        && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if request.auth != null
+        && (request.resource.data.userId == request.auth.uid || isAdmin());
+      allow update: if request.auth != null
+        && (resource.data.userId == request.auth.uid || isAdmin())
+        && onlyUpdating(['status']);
+      allow delete: if false;
+    }
+
+    // ── 품질 검수 결과 ────────────────────────────
+    match /quality_checks/{caseId} {
+      // 케이스 소유자 + 관리자만 읽기
+      allow read: if request.auth != null && (
+        get(/databases/$(database)/documents/cases/$(caseId)).data.userId == request.auth.uid
+        || isAdmin()
+      );
+      // 쓰기는 Cloud Functions (서버) 전용
+      allow write: if false;
+    }
+
+    // ── 신고 ─────────────────────────────────────
+    match /case_reports/{reportId} {
+      allow create: if request.auth != null && isApproved()
+        && request.resource.data.reporterUserId == request.auth.uid;
+      allow read: if request.auth != null && isAdmin();
+      allow update, delete: if false;
+    }
+
+    // ── 구독 정보 ────────────────────────────────
+    match /subscriptions/{userId} {
+      allow read:  if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow write: if false; // 서버(webhook/API)만 쓰기
+    }
+
+    // ── 결제 내역 ─────────────────────────────────
+    match /payments/{paymentId} {
+      allow read: if request.auth != null
+        && resource.data.userId == request.auth.uid;
+      allow write: if false; // 서버만 쓰기
+    }
+
+    // ── RAB 환전 신청 ─────────────────────────────
+    match /rab_cashouts/{cashoutId} {
+      allow read: if request.auth != null && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
+      allow create: if request.auth != null
+        && request.resource.data.userId == request.auth.uid;
+      allow update: if request.auth != null && isAdmin();
+      allow delete: if false;
+    }
+
+    // ── Settings ──────────────────────────────────
+    match /settings/{settingId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && isAdmin();
+    }
+
+    // ── Shop Products ─────────────────────────────
+    match /shop_products/{productId} {
+      allow read: if true;
+      allow write: if request.auth != null && isAdmin();
+    }
+
+    // ── Shop Orders ───────────────────────────────
+    match /shop_orders/{orderId} {
+      allow read: if request.auth != null && (resource.data.buyerId == request.auth.uid || isAdmin());
+      allow create: if request.auth != null && request.resource.data.buyerId == request.auth.uid;
+      allow update: if request.auth != null && (resource.data.buyerId == request.auth.uid || isAdmin());
+      allow delete: if request.auth != null && isAdmin();
+    }
+
+    // ── Product Requests ──────────────────────────
+    match /product_requests/{requestId} {
+      allow read: if true;
+      allow create: if request.auth != null && request.resource.data.requesterId == request.auth.uid;
+      allow update: if request.auth != null && (
+        resource.data.requesterId == request.auth.uid 
+        || isAdmin() 
+        || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upvoteCount', 'upvoterIds', 'updatedAt'])
+      );
+      allow delete: if request.auth != null && (resource.data.requesterId == request.auth.uid || isAdmin());
+    }
+
+    function isAdmin() {
+      return request.auth != null && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    function isApproved() {
+      return request.auth != null && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'approved';
+    }
+    function onlyUpdating(fields) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(fields);
+    }
+  }
+}

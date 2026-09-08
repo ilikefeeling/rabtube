@@ -1,0 +1,47 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // 영상 파일: 본인 폴더에만 업로드, 승인된 회원 전체 읽기
+    match /videos/{userId}/{fileName} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.size < 2 * 1024 * 1024 * 1024  // 2GB 제한
+        && request.resource.contentType.matches('video/.*');
+      allow delete: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // 면허증 업로드: 본인 폴더에만 업로드
+    match /licenses/{userId}/{fileName} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.size < 10 * 1024 * 1024  // 10MB 제한
+        && request.resource.contentType.matches('image/.*');
+      allow delete: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // 썸네일: 본인 폴더에만 업로드, 회원 전체 읽기
+    match /thumbnails/{userId}/{fileName} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.size < 10 * 1024 * 1024  // 10MB 제한
+        && request.resource.contentType.matches('image/.*');
+      allow delete: if request.auth != null && request.auth.uid == userId;
+    } match /thumbnails/{fileName} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // 상품 등록 요청 이미지 첨부
+    match /product_requests/{fileName} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null
+        && request.resource.size < 10 * 1024 * 1024  // 10MB 제한
+        && request.resource.contentType.matches('image/.*');
+      allow delete: if request.auth != null;
+    }
+  }
+}
