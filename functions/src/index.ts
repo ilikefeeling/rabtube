@@ -12,8 +12,8 @@
 
 import './init';
 import * as functions from 'firebase-functions';
-import * as admin     from 'firebase-admin';
-import { runQualityCheck }             from './aiQualityChecker';
+import * as admin from 'firebase-admin';
+import { runQualityCheck } from './aiQualityChecker';
 import { updateCommunityScore, handleReport, calculateReward } from './qualityScorer';
 import { generateThumbnail, getVideoDuration } from './thumbnailGenerator';
 import {
@@ -22,7 +22,7 @@ import {
   applyPenalty,
   confirmDuePending,
 } from './rabRewardDistributor';
-import { sendNewUserAdminAlert } from './adminNotifier';
+import { sendNewUserAdminAlert, sendPendingReviewAdminAlert } from './adminNotifier';
 import { sendApprovalEmail, sendRejectionEmail } from './userNotifier';
 
 const db = admin.firestore();
@@ -36,7 +36,7 @@ export const onVideoUploaded = functions
   .runWith({ timeoutSeconds: 540, memory: '2GB' })
   .storage.object()
   .onFinalize(async (object) => {
-    const filePath    = object.name ?? '';
+    const filePath = object.name ?? '';
     const contentType = object.contentType ?? '';
 
     // videos/ 경로의 영상 파일만 처리
@@ -67,8 +67,8 @@ export const onVideoUploaded = functions
       // ③ 케이스 상태 업데이트
       const verdict = quality?.verdict ?? 'review';
       await db.collection('cases').doc(caseId).update({
-        qualityVerdict:  verdict,
-        qualityScore:    quality?.score ?? 0,
+        qualityVerdict: verdict,
+        qualityScore: quality?.score ?? 0,
         qualityCheckedAt: admin.firestore.FieldValue.serverTimestamp(),
         ...(verdict === 'fail' ? { visibility: '비공개' } : {}),
       });
@@ -94,9 +94,9 @@ export const onVideoUploaded = functions
 export const onCaseCreated = functions
   .firestore.document('cases/{caseId}')
   .onCreate(async (snap, context) => {
-    const caseId   = context.params.caseId;
+    const caseId = context.params.caseId;
     const caseData = snap.data();
-    const userId   = caseData.userId;
+    const userId = caseData.userId;
     if (!userId) return;
 
     // 업로더 정보 조회
@@ -119,9 +119,9 @@ export const onCaseCreated = functions
 export const onQualityChecked = functions
   .firestore.document('quality_checks/{caseId}')
   .onWrite(async (change, context) => {
-    const caseId  = context.params.caseId;
-    const after   = change.after.data();
-    const before  = change.before.data();
+    const caseId = context.params.caseId;
+    const after = change.after.data();
+    const before = change.before.data();
     if (!after) return;
 
     const verdictChanged =
@@ -130,7 +130,7 @@ export const onQualityChecked = functions
     if (!verdictChanged) return;
 
     const verdict = after.verdict as string;
-    const score   = after.score ?? 0;
+    const score = after.score ?? 0;
 
     // 케이스 소유자 조회
     const caseSnap = await db.collection('cases').doc(caseId).get();
@@ -156,10 +156,10 @@ export const onQualityChecked = functions
 export const onReportCreated = functions
   .firestore.document('case_reports/{reportId}')
   .onCreate(async (snap, context) => {
-    const data          = snap.data();
-    const caseId        = data.caseId;
+    const data = snap.data();
+    const caseId = data.caseId;
     const reporterUserId = data.reporterUserId;
-    const reason        = data.reason ?? '사유 없음';
+    const reason = data.reason ?? '사유 없음';
 
     const result = await handleReport(caseId, reporterUserId, reason);
     console.log(`[Report] caseId=${caseId} flags=${result.flagCount} autoHidden=${result.autoHidden}`);
@@ -264,22 +264,23 @@ export const adminOverrideQuality = functions.https.onCall(
 export const onUserSignUp = functions.auth.user().onCreate(async (user) => {
   const { email, uid, displayName } = user;
   console.log(`[AuthTrigger] 신규 회원가입 감지: uid=${uid}, email=${email}`);
-  
+
   // 관리자 알림 메일 전송
   await sendNewUserAdminAlert(email, uid, displayName);
 });
 
 /* ══════════════════════════════════════════
    9. Firestore Trigger: 유저 상태 변경 감지
-   → 정회원 승인 / 반려 시 이메일 알림 전송
+   → 대기중 전환 시 관리자 알림 / 정회원 승인 및 반려 시 유저 알림
 ══════════════════════════════════════════ */
 
 export const onUserStatusChanged = functions.firestore
   .document('users/{userId}')
-  .onUpdate(async (change, context) => {
-    const beforeData = change.before.data();
+  .onWrite(async (change, context) => {
     const afterData = change.after.data();
+    if (!afterData) return; // 문서 삭제 시 무시
 
+    const beforeData = change.before.data() || {};
     const previousStatus = beforeData.status;
     const currentStatus = afterData.status;
 
@@ -289,6 +290,22 @@ export const onUserStatusChanged = functions.firestore
     const email = afterData.email;
     const name = afterData.name || afterData.ciName || '회원';
 
+    // 1. 회원가입 신청(면허증 제출 등)으로 대기중(pending) 전환 시 최고관리자에게 알림 메일 전송
+    if (currentStatus === 'pending') {
+      await sendPendingReviewAdminAlert({
+        uid: context.params.userId,
+        email: email,
+        name: name,
+        phoneNumber: afterData.phoneNumber || afterData.phone,
+        hospital: afterData.hospital || afterData.hospitalName,
+        region: afterData.region,
+        licenseNumber: afterData.licenseNumber,
+        licenseUrl: afterData.licenseUrl,
+      });
+      return;
+    }
+
+    // 2. 승인 또는 반려 시 유저에게 이메일 알림 전송
     if (!email) {
       console.warn(`[UserStatus] email not found for userId=${context.params.userId}`);
       return;
